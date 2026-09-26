@@ -1,0 +1,29 @@
+{
+  "skill_name": "human-readable",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Can you polish this PR description? It sounds very AI-generated right now:\n\n'In this PR, we delve into the core retry logic to ensure robust performance across the fleet. The insight: the worker already tracks failure counts — never blindly retrying on failure. We eliminated redundant API calls, streamlined database interactions, and fostered better worker isolation. The queue is the real missing piece. At the end of the day, this unlocks unprecedented reliability for our distributed workers.'",
+      "expected_output": "A direct, clear, human-authored PR description that removes throat-clearing, cliches ('delve', 'unlocks unprecedented reliability', 'fostered'), antithesis halves, restatement tails, and em-dash staging.",
+      "files": [],
+      "assertions": [
+        "Does not contain LLM cliches like 'delve', 'fostered', 'unprecedented', or 'at the end of the day'",
+        "Eliminates staccato/antithesis fragments like 'The insight:' or '— never blindly retrying'",
+        "Removes restatement tail ('The queue is the real missing piece.')",
+        "Retains exact technical meaning: retry logic using existing worker failure counts to prevent blind retries and reduce duplicate API/DB calls"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Rewrite this announcement draft to make it sound like a real human engineer wrote it, not an AI:\n\n'Today, we are thrilled to unveil our new background worker architecture — a crucial milestone in our journey. Our workers process millions of jobs with genuine efficiency — retries, timeouts, and edge cases. No new flags, no extra overhead. The worker ID is the whole signal. While not a silver bullet, it represents a testament to our team's hard work.'",
+      "expected_output": "A grounded announcement that strips artificial hype, intensifiers ('genuine efficiency'), fake humility ('While not a silver bullet'), and em-dash lists.",
+      "files": [],
+      "assertions": [
+        "Removes corporate/AI hype words like 'thrilled to unveil', 'crucial milestone', 'testament'",
+        "Replaces em dash before list ('— retries, timeouts, and edge cases.') with a colon or natural sentence",
+        "Converts staccato fragment ('The worker ID is the whole signal.') into a natural connective clause",
+        "Maintains clear, humble, engineering-focused tone"
+      ]
+    }
+  ]
+}

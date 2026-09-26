@@ -9,6 +9,7 @@ A collection of agent skills designed, authored, and maintained according to the
 | Skill | Description |
 | :--- | :--- |
 | [skill-architect](./skill-architect/SKILL.md) | Designs, scaffolds, evaluates, and refines agent skills according to the Open Skills specification and Antigravity guidelines. |
+| [human-readable](./human-readable/SKILL.md) | Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from drafts to make them sound natural and human-authored. |
 
 ---
 
