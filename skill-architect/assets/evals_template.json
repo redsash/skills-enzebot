@@ -1,0 +1,16 @@
+{
+  "skill_name": "[skill-name]",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "[Realistic user prompt including paths, parameters, or conversational detail]",
+      "expected_output": "[Human-readable description of what a successful result looks like]",
+      "files": [],
+      "assertions": [
+        "[Objective verifiable check: e.g. Generated file exists and is valid JSON]",
+        "[Observable structure check: e.g. Contains required sections]",
+        "[Content check: e.g. Handles edge case X without error]"
+      ]
+    }
+  ]
+}
