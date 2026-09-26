@@ -12,6 +12,7 @@ A collection of agent skills designed, authored, and maintained according to the
 | [human-readable](./human-readable/SKILL.md) | Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from drafts to make them sound natural and human-authored. |
 | [deeply-investigate](./deeply-investigate/SKILL.md) | Investigates complex technical topics, nascent architectures, APIs, or documents against primary sources to generate a structured dossier. |
 | [perspectives](./perspectives/SKILL.md) | Stress-tests decisions and strategic dilemmas by simulating a multi-expert advisory panel and adversarial cross-debate. |
+| [competing-hypothesis](./competing-hypothesis/SKILL.md) | Evaluates ambiguous or contradictory evidence against rival explanations using Richards Heuer's Analysis of Competing Hypotheses (ACH). |
 
 ---
 

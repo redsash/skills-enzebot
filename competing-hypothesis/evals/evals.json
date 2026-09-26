@@ -1,0 +1,30 @@
+{
+  "skill_name": "competing-hypothesis",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our payment service has been experiencing intermittent 504 Gateway Timeouts for 48 hours during peak traffic. Symptoms: CPU is at 40%, memory is stable, DB connection pool is 85% utilized, Redis latency spiked twice, and only requests touching the fraud-check webhook fail. Some engineers blame Redis timeouts, others blame DB connection pool exhaustion, and others suspect third-party fraud webhook rate-limiting. Apply the Analysis of Competing Hypotheses (ACH) method to evaluate these root causes.",
+      "expected_output": "An ACH evaluation with an evidence matrix, consistency ratings (++ to --), focus on inconsistencies to eliminate hypotheses, sensitivity analysis, and the most diagnostic next probe.",
+      "files": [],
+      "assertions": [
+        "Defines clear, mutually exclusive hypotheses for the incident",
+        "Includes an ACH comparison matrix mapping evidence items against each hypothesis with consistency symbols",
+        "Evaluates hypotheses by focusing on inconsistencies rather than merely tallying supporting points",
+        "Explicitly evaluates the diagnostic value of the fraud-check webhook failure",
+        "Identifies high-value diagnostic information gaps or tests to run next"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We detected an unexpected AWS IAM role assumption from an external IP at 02:00 UTC. The role belongs to our CI/CD runner. Hypotheses: (1) Compromised CI runner token, (2) Authorized developer debugging from home VPN, (3) Misconfigured third-party security scanner. Apply ACH to structure this investigation and avoid confirmation bias.",
+      "expected_output": "A structured ACH report contrasting evidence (IP reputation, CloudTrail event parameters, MFA usage, session duration) across all three hypotheses, identifying diagnostic differentiators.",
+      "files": [],
+      "assertions": [
+        "Structures analysis across all three candidate hypotheses",
+        "Distinguishes between diagnostic evidence and neutral/non-diagnostic facts",
+        "Constructs a weighted or symbolic consistency matrix",
+        "Provides a sensitivity analysis and clear confidence assessment"
+      ]
+    }
+  ]
+}
