@@ -1,0 +1,13 @@
+# Data and heavy outputs
+**/outputs/*.json
+**/outputs/*.csv
+**/sources/*.pdf
+
+# Environment and secrets
+.env
+*.local
+.data/
+
+# OS specific files
+.DS_Store
+Thumbs.db

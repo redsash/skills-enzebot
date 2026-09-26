@@ -1,0 +1,29 @@
+{
+  "skill_name": "research-journaler",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We are starting a new research inquiry on 'distributed-consensus-raft' in software engineering. Set up the research journal entry, initialize the log, and record the initial research prompt.",
+      "expected_output": "Creates the chronological entry under entries/YYYY-MM/YYYY-MM-DD_distributed-consensus-raft/ with logs.md, prompts.json, outputs/, and sources/, and appends the initial prompt.",
+      "files": [],
+      "assertions": [
+        "Invokes log_research.py new-entry with topic distributed-consensus-raft",
+        "Directory structure contains logs.md and prompts.json",
+        "Outputs and sources subdirectories exist",
+        "Prompts file records the initial iteration without errors"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Initialize a research journal repository from scratch, ensuring templates and gitignore are placed correctly.",
+      "expected_output": "Executes log_research.py init-repo to scaffold docs/templates/, entries/archives/, and .gitignore.",
+      "files": [],
+      "assertions": [
+        "docs/templates/ contains research-log-template.md",
+        "docs/templates/ contains prompt-library-template.md",
+        ".gitignore excludes heavy outputs and secret files",
+        "Repository README.md is present"
+      ]
+    }
+  ]
+}

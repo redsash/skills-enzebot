@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "topic": "[topic-slug]",
+  "date_created": "YYYY-MM-DD",
+  "prompts": [
+    {
+      "iteration": 1,
+      "timestamp": "YYYY-MM-DDTHH:MM:SSZ",
+      "model": "[model-identifier]",
+      "system_flags": {
+        "temperature": 0.2,
+        "max_tokens": 4096
+      },
+      "user_prompt": "[Exact user prompt text]",
+      "response_summary": "[Concise summary of response or key output produced]",
+      "artifacts_generated": []
+    }
+  ]
+}
