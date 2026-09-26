@@ -1,0 +1,30 @@
+{
+  "skill_name": "deeply-investigate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Deeply investigate how PostgreSQL implements logical replication failover slots in PG 17. Check official docs and release notes, highlight any prerequisites and gotchas, and write a dossier to docs/research/.",
+      "expected_output": "A technical research dossier conforming to the progressive-disclosure template, citing PG 17 official documentation, explaining replication slots synchronization, prerequisites, and follow-up vectors.",
+      "files": [],
+      "assertions": [
+        "A markdown dossier is generated in docs/research/ with date and topic slug",
+        "Contains an Executive Brief explaining the mental model of logical failover slots",
+        "Primary source index cites official PostgreSQL 17 documentation or release notes",
+        "Lists at least 2 concrete prerequisites or failure modes (e.g. sync_replication_slots, physical standby requirements)",
+        "Includes concrete next-turn exploration vectors with sample follow-up prompts"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We have an open question on whether to use SQLite WAL2 mode or standard WAL for our edge sync engine. Investigate the upstream SQLite source, design docs, and known limitations. Provide a technical dossier.",
+      "expected_output": "A technical dossier analyzing SQLite WAL vs WAL2 mode based on canonical SQLite documentation and source discussions, detailing checkpoint behavior and compatibility trade-offs.",
+      "files": [],
+      "assertions": [
+        "Dossier contains a comparison between WAL and WAL2 modes",
+        "Explicitly identifies that WAL2 is experimental / not in the default amalgamation build",
+        "Cites sqlite.org primary docs or source repository commits",
+        "Structures findings with an executive brief, core mechanics, and next-turn exploration vectors"
+      ]
+    }
+  ]
+}
