@@ -8,11 +8,25 @@ A collection of agent skills designed, authored, and maintained according to the
 
 | Skill | Description |
 | :--- | :--- |
-| [skill-architect](./skill-architect/SKILL.md) | Designs, scaffolds, evaluates, and refines agent skills according to the Open Skills specification and Antigravity guidelines. |
-| [human-readable](./human-readable/SKILL.md) | Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from drafts to make them sound natural and human-authored. |
-| [deeply-investigate](./deeply-investigate/SKILL.md) | Investigates complex technical topics, nascent architectures, APIs, or documents against primary sources to generate a structured dossier. |
-| [perspectives](./perspectives/SKILL.md) | Stress-tests decisions and strategic dilemmas by simulating a multi-expert advisory panel and adversarial cross-debate. |
 | [competing-hypothesis](./competing-hypothesis/SKILL.md) | Evaluates ambiguous or contradictory evidence against rival explanations using Richards Heuer's Analysis of Competing Hypotheses (ACH). |
+| [deeply-investigate](./deeply-investigate/SKILL.md) | Investigates complex technical topics, nascent architectures, APIs, or documents against primary sources to generate a structured dossier. |
+| [human-readable](./human-readable/SKILL.md) | Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from drafts to make them sound natural and human-authored. |
+| [perspectives](./perspectives/SKILL.md) | Stress-tests decisions and strategic dilemmas by simulating a multi-expert advisory panel and adversarial cross-debate. |
+| [skill-architect](./skill-architect/SKILL.md) | Designs, scaffolds, evaluates, and refines agent skills according to the Open Skills specification and Antigravity guidelines. |
+
+---
+
+## Skills Wishlist & Brainstorming
+
+Candidate skills planned for development, generated through the `perspectives` advisory panel and edited with `human-readable`:
+
+| Candidate Skill | Proposed Description |
+| :--- | :--- |
+| `adr-synthesizer` | Synthesizes scattered design threads, PR reviews, and RFC notes into structured Architecture Decision Records. |
+| `blast-radius-audit` | Audits proposed code and infrastructure changes before execution to map dependency knock-on effects, migration risks, and rollback steps. |
+| `dead-code-pruner` | Identifies and verifies unused exports, obsolete feature flags, and abandoned routes for safe deletion. |
+| `flaky-test-hunter` | Isolates and reproduces non-deterministic test failures caused by race conditions, state leaks, and timing sensitivities. |
+| `incident-postmortem` | Assembles incident timelines, isolates contributing system factors, and drafts blameless postmortems with concrete remediation items. |
 
 ---
 
