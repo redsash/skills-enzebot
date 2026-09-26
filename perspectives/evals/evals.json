@@ -1,0 +1,29 @@
+{
+  "skill_name": "perspectives",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We are debating whether to rewrite our legacy monolithic core banking service in Go microservices or incrementally refactor the monolith in place. The board wants fast features, but our incident rate is rising. What would an expert panel think?",
+      "expected_output": "A multi-expert cross-debate between hyper-specific archetypes (e.g. legacy refactoring specialist, distributed systems red-teamer, fintech compliance auditor) showing live friction and ending with a Go/No-Go decision matrix.",
+      "files": [],
+      "assertions": [
+        "Curates a panel of 4-5 contextual experts including at least one aggressive skeptic and one visionary",
+        "Presents the discussion as an interactive cross-debate where experts counter and challenge each other",
+        "Identifies at least two critical blind spots uncovered by the debate",
+        "Delivers an actionable executive synthesis with clear Go/No-Go criteria and next steps"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm deciding whether to open-source our internal workflow engine under Apache 2.0 to drive developer adoption, or keep it proprietary and build an enterprise cloud service. Help me stress-test this strategy from multiple angles.",
+      "expected_output": "A lively panel debate featuring archetypes such as an Open Source Commercialization Veteran, Enterprise B2B Sales Director, Cloud Infra Red-Teamer, and Developer Advocate, culminating in a clear strategic recommendation.",
+      "files": [],
+      "assertions": [
+        "Curates tailored personas specific to open-source vs proprietary commercialization",
+        "Includes direct clash between open-source community growth and enterprise monetization defense",
+        "Avoids generic AI platitudes and vague 'pros and cons' summaries",
+        "Produces a concrete action plan with explicit risk mitigation factors"
+      ]
+    }
+  ]
+}
