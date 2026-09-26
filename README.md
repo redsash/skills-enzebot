@@ -2,6 +2,10 @@
 
 A collection of agent skills designed, authored, and maintained according to the [Open Skills specification](https://agentskills.io/specification.md) and [Antigravity](https://antigravity.google/docs/skills.md) guidelines.
 
+```bash
+npx skills add redsash/skills-enzebot
+```
+
 ---
 
 ## Skills Index
