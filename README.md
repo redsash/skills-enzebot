@@ -18,6 +18,7 @@ npx skills add redsash/skills-enzebot
 | [perspectives](./perspectives/SKILL.md) | Stress-tests decisions and strategic dilemmas by simulating a multi-expert advisory panel and adversarial cross-debate. |
 | [research-journaler](./research-journaler/SKILL.md) | Initializes, structures, and logs reproducible research sessions into chronological journal entries. |
 | [skill-architect](./skill-architect/SKILL.md) | Designs, scaffolds, evaluates, and refines agent skills according to the Open Skills specification and Antigravity guidelines. |
+| [strategic-thinking-5d](./strategic-thinking-5d/SKILL.md) | Applies 5D Thinking (AQAL, Kegan stages, holarchies) to diagnose bottlenecks, stress-test POCs, and eliminate one-dimensional slop. |
 
 ---
 
