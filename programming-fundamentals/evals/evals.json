@@ -1,0 +1,42 @@
+{
+  "skill_name": "programming-fundamentals",
+  "evals": [
+    {
+      "id": 1,
+      "name": "Over-engineered God Class Audit & Simplification",
+      "prompt": "Review this 350-line OrderManager class that handles database transactions, PDF generation, email sending, discount calculations, and credit card charging. Identify violations of Single Responsibility, High Cohesion, and KISS, and propose a decoupled, maintainable architecture.",
+      "expected_output": "A structured Programming Fundamentals Audit identifying concrete violations (SRP, High Cohesion, KISS, SoC) and a step-by-step refactoring plan following 'Do the Simplest Thing That Could Possibly Work'.",
+      "files": [],
+      "assertions": [
+        "Identifies violation of Single Responsibility Principle with distinct reasons to change",
+        "Identifies violation of Separation of Concerns between IO/persistence and business calculation",
+        "Applies 'Do the Simplest Thing That Could Possibly Work' rather than introducing unnecessary microservices or abstract factories",
+        "Adheres to the structured Audit Output Template"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Demeter & Exception Swallowing PR Review",
+      "prompt": "Review this PR diff: user.getCompany().getBillingPlan().getDiscountTier().apply() and an empty except block that ignores all database exceptions. Provide a code review grounded in fundamental principles.",
+      "expected_output": "Review citing Law of Demeter / Information Hiding for the object train wreck, and Principle of Least Astonishment / Write Code for the Maintainer for the silent exception suppression.",
+      "files": [],
+      "assertions": [
+        "Explicitly references Law of Demeter (Least Knowledge) and suggests delegation",
+        "Flags the swallowed exception under Principle of Least Astonishment and Write Code for the Maintainer",
+        "Provides clear, runnable before/after code refactoring snippets"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "DRY vs YAGNI Dilemma Arbitration",
+      "prompt": "Our team has two similar functions in two different microservices calculating customer tax. One engineer wants to create a new shared NPM package with generic plugin interfaces. The other wants to leave them as-is. Arbitrate this decision using programming fundamentals.",
+      "expected_output": "Balanced arbitration citing Sandi Metz's rule ('Duplication is cheaper than the wrong abstraction'), YAGNI, Low Coupling, and the Rule of Three / AHA.",
+      "files": [],
+      "assertions": [
+        "References DRY, YAGNI, and Low Coupling across microservice boundaries",
+        "Applies the Rule of Three / AHA heuristic before creating a shared dependency",
+        "Considers the cost of cross-service coupling vs identical code duplication"
+      ]
+    }
+  ]
+}

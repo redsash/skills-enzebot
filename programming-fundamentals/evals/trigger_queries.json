@@ -1,0 +1,102 @@
+[
+  {
+    "query": "Can you do a code review on this service class? It feels bloated and hard to maintain.",
+    "should_trigger": true,
+    "intent": "Code review for maintainability, SRP, and cohesion"
+  },
+  {
+    "query": "I want to refactor this module. We have duplicate logic copied across four handlers and I want to simplify it.",
+    "should_trigger": true,
+    "intent": "Refactoring for DRY, Abstraction Principle, and KISS"
+  },
+  {
+    "query": "Our junior dev wrote this 200-line function with 6 nested loops and ifs. Help me rewrite it so it doesn't make me think.",
+    "should_trigger": true,
+    "intent": "Simplification, Don't Make Me Think, and KISS"
+  },
+  {
+    "query": "Evaluate this architecture: my teammate created 12 abstract factories and interface adapters for a feature that only has one implementation.",
+    "should_trigger": true,
+    "intent": "Auditing premature abstraction, YAGNI, and KISS"
+  },
+  {
+    "query": "Review this PR diff before I merge: check if it respects the Law of Demeter and doesn't introduce high coupling.",
+    "should_trigger": true,
+    "intent": "Reviewing coupling, Law of Demeter, and Information Hiding"
+  },
+  {
+    "query": "Help me simplify this over-engineered microservice. I want to do the simplest thing that could possibly work.",
+    "should_trigger": true,
+    "intent": "Simplest thing that could possibly work / KISS"
+  },
+  {
+    "query": "This function has unexpected side effects when fetching data, mutating global cache and confusing callers. How should we redesign it?",
+    "should_trigger": true,
+    "intent": "Principle of Least Astonishment and Separation of Concerns"
+  },
+  {
+    "query": "We want to make this billing processor extendable for new payment providers without having to modify existing tested core code.",
+    "should_trigger": true,
+    "intent": "Open/Closed Principle and Embrace Change"
+  },
+  {
+    "query": "Audit this codebase for software engineering fundamentals and design smells.",
+    "should_trigger": true,
+    "intent": "Comprehensive fundamentals audit"
+  },
+  {
+    "query": "Should I optimize this inner loop with bitwise tricks or keep it as readable code for the maintainer?",
+    "should_trigger": true,
+    "intent": "Avoid Premature Optimization vs Write Code for the Maintainer"
+  },
+  {
+    "query": "What is the syntax for defining an async generator in Python 3.11?",
+    "should_trigger": false,
+    "intent": "Language syntax lookup"
+  },
+  {
+    "query": "Write a bash command to find all files larger than 100MB in /var/log.",
+    "should_trigger": false,
+    "intent": "Mechanical shell command"
+  },
+  {
+    "query": "How do I fix a merge conflict in git after pulling from origin main?",
+    "should_trigger": false,
+    "intent": "Git version control operations"
+  },
+  {
+    "query": "Configure an nginx reverse proxy configuration with SSL termination for port 3000.",
+    "should_trigger": false,
+    "intent": "DevOps / web server configuration"
+  },
+  {
+    "query": "Write a SQL query using window functions to calculate 7-day rolling revenue.",
+    "should_trigger": false,
+    "intent": "Database query authoring"
+  },
+  {
+    "query": "Install the Oxlint anti-slop plugin in my ESLint configuration.",
+    "should_trigger": false,
+    "intent": "Linter installation"
+  },
+  {
+    "query": "Fix the typo on line 42 of index.html: change 'Submitt' to 'Submit'.",
+    "should_trigger": false,
+    "intent": "Trivial single-word typo fix"
+  },
+  {
+    "query": "Set up a recurring cron job that runs a health check script every 15 minutes.",
+    "should_trigger": false,
+    "intent": "System scheduling task"
+  },
+  {
+    "query": "Can you design a CSS color palette with high contrast for dark mode?",
+    "should_trigger": false,
+    "intent": "Visual frontend design"
+  },
+  {
+    "query": "Generate an image mockup of a modern login screen.",
+    "should_trigger": false,
+    "intent": "Image asset generation"
+  }
+]

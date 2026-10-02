@@ -16,6 +16,7 @@ npx skills add redsash/skills-enzebot
 | [deeply-investigate](./deeply-investigate/SKILL.md) | Investigates complex technical topics, nascent architectures, APIs, or documents against primary sources to generate a structured dossier. |
 | [human-readable](./human-readable/SKILL.md) | Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from drafts to make them sound natural and human-authored. |
 | [perspectives](./perspectives/SKILL.md) | Stress-tests decisions and strategic dilemmas by simulating a multi-expert advisory panel and adversarial cross-debate. |
+| [programming-fundamentals](./programming-fundamentals/SKILL.md) | Applies foundational software engineering principles (DRY, KISS, YAGNI, SRP, Demeter, POLA, SoC, etc.) to design, review, refactor, and simplify code. |
 | [research-journaler](./research-journaler/SKILL.md) | Initializes, structures, and logs reproducible research sessions into chronological journal entries. |
 | [skill-architect](./skill-architect/SKILL.md) | Designs, scaffolds, evaluates, and refines agent skills according to the Open Skills specification and Antigravity guidelines. |
 | [strategic-thinking-5d](./strategic-thinking-5d/SKILL.md) | Applies 5D Thinking (AQAL, Kegan stages, holarchies) to diagnose bottlenecks, stress-test POCs, and eliminate one-dimensional slop. |
