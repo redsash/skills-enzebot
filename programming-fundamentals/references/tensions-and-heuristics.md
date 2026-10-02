@@ -82,3 +82,31 @@ When developers prematurely abstract two blocks of code that happen to look iden
    - Is there a measured SLA violation or flamegraph showing this code is in the 3% hot path?
    - If NO: Keep the clean, readable version.
    - If YES: Optimize the hot path, isolate the optimization behind a well-documented boundary (Information Hiding), and retain benchmarks in CI.
+
+---
+
+## 6. Functional Reusability vs. Object-Oriented Encapsulation
+
+### The Conflict
+- **OOP** encapsulates state and behavior together inside classes, relying on inheritance or interfaces for reuse.
+- **FP** strictly separates data (read-only structures) from behavior (pure functions), relying on composition and Higher-Order Functions for reuse.
+
+### The Resolution Heuristic: The Functional Core, Imperative Shell (FCIS)
+1. **Push Impurity to the Edges**: Keep business logic completely pure and stateless. Isolate network I/O, database writes, and user interaction in an outer imperative shell.
+2. **Prefer Composition Over Inheritance**: Never use inheritance hierarchies for code reuse. If behavior varies, pass a function parameter (HOF) or compose small transformer functions.
+3. **Data/Logic Separation vs. Domain Models**:
+   - Use **FP Data/Logic Separation** for transformations, data pipelines, business calculations, ETL, and stateless services.
+   - Use **OOP Encapsulation** only when managing stateful physical entities (e.g. GUI widgets, socket connections, game actors) where localized lifecycle management is mandatory.
+
+---
+
+## 7. Point-Free (Tacit) Style vs. "Don't Make Me Think"
+
+### The Conflict
+- Pure FP often embraces point-free (tacit) programming where arguments are omitted entirely:
+  `const getActiveNames = compose(map(prop('name')), filter(prop('isActive')));`
+- Steve Krug's **"Don't Make Me Think"** demands that code should be immediately readable without requiring mental gymnastics to trace which arguments flow where.
+
+### The Resolution Heuristic: Pragmatic Readability
+- Use point-free style **only** when the composition is intuitive and standard (e.g. `items.filter(isPositive).map(formatCurrency)`).
+- When a pipeline requires complex argument permutations, currying flips, or nested combinators, introduce explicit named arguments. A named parameter `(user) => user.email` communicates intent far better than an obscure combinator like `converge(assoc('key'), [prop('a'), prop('b')])`.

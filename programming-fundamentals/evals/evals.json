@@ -37,6 +37,19 @@
         "Applies the Rule of Three / AHA heuristic before creating a shared dependency",
         "Considers the cost of cross-service coupling vs identical code duplication"
       ]
+    },
+    {
+      "id": 4,
+      "name": "Refactoring Class Hierarchy to Functional Composition & Immutability",
+      "prompt": "We have a 4-level class inheritance tree (ReportGenerator -> CsvReport -> FormattedCsvReport -> FilteredReport) that mutates an internal state buffer in-place during generation. Refactor this to use functional programming reusability: pure functions, higher-order functions, and function composition.",
+      "expected_output": "A refactored pipeline using small, stateless pure functions composed together, parameterizing filters and formatters as higher-order function arguments with immutable data transformations.",
+      "files": [],
+      "assertions": [
+        "Replaces deep inheritance hierarchy with functional composition",
+        "Demonstrates pure functions with zero in-place mutations",
+        "Uses Higher-Order Functions (HOFs) to parameterize formatting and filtering",
+        "Explains the reusability and predictability gains over class mixins"
+      ]
     }
   ]
 }

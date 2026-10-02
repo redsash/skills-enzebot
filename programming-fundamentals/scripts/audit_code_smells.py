@@ -105,6 +105,31 @@ def check_train_wreck(line: str, line_no: int) -> Optional[Dict[str, Any]]:
     }
 
 
+def check_impurity_mutation(line: str, line_no: int, ext: str) -> Optional[Dict[str, Any]]:
+    """Flags direct global state mutation or in-place data mutations."""
+    stripped = line.strip()
+    if any(k in line for k in ['"smell":', "'smell':", "re.compile"]):
+        return None
+    if ext == ".py" and re.match(r"^global\s+[a-zA-Z0-9_]+", stripped):
+        return {
+            "line": line_no,
+            "principle": "Pure Functions / Low Coupling",
+            "smell": f"Global variable mutation declaration: `{stripped}`",
+            "severity": "medium",
+            "suggestion": "Pass state explicitly via arguments and return new state."
+        }
+    if re.search(r"\b[a-zA-Z0-9_]+\.(?:sort|reverse)\(\)", stripped):
+        if not any(k in stripped for k in ["toSorted", "toReversed", "sorted(", "def "]):
+            return {
+                "line": line_no,
+                "principle": "Immutability / Predictability",
+                "smell": f"In-place mutation detected: `{stripped[:60]}`",
+                "severity": "low",
+                "suggestion": "Use non-mutating copy transformations (e.g. sorted() or toSorted())."
+            }
+    return None
+
+
 def check_nesting_depth(raw_line: str, line_no: int, max_depth: int) -> Optional[Dict[str, Any]]:
     """Flags excessive indentation depth indicating complex control flow."""
     match = re.match(r"^(\s*)", raw_line)
@@ -158,6 +183,10 @@ def scan_code_lines(lines: List[str], ext: str, max_lines: int, max_depth: int) 
             smell = check_fn(raw_line, idx)
             if smell:
                 findings.append(smell)
+
+        impurity_smell = check_impurity_mutation(raw_line, idx, ext)
+        if impurity_smell:
+            findings.append(impurity_smell)
 
         depth_smell = check_nesting_depth(raw_line, idx, max_depth)
         if depth_smell:

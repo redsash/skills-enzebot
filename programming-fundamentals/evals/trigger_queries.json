@@ -50,6 +50,16 @@
     "intent": "Avoid Premature Optimization vs Write Code for the Maintainer"
   },
   {
+    "query": "How can I refactor this complex class hierarchy into pure functions and function composition?",
+    "should_trigger": true,
+    "intent": "Functional Reusability, Composition, and HOFs"
+  },
+  {
+    "query": "Audit this data pipeline to make sure it enforces immutability and doesn't mutate input arguments.",
+    "should_trigger": true,
+    "intent": "Immutability and Pure Functions audit"
+  },
+  {
     "query": "What is the syntax for defining an async generator in Python 3.11?",
     "should_trigger": false,
     "intent": "Language syntax lookup"

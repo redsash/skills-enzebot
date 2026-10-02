@@ -147,3 +147,40 @@ This catalog documents the core foundational principles of software engineering,
 - **Primary Heuristic**: Make code cheap to change. Decoupled modules, clean test suites, short feedback loops, and reversible decisions are superior to rigid, predictive upfront specifications.
 - **Violation Signs**: Heavy upfront speculative frameworks, architectures that require weeks of refactoring to support a slight business requirement shift, fear of modifying legacy code due to lack of tests.
 - **Litmus Test**: *"How easily can this system accommodate the opposite of today's business requirement?"*
+
+---
+
+## 6. Functional Reusability & Predictability
+
+Functional programming (FP) achieves reusability by composing small, stateless, and predictable functions rather than relying on deep object inheritance hierarchies. By separating data from behavior and ensuring functions have zero side effects, you create independent building blocks that can easily be combined to solve different problems.
+
+### Build Around Pure Functions
+- **Origin & Core Meaning**: Mathematical lambda calculus (Alonzo Church) applied to software engineering. A function is pure if it always returns the exact same output for the same input, and causes zero observable side effects (no mutation of external state, no console I/O, no network calls).
+- **Primary Heuristic**: Pure functions are completely self-contained, stateless, and referentially transparent. You can safely copy, move, or import them into entirely new contexts without worrying about global state or ambient environment.
+- **Violation Signs**: Functions reading or mutating global variables, methods that modify their input arguments, unexpected telemetry or logging buried inside business calculation functions.
+- **Litmus Test**: *"Can I replace the function call `f(x)` with its return value in my tests without changing the program's behavior?"*
+
+### Parameterize Behavior (Higher-Order Functions)
+- **Origin & Core Meaning**: Functions as first-class citizens. A Higher-Order Function (HOF) accepts other functions as arguments or returns a function.
+- **Primary Heuristic**: Instead of writing multiple functions that do almost the same thing, isolate the specific logic that changes and pass it in as a parameter. Standard iterators (`map`, `filter`, `reduce`) are classic examples where traversal logic is reused and transformation logic is parameterized.
+- **Violation Signs**: Copy-pasting a loop with a slight modification to the filtering check or formatting logic, or creating bloated class inheritance trees to override a single inner step (Template Method antipattern).
+- **Litmus Test**: *"Can we extract the structural loop or orchestration logic away from the domain transformation callback?"*
+
+### Embrace Currying & Partial Application
+- **Origin & Core Meaning**: Moses Schönfinkel & Haskell Curry. Currying translates a function of multiple arguments into a sequence of unary functions. Partial application binds a subset of arguments upfront, returning a specialized function.
+- **Primary Heuristic**: Allows creating highly generic core utilities and spinning off specialized, pre-configured versions throughout an application without rewriting logic or passing ambient dependencies everywhere.
+- **Violation Signs**: Threading configuration objects or API clients through 6 layers of function calls; repetitive boilerplate calling the same multi-argument utility with identical leading arguments.
+- **Litmus Test**: *"Can we bind configuration or context once at bootstrap, passing a zero-argument or single-argument worker function to business callers?"*
+
+### Rely on Function Composition
+- **Origin & Core Meaning**: Mathematical category theory & Unix pipeline philosophy (`|`). Function composition pipes the output of one function directly into the input of the next ($h = g \circ f$).
+- **Primary Heuristic**: Instead of building monolithic functions, write single-purpose utilities and snap them together like Lego bricks:
+  `const processEmail = compose(validateEmail, sanitizeInput);`
+- **Violation Signs**: Monolithic 80-line procedural routines where validation, normalization, calculation, and formatting are interleaved in an indivisible block.
+- **Litmus Test**: *"Can this workflow be expressed as a linear pipeline of small, independently testable single-responsibility transformations?"*
+
+### Enforce Immutability & Separate Data from Behavior
+- **Origin & Core Meaning**: Pure FP data model. Data structures are treated as read-only values. Transformations return new copies, leaving the original data untouched.
+- **Primary Heuristic**: When data is immutable, you eliminate accidental side effects and temporal coupling. Parallel processing, debugging, time-travel logging, and multi-threaded reuse become safe and predictable.
+- **Violation Signs**: Calling `list.sort()` or `delete user.role` in-place on input objects; bugs where modifying state in module A silently breaks module B; complex defensive cloning scattered everywhere.
+- **Litmus Test**: *"Does this function guarantee that caller data structures remain 100% byte-for-byte identical before and after invocation?"*
