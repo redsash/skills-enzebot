@@ -26,6 +26,30 @@
         "Proposes acoustic buffer wall, closet chase, or layout separation",
         "Introduces privacy vestibule or 90-degree visual baffle"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run a multi-pillar validation audit on a proposed layout to verify geometric non-overlap, IRC R310 emergency egress windows, and furniture clearance envelopes.",
+      "expected_output": "Validation scorecard confirming disjoint room geometries, code-compliant emergency escape windows (>=5.7 sq ft clear opening, sill <=44\"), and 36\" walking lane clearance around primary furniture.",
+      "files": [],
+      "assertions": [
+        "Checks room polygons for zero interior area intersection",
+        "Validates bedroom emergency egress window dimensions (5.7 sq ft clear opening, sill <= 44 in)",
+        "Verifies natural daylight glazing ratio >= 8% of room area",
+        "Verifies 36\" circulation perimeter around King/Queen bed envelopes"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Perform a corner-case stress test: Design a 3-level split-level residence on an ultra-narrow 24ft wide hillside lot with 5ft side setbacks, requiring an upslope concrete retaining wall and hurricane windward shear defense.",
+      "expected_output": "Valid layout fitting within the constrained 14ft buildable envelope snapped to 16\" CMU increments, with vertical circulation stacking and blind windward flank defense.",
+      "files": [],
+      "assertions": [
+        "Enforces narrow buildable envelope (24ft - 10ft = 14ft) snapped to modular CMU (13'-4\" or 14'-8\")",
+        "Stacks stairs and vertical plumbing chases across all 3 levels",
+        "Differentiates upslope retaining foundation from downslope terrace step-downs",
+        "Maintains unobstructed 36\" egress pathways to exterior exits"
+      ]
     }
   ]
 }

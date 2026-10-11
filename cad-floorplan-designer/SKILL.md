@@ -15,9 +15,11 @@ Design buildable, structurally sound 2D architectural floor plans, spatial circu
 - **Supporting Scripts**:
   - `python3 cad-floorplan-designer/scripts/validate_cmu_grid.py --check-spans "24' 8\"" "16' 0\""`: Validates dimensions against 8" and 16" CMU modular units.
   - `python3 cad-floorplan-designer/scripts/validate_cmu_grid.py --site-envelope --lot-width "60' 0\"" --lot-depth "100' 0\"" --side-setback "10' 0\""`: Computes setback envelope snapped to modular increments.
-  - `python3 cad-floorplan-designer/scripts/audit_spatial_ux.py --demo --mermaid`: Audits clearances, door collisions, acoustic buffers, and generates Mermaid circulation graphs.
+  - `python3 cad-floorplan-designer/scripts/audit_spatial_ux.py --demo`: Runs 4-pillar validation scorecard (geometry, IRC building codes, furniture clearances, and circulation).
+  - `python3 cad-floorplan-designer/scripts/audit_spatial_ux.py --demo --mermaid`: Generates clean Mermaid circulation graph.
   - `python3 cad-floorplan-designer/scripts/render_floorplan_svg.py --demo -o plan.svg`: Renders 2D CAD SVG floorplans with alphanumeric grid lines and circulation path overlays.
 - **Deep-Dive References**:
+  - [Floor Plan AI Validation Framework](references/validation-framework.md): 5-pillar validation standard (Geometry, Building Codes, Furniture Fit, Metrics, Expert Review).
   - [CMU Modular Masonry Guide](references/cmu-masonry-guide.md): Standard block dimensions, courses, lintel spans, and bond beams.
   - [Spatial UX & Circulation Design Guide](references/spatial-ux-and-circulation.md): Clear widths, door ergonomics, acoustic buffering, and sightline privacy.
 
@@ -64,12 +66,12 @@ graph TD
     Utility -.->|Exterior Direct Access| Mech[Battery, Inverter & Cistern Core]:::service
 ```
 
-### Step 3: Spatial UX & Ergonomics Verification
-Audit layout against high-traffic failure modes:
-- **Door Clearance**: Swing doors into rooms against adjacent walls; never swing directly into arterial circulation paths or collide with opposing doors.
-- **Transit Efficiency**: Short, direct path from parking/entry to pantry for supplies ($\le 2$ hops); wet-to-dry transit from beach/pool to laundry/outdoor shower without crossing carpeted or primary living areas.
-- **Sightline Privacy**: Avoid direct sightlines from public entry doors or dining tables into private bedrooms or powder room toilets.
-- **Life Safety & Egress**: Verify 36" clear egress paths to exterior exits; ensure sleeping rooms have at least one emergency egress window ($\ge 5.7\text{ sq ft}$ clear opening).
+### Step 3: Multi-Pillar Validation & Ergonomics Audit
+Audit layout against the [Validation Framework](references/validation-framework.md) using `audit_spatial_ux.py`:
+- **Geometric Validity**: Ensure zero polygon collision between rooms ($\text{Overlap} = 0$), watertight exterior boundary, and interior area conservation ($\sum \text{Rooms} + \text{Walls} \approx \text{Gross Footprint}$).
+- **Building Code Compliance (IRC/IBC)**: Verify sleeping rooms have emergency egress windows ($\ge 5.7\text{ sq ft}$ clear opening, width $\ge 20"$, height $\ge 24"$, sill $\le 44"$), habitable rooms $\ge 70\text{ sq ft}$, natural light glazing $\ge 8\%$, and sanitary fixture clearances ($\ge 21"$ in front of WC).
+- **Furniture Clearance Envelopes**: Verify continuous 36" circulation walking lanes around major furniture sets (King bed, Queen bed, dining table, sofa group).
+- **Spatial UX & Transit Flow**: Check 48" arterial corridors, 36" secondary halls, inward door swings, acoustic decoupling between beds and mechanical hum, sightline privacy baffles, grocery logistics ($\le 2$ hops), and wet beach loops.
 
 ### Step 4: Structural and Masonry Layout
 - **Exterior Walls**: Draw exterior walls and primary lateral shear walls at full structural thickness (8" CMU). Reinforce flank walls with minimal punched openings where lateral wind loads or solar heat gains are extreme.
