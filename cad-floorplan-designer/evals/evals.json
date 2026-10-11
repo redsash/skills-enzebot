@@ -50,6 +50,19 @@
         "Differentiates upslope retaining foundation from downslope terrace step-downs",
         "Maintains unobstructed 36\" egress pathways to exterior exits"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Generate a schematic construction cost estimate range for a 1,600 sq ft resilient villa on a 15% hillside slope in the Caribbean, including a 1,000-gallon cistern, 8kW solar array with 20kWh batteries, and 8\" CMU masonry shell.",
+      "expected_output": "Itemized AACE Class 4 construction cost schedule with Low (-15%), Expected Median, and High (+25%) bounds, material takeoffs, and differentiated unit rates for conditioned vs covered terrace areas.",
+      "files": [],
+      "assertions": [
+        "Presents an AACE Class 4 cost range with -15% low bound and +25% high bound",
+        "Applies moderate hillside slope factor (1.30x on foundation and earthwork)",
+        "Differentiates conditioned living area cost from covered terrace/lanai cost",
+        "Itemizes resilience core (cistern, solar PV array, battery storage, septic system)",
+        "Includes contractor overhead & profit (12%) and design contingency (15%)"
+      ]
     }
   ]
 }

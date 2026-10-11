@@ -17,9 +17,11 @@ Design buildable, structurally sound 2D architectural floor plans, spatial circu
   - `python3 cad-floorplan-designer/scripts/validate_cmu_grid.py --site-envelope --lot-width "60' 0\"" --lot-depth "100' 0\"" --side-setback "10' 0\""`: Computes setback envelope snapped to modular increments.
   - `python3 cad-floorplan-designer/scripts/audit_spatial_ux.py --demo`: Runs 4-pillar validation scorecard (geometry, IRC building codes, furniture clearances, and circulation).
   - `python3 cad-floorplan-designer/scripts/audit_spatial_ux.py --demo --mermaid`: Generates clean Mermaid circulation graph.
+  - `python3 cad-floorplan-designer/scripts/estimate_construction_cost.py --demo`: Computes AACE Class 4 construction cost range (-15% to +25%) with material and resilience takeoffs.
   - `python3 cad-floorplan-designer/scripts/render_floorplan_svg.py --demo -o plan.svg`: Renders 2D CAD SVG floorplans with alphanumeric grid lines and circulation path overlays.
 - **Deep-Dive References**:
   - [Floor Plan AI Validation Framework](references/validation-framework.md): 5-pillar validation standard (Geometry, Building Codes, Furniture Fit, Metrics, Expert Review).
+  - [Construction Cost Estimation Guide](references/construction-cost-estimation.md): Parametric takeoff formulas, slope multipliers, and AACE Class 4 confidence bands.
   - [CMU Modular Masonry Guide](references/cmu-masonry-guide.md): Standard block dimensions, courses, lintel spans, and bond beams.
   - [Spatial UX & Circulation Design Guide](references/spatial-ux-and-circulation.md): Clear widths, door ergonomics, acoustic buffering, and sightline privacy.
 
@@ -107,10 +109,18 @@ Accompany the SVG drawing with a comprehensive technical matrix:
 - **Corner Staking Table**: Primary structural grid intersection points (e.g., Grid A-1, A-5, D-1, D-5) with offset distances from boundary pins to guide geotechnical soil borings and percolation tests.
 - **Resilience Core Specifications**: Wall schedule (CMU 8", partition 4"/6"), cistern capacity (gal), battery backup (kWh), and drainage step-down details.
 
+### Step 8: Construction Cost & Feasibility Estimate Range
+Run `estimate_construction_cost.py` to calculate the AACE Class 4 schematic cost estimate range ($-15\%$ to $+25\%$):
+- **Executive Budget Summary**: Present the Low Bound ($-15\%$), Expected Median, and High Bound ($+25\%$) total project costs.
+- **Differentiated Unit Rates**: Report cost per sq ft for conditioned living space and total constructed footprint (including covered terraces).
+- **Quantity Takeoffs**: List net exterior 8" CMU wall area, block counts ($1.125/\text{sq ft}$), impact glazing area, and cistern/solar capacities.
+- **Itemized Budget Breakdown**: Itemize direct program finishes, foundation slope premium, hurricane impact glazing, off-grid resilience core, contractor O&P ($12\%$), design contingency ($15\%$), and soft costs ($8\%$).
+
 ---
 
 ## Gotchas & Edge Cases
 
+- **Point Estimate Fallacy**: Never state a single flat cost figure at the schematic stage. Always present an AACE Class 4 confidence band ($-15\%$ to $+25\%$) with explicit slope and location multipliers.
 - **Non-Modular Dimensions**: Any exterior wall dimension not divisible by 8" or 16" breaks masonry layout and causes costly block-cutting in the field.
 - **Corridor Bottlenecks**: Corridors narrower than 36" (or 42" near kitchen island prep zones) cause severe bottlenecking during multi-occupant use.
 - **Flush Weather Thresholds**: Placing exterior sliding doors flush with indoor FFL without a 1.5"–2" drop and covered overhang guarantees wind-driven water penetration during heavy storms.
