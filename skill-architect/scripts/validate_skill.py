@@ -64,11 +64,24 @@ def parse_frontmatter(content: str):
     else:
         # Fallback simple parser for name & description if PyYAML is unavailable
         data = {}
-        for line in raw_yaml.splitlines():
-            line = line.strip()
-            if ":" in line:
-                k, v = line.split(":", 1)
-                data[k.strip()] = v.strip().strip("'\"")
+        current_key = None
+        for raw_line in raw_yaml.splitlines():
+            stripped = raw_line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            if not raw_line.startswith((" ", "\t")) and ":" in stripped:
+                k, v = stripped.split(":", 1)
+                current_key = k.strip()
+                val = v.strip().strip("'\"")
+                if val in (">-", ">", "|", "|-", ""):
+                    data[current_key] = ""
+                else:
+                    data[current_key] = val
+            elif current_key and (raw_line.startswith(" ") or raw_line.startswith("\t")):
+                if data[current_key]:
+                    data[current_key] += " " + stripped
+                else:
+                    data[current_key] = stripped
         return data, body, []
 
 
@@ -180,6 +193,32 @@ def validate_skill(skill_dir_path: Path):
                 if not os.access(script_file, os.X_OK):
                     warnings.append(f"Script '{script_file.name}' is not marked executable (chmod +x).")
 
+    # Validate Mermaid syntax in SKILL.md and references/
+    md_files_to_check = [skill_file]
+    ref_dir = skill_dir / "references"
+    if ref_dir.is_dir():
+        md_files_to_check.extend(list(ref_dir.glob("*.md")))
+
+    try:
+        sys.path.insert(0, str(Path(__file__).parent.resolve()))
+        from lint_mermaid import lint_markdown_file
+    except Exception:
+        lint_markdown_file = None
+
+    if lint_markdown_file:
+        for md_f in md_files_to_check:
+            m_res = lint_markdown_file(md_f)
+            if m_res.get("total_diagrams", 0) > 0:
+                details.setdefault("mermaid_diagrams_checked", 0)
+                details["mermaid_diagrams_checked"] += m_res["total_diagrams"]
+                rel_name = md_f.name if md_f == skill_file else f"references/{md_f.name}"
+                for m_err in m_res.get("errors", []):
+                    errors.append(f"Mermaid syntax error in {rel_name} (line {m_err['line']}): [{m_err['rule']}] {m_err['message']}")
+                for m_maid in m_res.get("maid_errors", []):
+                    errors.append(f"Mermaid parser error in {rel_name}: {m_maid}")
+                for m_warn in m_res.get("warnings", []):
+                    warnings.append(f"Mermaid warning in {rel_name} (line {m_warn['line']}): [{m_warn['rule']}] {m_warn['message']}")
+
     is_valid = len(errors) == 0
     return {
         "valid": is_valid,
@@ -213,6 +252,8 @@ def main():
             print(f"Description Size:  {result['details']['description_length']} / 1024 characters")
         if result["details"].get("total_lines"):
             print(f"Line Count:        {result['details']['total_lines']} lines")
+        if result["details"].get("mermaid_diagrams_checked"):
+            print(f"Mermaid Diagrams:  {result['details']['mermaid_diagrams_checked']} checked (syntax valid)")
 
         if result["errors"]:
             print("\nErrors:")

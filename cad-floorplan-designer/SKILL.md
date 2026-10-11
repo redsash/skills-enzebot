@@ -50,10 +50,10 @@ Before drawing walls, map functional adjacencies, acoustic buffers, and traffic 
 
 ```mermaid
 graph TD
-    classDef public fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
-    classDef private fill:#ede7f6,stroke:#7e57c2,stroke-width:2px;
-    classDef service fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
-    classDef exterior fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+    classDef public fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    classDef private fill:#ede7f6,stroke:#7e57c2,stroke-width:2px
+    classDef service fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef exterior fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
 
     Entry([Main Entry]):::public ==>|Arterial 48-in Corridor| Living[Living / Dining Room]:::public
     Living <-->|Open Plan| Kitchen[Kitchen / Pantry]:::public

@@ -15,11 +15,13 @@ The meta-skill for creating, auditing, optimizing, and evaluating agent skills i
 - **Core References**:
   - [Open Skills Specification & Antigravity Conventions](references/open-skills-spec.md)
   - [Skill Authoring Best Practices](references/best-practices.md)
+  - [Mermaid Diagram Clean Syntax & Linting Guide](references/mermaid-linting.md)
   - [Description Optimization & Trigger Accuracy](references/description-optimization.md)
   - [Script Engineering for Skills](references/script-patterns.md)
   - [Evaluation & Quality Benchmarking](references/eval-methodology.md)
 - **Bundled Utilities**:
-  - `python3 skill-architect/scripts/validate_skill.py <path-to-skill>`: Audits frontmatter, directory naming, line counts, and relative link validity.
+  - `python3 skill-architect/scripts/validate_skill.py <path-to-skill>`: Audits frontmatter, directory naming, line counts, relative links, and Mermaid diagram syntax.
+  - `python3 skill-architect/scripts/lint_mermaid.py <path-to-file-or-dir> [--fix]`: Lints and auto-fixes Mermaid diagrams using `@probelabs/maid` and built-in rules.
   - `python3 skill-architect/scripts/scaffold_skill.py <skill-name>`: Scaffolds a spec-compliant skill structure with optional scripts, references, and evals.
 - **Templates**:
   - [SKILL.md Starter Template](assets/skill_template.md)
@@ -73,11 +75,16 @@ Keep the body under 500 lines / 5,000 tokens by adhering to progressive disclosu
    - For stateful or destructive actions, instruct the agent to generate a plan, run a validator, and fix errors before execution.
 5. **Output Format**:
    - Provide concrete structural markdown or JSON templates.
+6. **Mermaid Diagram Clean Syntax**:
+   - Ensure any Mermaid diagrams adhere to strict syntax (see [Mermaid Diagram Clean Syntax & Linting Guide](references/mermaid-linting.md)): no bare double quotes in edge labels (`48-in` instead of `48"`), standard arrows only (`-->`, `<-->`, `==>`), no trailing semicolons on `classDef`, and quote labels with special characters `Node["Label (Details)"]`.
 
 ### Phase 5: Verification
-Run the validation script and resolve any errors or warnings:
+Run the validation script (which automatically audits YAML, links, line budget, and Mermaid syntax) and resolve any errors or warnings:
 ```bash
 python3 skill-architect/scripts/validate_skill.py <path-to-skill>
+
+# Or lint and auto-fix Mermaid diagrams specifically:
+python3 skill-architect/scripts/lint_mermaid.py <path-to-skill> --fix
 ```
 
 ---
