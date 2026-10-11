@@ -241,7 +241,7 @@ def generate_mermaid_circulation(layout: Dict[str, Any]) -> str:
     for c in layout.get("connections", []):
         f_id = c["from"]
         t_id = c["to"]
-        width = f"{c.get('width_in', 36)}\""
+        width = f"{c.get('width_in', 36)} in"
         traffic = c.get("traffic", "medium")
         c_type = c.get("type", "door")
 

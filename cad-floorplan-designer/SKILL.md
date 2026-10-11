@@ -55,12 +55,12 @@ graph TD
     classDef service fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
     classDef exterior fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
 
-    Entry([Main Entry]):::public ==>|Arterial 48" Corridor| Living[Living / Dining Room]:::public
-    Living <==>|Open Plan| Kitchen[Kitchen / Pantry]:::public
-    Living ==>|2" Step-Down| Terrace[Covered Terrace / Pool]:::exterior
+    Entry([Main Entry]):::public ==>|Arterial 48-in Corridor| Living[Living / Dining Room]:::public
+    Living <-->|Open Plan| Kitchen[Kitchen / Pantry]:::public
+    Living ==>|2-in Step-Down| Terrace[Covered Terrace / Pool]:::exterior
     Kitchen -->|Service Transit| Utility[Laundry & Beach Wash]:::service
-    Entry -.->|Acoustic Buffer Hall 42"| BedMaster[Primary Suite]:::private
-    Entry -.->|Baffled Vestibule 36"| Powder[Guest Powder Room]:::public
+    Entry -.->|Acoustic Buffer Hall 42-in| BedMaster[Primary Suite]:::private
+    Entry -.->|Baffled Vestibule 36-in| Powder[Guest Powder Room]:::public
     Utility -.->|Exterior Direct Access| Mech[Battery, Inverter & Cistern Core]:::service
 ```
 
