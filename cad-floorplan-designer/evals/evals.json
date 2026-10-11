@@ -1,0 +1,31 @@
+{
+  "skill_name": "cad-floorplan-designer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Design a 2-bedroom resilient coastal hillside residence on a 60ft x 100ft lot with 15ft front and rear setbacks and 10ft side setbacks. Ensure CMU modular 16\" grid alignment, an inverted living program, a spatial UX circulation map, and a resilience utility core.",
+      "expected_output": "Buildable CMU floorplan with modular dimension validation, Mermaid circulation topology, 2D CAD SVG plan, and architectural schedule.",
+      "files": [],
+      "assertions": [
+        "Exterior dimensions snap to 8-inch or 16-inch CMU increments",
+        "Setbacks are fully respected in the buildable envelope",
+        "A Mermaid circulation graph is generated with clear hierarchy",
+        "Arterial corridors have at least 42-48 inches of clear width",
+        "SVG output includes structural grid, walls, door swings, and North arrow",
+        "Resilience utility core with cistern and battery storage is incorporated"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit and redesign a proposed floorplan where the master bedroom shares an uninsulated wall with a solar inverter and booster pump room, and the front door looks directly into a guest bathroom toilet.",
+      "expected_output": "Spatial UX audit identifying the acoustic and sightline defects, followed by a redesigned circulation layout with acoustic buffering and visual baffles.",
+      "files": [],
+      "assertions": [
+        "Identifies acoustic conflict between master bedroom and mechanical room",
+        "Identifies visual privacy breach into bathroom",
+        "Proposes acoustic buffer wall, closet chase, or layout separation",
+        "Introduces privacy vestibule or 90-degree visual baffle"
+      ]
+    }
+  ]
+}

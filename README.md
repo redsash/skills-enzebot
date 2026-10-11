@@ -12,6 +12,7 @@ npx skills add redsash/skills-enzebot
 
 | Skill | Description |
 | :--- | :--- |
+| [cad-floorplan-designer](./cad-floorplan-designer/SKILL.md) | Designs buildable 2D architectural CAD floor plans, spatial layouts, and circulation maps adhering to CMU modularity and spatial UX. |
 | [competing-hypothesis](./competing-hypothesis/SKILL.md) | Evaluates ambiguous or contradictory evidence against rival explanations using Richards Heuer's Analysis of Competing Hypotheses (ACH). |
 | [deeply-investigate](./deeply-investigate/SKILL.md) | Investigates complex technical topics, nascent architectures, APIs, or documents against primary sources to generate a structured dossier. |
 | [human-readable](./human-readable/SKILL.md) | Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from drafts to make them sound natural and human-authored. |
