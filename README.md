@@ -12,13 +12,13 @@ npx skills add redsash/skills-enzebot
 
 To prevent repository bloat, tag fatigue, and context exhaustion in large agent environments, skills in this repository are cataloged using a **Faceted Classification System** across three orthogonal coordinates (plus an optional interaction mode):
 
-1. **Cognitive Phase (`phase`)**: Where in the agent's cognition/execution loop the skill triggers:
-   * `explore`: Discovery, research, and mapping unknowns.
-   * `deliberate`: High-stakes decision analysis, trade-off evaluation, and planning.
-   * `author`: Generative creation, synthesis, and scaffolding.
-   * `critique`: Quality review, principle auditing, anti-slop editing, and verification.
-   * `maintain`: Remediation, drift prevention, logging, and codebase cleanup.
-   * `meta`: Agent behavior, self-governance, and skill engineering.
+1. **Cognitive Phase (`phase`)**: Rather than a rigid state machine, **Phase is a Cognitive Stance**. At any given turn, what is the agent's posture?
+   * *Am I opening the aperture?* &rarr; `explore` (discovery, research, mapping unknowns)
+   * *Am I eliminating rival hypotheses?* &rarr; `deliberate` (decision analysis, trade-off evaluation, planning)
+   * *Am I putting ink on paper?* &rarr; `author` (generative creation, synthesis, scaffolding)
+   * *Am I holding a red pen?* &rarr; `critique` (quality review, principle auditing, anti-slop editing)
+   * *Am I recording the trail?* &rarr; `maintain` (remediation, drift prevention, logging, cleanup)
+   * *Am I observing or tooling the system itself?* &rarr; `meta` (agent behavior, self-governance, skill engineering)
 2. **Operational Modality (`modality`)**: How the skill enforces its instructions:
    * `lens`: Epistemic model or cognitive framework that shifts reasoning style.
    * `spec`: Hard rules, invariants, and domain constraints.

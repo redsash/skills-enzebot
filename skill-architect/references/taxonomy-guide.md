@@ -30,7 +30,14 @@ To solve this, Agent Skills adopt **Faceted Classification** (inspired by librar
 ## 2. The Three Core Facets
 
 ### Facet 1: Cognitive Phase (`phase`)
-*Where in the agent's cognition or task execution lifecycle does this skill fire?*
+Rather than a rigid state machine, **Phase is a Cognitive Stance**. At any given turn, what is the agent's posture?
+
+* **Am I opening the aperture?** &rarr; `explore`
+* **Am I eliminating rival hypotheses?** &rarr; `deliberate`
+* **Am I putting ink on paper?** &rarr; `author`
+* **Am I holding a red pen?** &rarr; `critique`
+* **Am I recording the trail?** &rarr; `maintain`
+* **Am I observing or tooling the system itself?** &rarr; `meta`
 
 | Phase | Purpose | Agent Cognitive Action | Examples |
 | :--- | :--- | :--- | :--- |
