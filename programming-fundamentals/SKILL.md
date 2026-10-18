@@ -2,6 +2,11 @@
 name: programming-fundamentals
 description: >-
   Applies foundational software engineering principles (DRY, KISS, YAGNI, Single Responsibility, Low Coupling, High Cohesion, Law of Demeter, Information Hiding, Principle of Least Astonishment, and Kent Beck's Embrace Change) along with functional programming reusability (Pure Functions, Immutability, Higher-Order Functions, Currying, and Composition) to design, review, refactor, and simplify code. Use when reviewing code, refactoring architectures, evaluating design trade-offs, simplifying over-engineered logic, or auditing code maintainability.
+taxonomy:
+  phase: [critique, author]
+  modality: [spec]
+  domain: [software-engineering]
+  interaction: autonomous
 ---
 
 # Programming Fundamentals

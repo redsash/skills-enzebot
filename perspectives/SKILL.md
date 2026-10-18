@@ -2,6 +2,11 @@
 name: perspectives
 description: >-
   Stress-tests decisions, strategic dilemmas, and complex architectural forks by simulating a multi-expert advisory panel and adversarial cross-debate. Use when the user asks for multiple perspectives, says "what would experts think", asks to stress-test a strategy or design, evaluates high-stakes trade-offs, or faces a difficult crossroads.
+taxonomy:
+  phase: [deliberate]
+  modality: [lens]
+  domain: [architecture-strategy]
+  interaction: interactive
 ---
 
 # Perspectives (Expert Advisory Panel)

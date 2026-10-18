@@ -3,6 +3,11 @@ name: research-journaler
 description: >-
   Initializes, structures, and logs reproducible research sessions into chronological journal entries (entries/YYYY-MM/YYYY-MM-DD_topic-slug/). Use when starting a research inquiry, logging experimental findings, recording prompt iterations, or wrapping up research milestones across software engineering, academic, or data analysis domains.
 compatibility: Requires Python 3.8+
+taxonomy:
+  phase: [maintain]
+  modality: [runbook, harness]
+  domain: [operations-reliability, software-engineering]
+  interaction: autonomous
 ---
 
 # Research Journaler

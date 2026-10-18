@@ -2,6 +2,11 @@
 name: human-readable
 description: >-
   Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from written drafts to make them sound natural and human-authored. Use when a draft "sounds like AI", "reads like an LLM", or feels stilted, corporate, or formulaic across PR descriptions, proposals, documentation, announcements, commit messages, or blog posts.
+taxonomy:
+  phase: [critique]
+  modality: [lens, spec]
+  domain: [editorial-communication]
+  interaction: autonomous
 ---
 
 # Make Fit for Human Consumption

@@ -38,6 +38,7 @@ The `SKILL.md` file must start with valid YAML frontmatter between `---` delimit
 | `description` | string | **Yes** | 1–1024 chars; non-empty. Plain text or folded block scalar (`>-`). | Explains what the skill does and when the agent should activate it. Primary trigger mechanism. |
 | `license` | string | No | Short identifier (e.g. `Apache-2.0`, `MIT`, `Proprietary`) or pointer to bundled license. | Licensing terms. |
 | `compatibility` | string | No | Max 500 characters. | Runtime/system prerequisites (e.g. `Requires Python 3.10+, docker, jq`). |
+| `taxonomy` | map | Recommended | Contains `phase`, `modality`, `domain` (and optional `interaction`). See [Taxonomy Guide](taxonomy-guide.md). | Multi-dimensional faceted classification for routing and cataloging. |
 | `metadata` | map[str, str] | No | String key-value mapping. | Custom extensions, author info, versioning. |
 | `allowed-tools` | string | No | Space-separated list of approved tool patterns (e.g. `Bash(git:*) Read`). | Tool sandboxing hints (experimental). |
 

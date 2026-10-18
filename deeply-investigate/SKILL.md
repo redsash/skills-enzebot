@@ -2,6 +2,11 @@
 name: deeply-investigate
 description: >-
   Investigates complex technical topics, nascent architectural concepts, external APIs, or local documents (PDFs, specifications, data) against canonical primary sources. Use when tasked with conducting in-depth research, architectural discovery, API verification, or compiling a progressive-disclosure technical dossier, especially when delegating heavy exploration to a background subagent.
+taxonomy:
+  phase: [explore]
+  modality: [runbook]
+  domain: [software-engineering, architecture-strategy]
+  interaction: autonomous
 ---
 
 # Deeply Investigate

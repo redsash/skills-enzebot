@@ -33,6 +33,11 @@ except ImportError:
 
 NAME_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 MARKDOWN_LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+KEBAB_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
+VALID_PHASES = {"explore", "deliberate", "author", "critique", "maintain", "meta"}
+VALID_MODALITIES = {"lens", "spec", "runbook", "harness"}
+VALID_INTERACTIONS = {"interactive", "autonomous"}
 
 
 def parse_frontmatter(content: str):
@@ -62,26 +67,78 @@ def parse_frontmatter(content: str):
         except Exception as e:
             return None, body, [f"YAML parsing error: {e}"]
     else:
-        # Fallback simple parser for name & description if PyYAML is unavailable
+        # Fallback structured parser for frontmatter with mappings, lists, and folded scalars
         data = {}
-        current_key = None
-        for raw_line in raw_yaml.splitlines():
-            stripped = raw_line.strip()
+        yaml_lines = raw_yaml.splitlines()
+        stack = [(-1, data)]
+        i = 0
+        while i < len(yaml_lines):
+            line = yaml_lines[i]
+            stripped = line.strip()
             if not stripped or stripped.startswith("#"):
+                i += 1
                 continue
-            if not raw_line.startswith((" ", "\t")) and ":" in stripped:
+
+            indent = len(line) - len(line.lstrip(" "))
+            while len(stack) > 1 and indent <= stack[-1][0]:
+                stack.pop()
+
+            cur = stack[-1][1]
+
+            if stripped.startswith("- "):
+                val = stripped[2:].strip().strip("'\"")
+                if isinstance(cur, list):
+                    cur.append(val)
+                i += 1
+                continue
+
+            if ":" in stripped:
                 k, v = stripped.split(":", 1)
-                current_key = k.strip()
-                val = v.strip().strip("'\"")
-                if val in (">-", ">", "|", "|-", ""):
-                    data[current_key] = ""
+                k = k.strip()
+                v = v.strip()
+
+                if v in (">-", ">", "|", "|-", ""):
+                    # Look ahead for indentation
+                    next_indent = None
+                    for j in range(i + 1, len(yaml_lines)):
+                        if yaml_lines[j].strip() and not yaml_lines[j].strip().startswith("#"):
+                            next_indent = len(yaml_lines[j]) - len(yaml_lines[j].lstrip(" "))
+                            break
+
+                    if next_indent is not None and next_indent > indent:
+                        next_stripped = yaml_lines[j].strip()
+                        if v in (">-", ">", "|", "|-"):
+                            block_lines = []
+                            i += 1
+                            while i < len(yaml_lines):
+                                curr_line = yaml_lines[i]
+                                if not curr_line.strip():
+                                    block_lines.append("")
+                                    i += 1
+                                    continue
+                                line_indent = len(curr_line) - len(curr_line.lstrip(" "))
+                                if line_indent < next_indent:
+                                    break
+                                block_lines.append(curr_line.strip())
+                                i += 1
+                            cur[k] = " ".join(block_lines) if ">" in v else "\n".join(block_lines)
+                            continue
+                        elif next_stripped.startswith("- "):
+                            new_list = []
+                            cur[k] = new_list
+                            stack.append((indent, new_list))
+                        else:
+                            new_dict = {}
+                            cur[k] = new_dict
+                            stack.append((indent, new_dict))
+                    else:
+                        cur[k] = ""
+                elif v.startswith("[") and v.endswith("]"):
+                    items = [x.strip().strip("'\"") for x in v[1:-1].split(",") if x.strip()]
+                    cur[k] = items
                 else:
-                    data[current_key] = val
-            elif current_key and (raw_line.startswith(" ") or raw_line.startswith("\t")):
-                if data[current_key]:
-                    data[current_key] += " " + stripped
-                else:
-                    data[current_key] = stripped
+                    cur[k] = v.strip("'\"")
+            i += 1
         return data, body, []
 
 
@@ -156,6 +213,73 @@ def validate_skill(skill_dir_path: Path):
             for k, v in meta.items():
                 if not isinstance(k, str) or not isinstance(v, str):
                     errors.append(f"Metadata entries must be string-to-string. Invalid pair: {k}={v}")
+
+    # Validate taxonomy (recommended)
+    taxonomy = frontmatter.get("taxonomy")
+    if taxonomy is None:
+        warnings.append("Missing 'taxonomy' in frontmatter. Consider adding 'phase', 'modality', and 'domain' for cataloging and routing.")
+    elif not isinstance(taxonomy, dict):
+        errors.append("Field 'taxonomy' must be a dictionary / mapping.")
+    else:
+        tax_details = {}
+
+        # 1. Phase (explore, deliberate, author, critique, maintain, meta)
+        raw_phases = taxonomy.get("phase")
+        if not raw_phases:
+            errors.append("Taxonomy requires 'phase' (e.g. explore, deliberate, author, critique, maintain, meta).")
+        else:
+            phases = [raw_phases] if isinstance(raw_phases, str) else list(raw_phases) if isinstance(raw_phases, list) else None
+            if phases is None:
+                errors.append("Taxonomy 'phase' must be a string or list of strings.")
+            else:
+                invalid_phases = [p for p in phases if not isinstance(p, str) or p not in VALID_PHASES]
+                if invalid_phases:
+                    errors.append(f"Invalid taxonomy phase(s): {invalid_phases}. Allowed: {sorted(list(VALID_PHASES))}")
+                if len(phases) > 1:
+                    warnings.append(f"Skill defines multiple phases: {phases}. While supported (1..n), single-phase focus is recommended for modular agent routing.")
+                tax_details["phase"] = phases
+
+        # 2. Modality (lens, spec, runbook, harness)
+        raw_modalities = taxonomy.get("modality")
+        if not raw_modalities:
+            errors.append("Taxonomy requires 'modality' (e.g. lens, spec, runbook, harness).")
+        else:
+            modalities = [raw_modalities] if isinstance(raw_modalities, str) else list(raw_modalities) if isinstance(raw_modalities, list) else None
+            if modalities is None:
+                errors.append("Taxonomy 'modality' must be a string or list of strings.")
+            else:
+                invalid_mods = [m for m in modalities if not isinstance(m, str) or m not in VALID_MODALITIES]
+                if invalid_mods:
+                    errors.append(f"Invalid taxonomy modality(s): {invalid_mods}. Allowed: {sorted(list(VALID_MODALITIES))}")
+                tax_details["modality"] = modalities
+
+        # 3. Domain
+        raw_domains = taxonomy.get("domain")
+        if not raw_domains:
+            errors.append("Taxonomy requires 'domain' (e.g. architecture-strategy, software-engineering, operations-reliability).")
+        else:
+            domains = [raw_domains] if isinstance(raw_domains, str) else list(raw_domains) if isinstance(raw_domains, list) else None
+            if domains is None:
+                errors.append("Taxonomy 'domain' must be a string or list of strings.")
+            else:
+                invalid_doms = [d for d in domains if not isinstance(d, str) or not KEBAB_PATTERN.match(d)]
+                if invalid_doms:
+                    errors.append(f"Invalid taxonomy domain(s): {invalid_doms}. Must be lowercase kebab-case strings.")
+                tax_details["domain"] = domains
+
+        # 4. Interaction (optional)
+        raw_interaction = taxonomy.get("interaction")
+        if raw_interaction is not None:
+            interactions = [raw_interaction] if isinstance(raw_interaction, str) else list(raw_interaction) if isinstance(raw_interaction, list) else None
+            if interactions is None:
+                errors.append("Taxonomy 'interaction' must be a string or list of strings.")
+            else:
+                invalid_ints = [i for i in interactions if not isinstance(i, str) or i not in VALID_INTERACTIONS]
+                if invalid_ints:
+                    errors.append(f"Invalid taxonomy interaction(s): {invalid_ints}. Allowed: {sorted(list(VALID_INTERACTIONS))}")
+                tax_details["interaction"] = interactions
+
+        details["taxonomy"] = tax_details
 
     # Validate line count for progressive disclosure
     total_lines = len(content.splitlines())
@@ -252,6 +376,18 @@ def main():
             print(f"Description Size:  {result['details']['description_length']} / 1024 characters")
         if result["details"].get("total_lines"):
             print(f"Line Count:        {result['details']['total_lines']} lines")
+        if result["details"].get("taxonomy"):
+            tax = result["details"]["taxonomy"]
+            tax_parts = []
+            if "phase" in tax:
+                tax_parts.append(f"phase=[{', '.join(tax['phase'])}]")
+            if "modality" in tax:
+                tax_parts.append(f"modality=[{', '.join(tax['modality'])}]")
+            if "domain" in tax:
+                tax_parts.append(f"domain=[{', '.join(tax['domain'])}]")
+            if "interaction" in tax:
+                tax_parts.append(f"interaction=[{', '.join(tax['interaction'])}]")
+            print(f"Taxonomy:          {', '.join(tax_parts)}")
         if result["details"].get("mermaid_diagrams_checked"):
             print(f"Mermaid Diagrams:  {result['details']['mermaid_diagrams_checked']} checked (syntax valid)")
 

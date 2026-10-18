@@ -23,7 +23,18 @@ from pathlib import Path
 NAME_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
-def scaffold_skill(name: str, description: str, base_dir: Path, with_scripts: bool, with_references: bool, with_evals: bool):
+def scaffold_skill(
+    name: str,
+    description: str,
+    base_dir: Path,
+    with_scripts: bool,
+    with_references: bool,
+    with_evals: bool,
+    phase: str = "author",
+    modality: str = "runbook",
+    domain: str = "software-engineering",
+    interaction: str = None
+):
     if len(name) < 1 or len(name) > 64:
         sys.stderr.write(f"Error: Skill name must be 1-64 characters. Received: {name}\n")
         sys.exit(1)
@@ -41,10 +52,15 @@ def scaffold_skill(name: str, description: str, base_dir: Path, with_scripts: bo
 
     desc_text = description if description else f"Describe what {name} does and exact conditions when the agent should activate it. Use imperative phrasing."
 
+    interaction_line = f"\n  interaction: {interaction}" if interaction else ""
     skill_md_content = f"""---
 name: {name}
 description: >-
   {desc_text}
+taxonomy:
+  phase: [{phase}]
+  modality: [{modality}]
+  domain: [{domain}]{interaction_line}
 ---
 
 # {name.replace('-', ' ').title()}
@@ -169,6 +185,10 @@ def main():
     parser.add_argument("--with-scripts", action="store_true", help="Create scripts/ directory with starter run.py")
     parser.add_argument("--with-references", action="store_true", help="Create references/ directory")
     parser.add_argument("--with-evals", action="store_true", help="Create evals/ directory with evals.json template")
+    parser.add_argument("--phase", default="author", choices=["explore", "deliberate", "author", "critique", "maintain", "meta"], help="Cognitive phase (default: author)")
+    parser.add_argument("--modality", default="runbook", choices=["lens", "spec", "runbook", "harness"], help="Operational modality (default: runbook)")
+    parser.add_argument("--domain", default="software-engineering", help="Domain vertical (default: software-engineering)")
+    parser.add_argument("--interaction", choices=["interactive", "autonomous"], default=None, help="Optional interaction mode")
     parser.add_argument("--output-dir", default=".", help="Target output directory (default: .)")
 
     args = parser.parse_args()
@@ -178,7 +198,11 @@ def main():
         base_dir=Path(args.output_dir),
         with_scripts=args.with_scripts,
         with_references=args.with_references,
-        with_evals=args.with_evals
+        with_evals=args.with_evals,
+        phase=args.phase,
+        modality=args.modality,
+        domain=args.domain,
+        interaction=args.interaction
     )
 
 

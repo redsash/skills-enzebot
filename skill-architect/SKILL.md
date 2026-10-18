@@ -2,6 +2,11 @@
 name: skill-architect
 description: >-
   Designs, scaffolds, evaluates, and refines agent skills according to the Open Skills specification and Antigravity guidelines. Use this skill whenever creating a new skill, updating or auditing an existing SKILL.md, optimizing trigger descriptions, engineering bundled scripts, or running evals and benchmarks.
+taxonomy:
+  phase: [meta]
+  modality: [runbook, harness]
+  domain: [agent-meta]
+  interaction: interactive
 ---
 
 # Skill Architect
@@ -14,15 +19,16 @@ The meta-skill for creating, auditing, optimizing, and evaluating agent skills i
 
 - **Core References**:
   - [Open Skills Specification & Antigravity Conventions](references/open-skills-spec.md)
+  - [AI Agent Skills Taxonomy & Classification Guide](references/taxonomy-guide.md)
   - [Skill Authoring Best Practices](references/best-practices.md)
   - [Mermaid Diagram Clean Syntax & Linting Guide](references/mermaid-linting.md)
   - [Description Optimization & Trigger Accuracy](references/description-optimization.md)
   - [Script Engineering for Skills](references/script-patterns.md)
   - [Evaluation & Quality Benchmarking](references/eval-methodology.md)
 - **Bundled Utilities**:
-  - `python3 skill-architect/scripts/validate_skill.py <path-to-skill>`: Audits frontmatter, directory naming, line counts, relative links, and Mermaid diagram syntax.
+  - `python3 skill-architect/scripts/validate_skill.py <path-to-skill>`: Audits frontmatter, taxonomy, directory naming, line counts, relative links, and Mermaid diagram syntax.
   - `python3 skill-architect/scripts/lint_mermaid.py <path-to-file-or-dir> [--fix]`: Lints and auto-fixes Mermaid diagrams using `@probelabs/maid` and built-in rules.
-  - `python3 skill-architect/scripts/scaffold_skill.py <skill-name>`: Scaffolds a spec-compliant skill structure with optional scripts, references, and evals.
+  - `python3 skill-architect/scripts/scaffold_skill.py <skill-name>`: Scaffolds a spec-compliant skill structure with optional scripts, references, taxonomy, and evals.
 - **Templates**:
   - [SKILL.md Starter Template](assets/skill_template.md)
   - [Evals JSON Starter Template](assets/evals_template.json)
@@ -51,16 +57,24 @@ When asked to create a new skill from scratch, follow this 5-stage procedure:
    ```bash
    python3 skill-architect/scripts/scaffold_skill.py <skill-name> \
      --description "<imperative description under 1024 chars>" \
+     --phase <explore|deliberate|author|critique|maintain|meta> \
+     --modality <lens|spec|runbook|harness> \
+     --domain <domain-slug> \
      --with-scripts --with-references --with-evals
    ```
    *(Omit `--with-scripts` or `--with-references` if the skill is purely procedural and fits within a concise SKILL.md).*
 
-### Phase 3: Drafting the Frontmatter
+### Phase 3: Drafting Frontmatter & Taxonomy
 - **`name`**: Must strictly match the directory name.
 - **`description`**: Imperative, pushy, focused on user intent:
   - Must state **what** the skill accomplishes and **when** the agent should activate it.
   - Include synonyms, file extensions, and edge situations (e.g. *"even if the user does not explicitly say 'CSV'"*).
   - Must be strictly $\le 1024$ characters.
+- **`taxonomy`** (Faceted Classification coordinates):
+  - `phase`: 1..n of `[explore, deliberate, author, critique, maintain, meta]` (single-phase recommended).
+  - `modality`: 1..n of `[lens, spec, runbook, harness]`.
+  - `domain`: 1..n domain slugs (e.g. `[architecture-strategy, software-engineering]`).
+  - `interaction` (optional): `[interactive, autonomous]`.
 - **Optional fields**: Specify `compatibility` only if external packages/tools are required (max 500 chars).
 
 ### Phase 4: Authoring the Body (`SKILL.md`)

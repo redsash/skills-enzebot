@@ -3,6 +3,10 @@ name: [skill-name]
 description: >-
   [Imperative description of what the skill does and exact conditions when the agent should activate it.
   State user intent, keywords, file formats, and boundary conditions. Max 1024 characters.]
+taxonomy:
+  phase: [author]
+  modality: [runbook]
+  domain: [software-engineering]
 ---
 
 # [Skill Title]

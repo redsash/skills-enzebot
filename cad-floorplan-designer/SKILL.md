@@ -2,6 +2,11 @@
 name: cad-floorplan-designer
 description: "Designs buildable, structurally sound 2D architectural CAD floor plans, spatial layouts, and circulation maps adhering to modular masonry (CMU), zoning setbacks, island resilience, and spatial UX principles. Use whenever asked to design floor plans, architectural layouts, bubble diagrams, room circulation flow, or generate 2D CAD SVG drawings with schedules."
 compatibility: Standard markdown and SVG viewer; Python 3.8+ for bundled scripts
+taxonomy:
+  phase: [author]
+  modality: [spec, harness]
+  domain: [physical-spatial-design]
+  interaction: interactive
 ---
 
 # CAD Floorplan Designer

@@ -2,6 +2,11 @@
 name: competing-hypothesis
 description: >-
   Evaluates complex, ambiguous, or contradictory evidence against multiple mutually exclusive explanations using Richards Heuer's Analysis of Competing Hypotheses (ACH) methodology. Use when diagnosing elusive production bugs, investigating security incidents, evaluating intelligence/risk scenarios, or choosing among rival technical root causes while eliminating confirmation bias.
+taxonomy:
+  phase: [deliberate]
+  modality: [lens]
+  domain: [architecture-strategy, operations-reliability]
+  interaction: interactive
 ---
 
 # Analysis of Competing Hypotheses (ACH)

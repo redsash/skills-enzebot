@@ -2,6 +2,11 @@
 name: strategic-thinking-5d
 description: >-
   Applies Dan Koe's 5D Thinking framework (grounded in Ken Wilber's Integral AQAL, Robert Kegan's developmental psychology, and holarchies) to diagnose bottlenecks, stress-test architectural decisions, evaluate product POCs, and eliminate one-dimensional AI slop. Use when analyzing complex strategic dilemmas, designing or reviewing products/POCs, authoring high-conviction technical proposals, or when the user invokes 5D thinking, strategic genius, Dan Koe, AQAL, or integral strategy.
+taxonomy:
+  phase: [deliberate]
+  modality: [lens]
+  domain: [architecture-strategy]
+  interaction: interactive
 ---
 
 # 5D Strategic Thinking
