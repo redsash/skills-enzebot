@@ -1,0 +1,44 @@
+{
+  "skill_name": "discord-webhook-script-writer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a reusable bash script for sending GitHub Actions CI/CD deployment notifications to Discord. The script must accept --status, --repo, --branch, --commit, and --run-url arguments, format an embed with dynamic green/red/yellow status colors, support both CLI and env var for the webhook URL, and pass ShellCheck.",
+      "expected_output": "A complete, executable Bash script adhering to set -euo pipefail, jq-based JSON construction, dual webhook URL resolution, and --dry-run support, accompanied by ShellCheck validation confirmation.",
+      "files": [],
+      "assertions": [
+        "Script contains 'set -euo pipefail' and 'IFS=$'\\n\\t''",
+        "Script isolates primary execution logic inside a main() function",
+        "Script supports both --webhook-url and DISCORD_WEBHOOK_URL",
+        "Script formats JSON using jq rather than raw string interpolation",
+        "Script implements -h/--help and --dry-run flags",
+        "Script passes shellcheck validation with zero errors or warnings"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a cronjob bash script that checks disk and memory usage every 10 minutes and sends a Discord alert only when disk usage exceeds 85% or memory exceeds 90%. It should ping a specific Discord user ID on alerts and output nothing when normal.",
+      "expected_output": "A production-ready Bash script that gathers system metrics via df and free/top, compares against configurable thresholds, constructs a Discord embed with red color and user mention tag, supports --only-on-alert, and validates cleanly.",
+      "files": [],
+      "assertions": [
+        "Script gathers disk and memory utilization reliably",
+        "Script supports --only-on-alert to suppress normal runs in cron",
+        "Script formats Discord mention syntax <@USER_ID>",
+        "Script includes dual webhook URL resolution and error handling",
+        "Script passes shellcheck validation with zero warnings"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Write a bash script for an automated nightly Postgres backup job that posts a completion report to Discord with database name, archive file size, duration, and if failed, attaches the last 10 lines of the backup log.",
+      "expected_output": "A robust backup notifier script with --status, --name, --file, --duration, and --log-file options, dynamic embeds, and ShellCheck compliance.",
+      "files": [],
+      "assertions": [
+        "Script inspects file size using du -h when file path is provided",
+        "Script extracts log tail on failure using tail -n",
+        "Script uses jq to safely escape multiline log text in code block",
+        "Script passes shellcheck validation with zero warnings"
+      ]
+    }
+  ]
+}
