@@ -1,0 +1,38 @@
+{
+  "skill_name": "quant-edge-auditor",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit historical NFL prediction dataset for temporal lookahead bias and verify that all knowledge timestamps precede prediction and kickoff timestamps.",
+      "expected_output": "Identification of any records where knowledge_time > prediction_time or prediction_time >= event_start_time, reporting an exact causal integrity rate.",
+      "files": ["tests/sample_bets.csv"],
+      "assertions": [
+        "The script asof_leakage_verifier.py executes without crash",
+        "Sample violations are flagged with exact row timestamps",
+        "The output returns a clear causal integrity rate percentage"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Extract true fair probabilities from a heavy favorite / longshot market (-450 / +350) using Shin's method and compare against naive proportional devigging.",
+      "expected_output": "Calculation of insider informed capital parameter z, fair decimal odds, and demonstration that Shin attributes higher probability to the favorite than naive normalization.",
+      "files": [],
+      "assertions": [
+        "Shin method computes z > 0",
+        "Fair probabilities sum to exactly 1.0",
+        "Fair decimal odds and market overround are reported in a structured format"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Evaluate a sports betting log claiming 18% ROI over 450 bets after testing 30 different qualification variations.",
+      "expected_output": "Deflated Sharpe Ratio calculation penalizing the reported Sharpe for 30 prior discarded trials, reporting whether the edge is durable or rejected as data snooping.",
+      "files": ["tests/sample_bets.csv"],
+      "assertions": [
+        "Deflated Sharpe Ratio (DSR) is computed using Bailey & Lopez de Prado's formula",
+        "Null permutation test scrambles target outcomes",
+        "Final verdict correctly accounts for multiple testing penalty"
+      ]
+    }
+  ]
+}
