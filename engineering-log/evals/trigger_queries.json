@@ -1,0 +1,85 @@
+{
+  "skill_name": "engineering-log",
+  "queries": [
+    {
+      "query": "/engineering-log",
+      "should_trigger": true,
+      "notes": "Explicit slash invocation at end of session"
+    },
+    {
+      "query": "/engineering-log brutal auth race finally resolved after 3 dead ends",
+      "should_trigger": true,
+      "notes": "Explicit invocation with inline context"
+    },
+    {
+      "query": "Let's wrap up and save what we learned from debugging this Kubernetes OOMKilled issue to my engineering log before I quit.",
+      "should_trigger": true,
+      "notes": "Natural end-of-session capture request"
+    },
+    {
+      "query": "Record the dead ends and belief revisions from today's architecture brainstorming session so future sessions remember why we rejected DynamoDB.",
+      "should_trigger": true,
+      "notes": "Non-code brainstorming capture"
+    },
+    {
+      "query": "Check my engineering log for past notes and gotchas about Postgres connection pooling before we touch this module.",
+      "should_trigger": true,
+      "notes": "Pre-flight recall mode via query"
+    },
+    {
+      "query": "Show stats from my engineering logs across projects — which agent failure modes and high-friction techs keep showing up?",
+      "should_trigger": true,
+      "notes": "Cross-project telemetry and stats mode"
+    },
+    {
+      "query": "Append a quick addendum to my earlier engineering log entry noting that the canary deploy held overnight.",
+      "should_trigger": true,
+      "notes": "Follow-up append mode"
+    },
+    {
+      "query": "Can you capture what broke, what unstuck us, and any rule candidates from this frustrating CI pipeline session?",
+      "should_trigger": true,
+      "notes": "Implicit capture request naming core epistemic concepts"
+    },
+    {
+      "query": "Start a new repo-local research journal entry inside research-journal/entries/ for my morning paper notes and track prompt iterations in prompts.json.",
+      "should_trigger": false,
+      "notes": "Near-miss: belongs to research-journaler, not engineering-log"
+    },
+    {
+      "query": "Update CHANGELOG.md and write release notes for v2.4.0 from the merged PRs.",
+      "should_trigger": false,
+      "notes": "Near-miss: release changelog generation"
+    },
+    {
+      "query": "Draft an Architecture Decision Record in docs/adr/0012-use-sqlite.md for this repository.",
+      "should_trigger": false,
+      "notes": "Near-miss: repo ADR authoring"
+    },
+    {
+      "query": "Fix the Python logging configuration in src/server.py so structured JSON logs go to stdout.",
+      "should_trigger": false,
+      "notes": "Near-miss: application logging code edit"
+    },
+    {
+      "query": "Write a git commit message summarizing my staged changes.",
+      "should_trigger": false,
+      "notes": "Near-miss: git commit helper"
+    },
+    {
+      "query": "Inspect the database migration logs in /var/log/app/migrate.log and find the failing SQL statement.",
+      "should_trigger": false,
+      "notes": "Near-miss: reading runtime server log files"
+    },
+    {
+      "query": "Create a new skill for analyzing Terraform plans using skill-architect.",
+      "should_trigger": false,
+      "notes": "Near-miss: skill creation"
+    },
+    {
+      "query": "Review this TypeScript pull request for DRY and SRP violations.",
+      "should_trigger": false,
+      "notes": "Near-miss: code critique (programming-fundamentals)"
+    }
+  ]
+}

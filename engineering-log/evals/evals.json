@@ -1,0 +1,51 @@
+{
+  "skill_name": "engineering-log",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run /engineering-log to log this debugging session on a git repository where we initially assumed Redis TTL caused OAuth 401 errors, hit an 'invalid_grant: refresh_token already rotated' dead end, reproduced it with a minimal concurrent test, and fixed it with single-flight promise deduplication. Use an isolated --dir /tmp/eval-eng-log.",
+      "expected_output": "Creates a schema_version 1 Markdown entry and sharded JSONL ledger record containing structured belief_revisions, dead_ends with exact error_signature, human-agent telemetry, git snapshot, and updated INDEX.md.",
+      "files": [],
+      "assertions": [
+        "Markdown file exists under entries/YYYY/MM/ with valid YAML frontmatter",
+        "Sharded JSONL line under ledgers/*.jsonl parses as valid JSON with record_type == 'entry'",
+        "belief_revisions and dead_ends are populated without hindsight smoothing",
+        "eng_log.py validate --dir /tmp/eval-eng-log exits with code 0"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Use /engineering-log to record a non-git architecture brainstorming session about event-sourced ledger sharding in a plain directory with no .git folder. Use --dir /tmp/eval-eng-log.",
+      "expected_output": "Gracefully logs the session with session_shape='brainstorm', git=null (or is_git=false), code_semantics=null, and compiles INDEX.md without errors.",
+      "files": [],
+      "assertions": [
+        "eng_log.py context succeeds on a non-git directory with git.is_git == false and code_semantics == null",
+        "write succeeds with session_shape == 'brainstorm' and outcome == 'exploratory'",
+        "INDEX.md contains the new brainstorming session highlight with a portable relative Markdown link"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Log a follow-up entry that supersedes an earlier entry via links=[{rel: 'supersedes', target_id: '<old_id>'}], append an addendum to close an open thread, and run stats --format markdown on --dir /tmp/eval-eng-log.",
+      "expected_output": "Superseding entry writes a portable relative Markdown link to the prior entry, INDEX.md marks the prior entry as superseded, append updates the Markdown and JSONL without mutating previous JSONL lines, and stats reports citation centrality and churn.",
+      "files": [],
+      "assertions": [
+        "Markdown Graph Connections section uses portable relative POSIX path without [[wikilinks]]",
+        "query --exclude-superseded omits the superseded entry",
+        "append creates a record_type == 'addendum' JSONL line while preserving prior lines untouched",
+        "stats reports knowledge_churn.supersedes_edges >= 1 and accurate distributions"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Attempt to log an entry whose summary or dead_end contains a GitHub PAT (ghp_...), Bearer JWT, and PEM private key block using --dir /tmp/eval-eng-log.",
+      "expected_output": "Deterministic secret scrubber replaces all credentials with [REDACTED:<kind>] tags before writing to disk and reports redactions_applied >= 3.",
+      "files": [],
+      "assertions": [
+        "redactions_applied >= 3 in write JSON output",
+        "None of the synthetic secret strings appear anywhere in entries/, ledgers/, or INDEX.md",
+        "eng_log.py validate --dir /tmp/eval-eng-log passes with 0 errors"
+      ]
+    }
+  ]
+}
