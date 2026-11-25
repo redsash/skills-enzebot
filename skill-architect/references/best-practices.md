@@ -26,14 +26,31 @@ When a skill activates, its full `SKILL.md` body enters the context window along
 
 ### The Litmus Test
 For every paragraph or bullet point, ask:
-> *"Would an intelligent agent make a mistake here if this instruction were absent?"*
+> *"Would a frontier agent make a mistake here if this instruction were absent?"*
 If the answer is **no**, delete or condense it.
+
+### Small-Model Guardrail Debt vs. Durable Leverage
+Skills written for earlier small models often accumulate procedural micromanagement that wastes tokens and degrades reasoning on Gemini 4 / Claude 5.5. Prune guardrail debt while keeping durable leverage intact (which helps **both** frontier models and Gemini 3.8 Flash):
+
+| Prune (Guardrail Debt) | Keep (Durable Leverage) |
+| :--- | :--- |
+| Mandatory `- [ ] Step N` scratchpad narration on simple tasks | **Hard invariants** and domain rules that cannot be violated |
+| Telling the model *how to think* or restating standard engineering hygiene | **Decision trees** (when to branch, escalate, or stop) |
+| "Pushy" trigger padding to force activation | **Crisp trigger keywords + explicit non-triggers** (`Do not use for...`) |
+| Inline 60-line boilerplate templates or full API docs inside `SKILL.md` | **Offloaded `references/` & `examples/`** linked 1 level deep |
+| Asking the agent to read script source to figure out flags | **Black-box `scripts/`** invoked via `--help` + deterministic exit codes |
+| Vague prose quality wishes ("be thorough", "double check") | **Falsifiable exit criteria** (validators, schema checks, tests, `--dry-run`) |
 
 ---
 
-## 3. Calibrating Prescriptiveness
+## 3. Core Agentic Workflow & Calibrating Prescriptiveness
 
-Match the rigidity of your instructions to the fragility of the workflow.
+Design skills around the durable execution loop:
+1. **Plan**: Identify target invariants, inputs, and verification criteria before editing or executing.
+2. **Use / Adapt / Build Tools to Verify**: Run bundled black-box scripts (`--help` first) or existing repo tools to ground decisions; if no deterministic check exists for a recurring failure mode, build a lightweight verifier script.
+3. **Iterate**: Inspect validator/test output, fix all reported defects, and re-verify until hard exit criteria pass.
+
+Match instruction rigidity to the fragility of the workflow:
 
 | Fragility Level | Approach | Style | Example |
 | :--- | :--- | :--- | :--- |
@@ -57,12 +74,15 @@ Gotchas are high-value, environment-specific corrections that contradict reasona
 - IDs in the billing API are camelCase (`accountId`), but snake_case (`account_id`) in DB.
 ```
 
-### B. Output Format Templates
-Rather than describing desired output in prose, provide a concrete Markdown or JSON skeleton. Models pattern-match significantly better on concrete templates.
+### B. Output Format Contracts
+Rather than describing desired output in prose, provide a concrete Markdown or JSON skeleton. Models pattern-match significantly better on concrete schemas. Keep skeletons concise (under ~30–40 lines) in `SKILL.md`; move larger schemas or multi-variant examples into `references/` or `examples/`.
 
-### C. Validation Loops (Plan-Validate-Execute)
-For batch or multi-stage operations, enforce a self-correcting loop:
+### C. Black-Box Script Invocation
+When a skill bundles executables in `scripts/`, explicitly instruct the agent to run `scripts/<tool> --help` first and execute it directly rather than reading script source code into context (unless debugging or modifying the script).
+
+### D. Validation Loops (Plan-Validate-Execute)
+For batch, stateful, or destructive operations, enforce a self-correcting exit gate:
 1. **Plan**: Generate an intermediate manifest (e.g. `mapping.json` or dry-run log).
-2. **Validate**: Run a deterministic validation script or checklist.
-3. **Correct**: If validation outputs errors, adjust the plan and re-validate.
+2. **Validate**: Run a deterministic validation script or invariant check.
+3. **Correct**: If validation outputs errors, fix all defects and re-validate.
 4. **Execute**: Only execute real actions after validation succeeds.

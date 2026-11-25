@@ -15,21 +15,32 @@ The `description` carries the complete burden of triggering:
 
 ## 2. Rules for High-Accuracy Descriptions
 
-1. **Use Imperative Phrasing**: 
-   Tell the agent when to act.
-   * *Good*: `"Extracts text and tables from PDF files... Use when working with PDF documents or when the user mentions forms, extraction, or PDF parsing."`
+Use the canonical 3-part pattern: **`[Third-person capability] + [Explicit trigger clause] + [Explicit non-trigger boundary]`**.
+
+1. **Use Crisp Third-Person Phrasing**:
+   Open with a third-person present-tense action verb describing what the skill accomplishes (avoid `"I help..."`, `"This skill..."`, or `"A skill that..."`).
+   * *Good*: `"Extracts structured tables and form fields from PDF documents. Use when parsing PDFs, extracting invoices, or inspecting form schemas. Do not use for generating PDFs from Markdown or OCR-only image scans."`
    * *Poor*: `"A skill that helps with PDFs."`
-2. **Focus on User Intent, Not Implementation**:
-   Agents match user prompts against what the user is trying to accomplish.
-3. **Be Constructively Pushy**:
-   Mention situations where the user does not use the exact jargon:
-   * `"Use this skill when analyzing tabular data, even if the user does not explicitly say 'CSV' or 'analytics'."`
-4. **Enforce the 1024-Character Limit**:
-   Keep descriptions concise (typically 200–500 characters). Every character counts against startup context when dozens of skills are installed.
+2. **Focus on User Intent & Domain Keywords, Not Implementation**:
+   Agents match user prompts against what the user is trying to accomplish, plus concrete domain artifacts (file extensions, protocols, slash commands).
+3. **Declare Explicit Non-Triggers (Prevent Routing Collisions)**:
+   Do **not** write "pushy" or catch-all descriptions (`"use anytime the user mentions data"`). On frontier models with dozens of installed skills, broad wording causes false activations. Always add a `Do not use for...` clause naming adjacent skills or native workflows (e.g., `"Do not use for repo-local prompt journals (use research-journaler) or CHANGELOGs."`).
+4. **Match Invocation Posture (`auto` vs. `manual` vs. `hybrid`)**:
+   - **`auto`**: Include crisp ambient triggers + non-triggers.
+   - **`manual`**: Explicitly narrow activation (`"Use only on /<skill-name> or when the user explicitly requests..."`) so heavy frameworks or destructive workflows do not hijack routine turns.
+   - **`hybrid`**: Name `/<skill-name>` plus narrow, unmistakable triggers.
+5. **Respect Context Economy (Target 200–550 chars; Hard Max 1024)**:
+   Every character sits in startup context across every turn. Keep descriptions dense and high-signal.
 
 ---
 
-## 3. Trigger Eval Query Design
+## 3. Cross-Skill Collision Checking & Trigger Eval Design
+
+Before writing trigger evals, run the repo-wide collision check to identify sibling skills sharing the same `phase` + `domain` or high lexical overlap:
+```bash
+python3 skill-architect/scripts/validate_skill.py --all .
+```
+Every colliding sibling skill must become a **negative near-miss** in `evals/trigger_queries.json` and be explicitly disambiguated in both skills' descriptions.
 
 To validate triggering, construct a test suite of ~20 queries in `evals/trigger_queries.json`:
 

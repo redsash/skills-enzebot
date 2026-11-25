@@ -49,7 +49,7 @@ Rather than a rigid state machine, **Phase is a Cognitive Stance**. At any given
 | **`meta`** | Orchestration & self-governance | Authoring skills, configuring agents, benchmarking | `skill-architect` |
 
 #### Cardinality Rule: 1..n (Single-Phase Strongly Recommended)
-While the schema permits multiple phases (`1..n`) to accommodate hybrid transition workflows (e.g., `flaky-test-hunter` traversing `explore` $\rightarrow$ `maintain`), **single-phase assignment is the gold standard**. If a skill spans 3+ phases, it is likely a "megaskill" that should be decomposed into composable sub-skills.
+While the schema permits multiple phases (`1..n`) to accommodate hybrid transition workflows (e.g., `flaky-test-hunter` traversing `explore` → `maintain`), **single-phase assignment is the gold standard**. If a skill spans 3+ phases, it is almost certainly a "megaskill" that should be decomposed into composable single-purpose skills.
 
 ---
 
@@ -84,27 +84,33 @@ Canonical domains include:
 ---
 
 ### Optional Attribute: Interaction Mode (`interaction`)
-*Does the skill require human dialogue or execute autonomously?*
+*Once active, does the skill require human dialogue or execute end-to-end?*
 
-* **`interactive`**: Multi-turn dialogue, interview questions, or human decision gates (e.g. advisory panels).
+* **`interactive`**: Multi-turn dialogue, interview questions, or human decision gates (e.g., advisory panels, approval checkpoints).
 * **`autonomous`**: Fire-and-forget; runs end-to-end without requiring human intervention unless blocked.
+
+*Note on Routing vs. Execution*: `taxonomy.interaction` describes **execution dialogue style**. To specify **triggering posture** (ambient auto-routing vs. manual `/skill-name` invocation), declare `metadata.invocation` (`auto` | `manual` | `hybrid`) alongside optional `metadata.model-tier` and `metadata.effort` hints (see [Harness Layering & Model Tiers](harness-layering.md)).
 
 ---
 
 ## 3. Manifest Declaration (`SKILL.md`)
 
-Declare taxonomy in the YAML frontmatter:
+Declare taxonomy (and optional Open Skills `metadata` execution hints) in the YAML frontmatter:
 
 ```yaml
 ---
 name: competing-hypothesis
 description: >-
-  Evaluates complex, ambiguous, or contradictory evidence against multiple mutually exclusive explanations using Richards Heuer's Analysis of Competing Hypotheses (ACH) methodology.
+  Evaluates complex, ambiguous, or contradictory evidence against multiple mutually exclusive explanations using Richards Heuer's Analysis of Competing Hypotheses (ACH) methodology. Use when diagnosing elusive bugs, investigating incidents, or weighing rival root causes. Do not use for open-ended brainstorming or stylistic code reviews.
 taxonomy:
   phase: [deliberate]
   modality: [lens]
   domain: [architecture-strategy, operations-reliability]
   interaction: interactive
+metadata:
+  model-tier: "deep"
+  effort: "high"
+  invocation: "hybrid"
 ---
 ```
 

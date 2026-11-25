@@ -1,52 +1,79 @@
 ---
 name: [skill-name]
 description: >-
-  [Imperative description of what the skill does and exact conditions when the agent should activate it.
-  State user intent, keywords, file formats, and boundary conditions. Max 1024 characters.]
+  [Third-person summary of what this skill accomplishes. Use when <specific user intent,
+  artifacts, keywords, or /skill-name>. Do not use for <explicit near-miss boundaries or
+  native workflows handled elsewhere>. Target 200-550 chars; max 1024.]
 taxonomy:
   phase: [author]
   modality: [runbook]
   domain: [software-engineering]
+  interaction: autonomous
+metadata:
+  model-tier: "standard"
+  effort: "medium"
+  invocation: "auto"
 ---
 
 # [Skill Title]
 
-[Brief 1-2 sentence orientation describing the core purpose and expected end-state.]
-
-## When to Use This Skill
-- [Trigger condition 1 / user task]
-- [Trigger condition 2 / input file types]
-- **Do not use for**: [Explicit near-miss boundaries handled elsewhere]
+[1-2 sentence orientation: exact goal state and operational scope.]
 
 ---
 
-## Workflow / Procedure
+## Quick Reference & Bundled Resources
 
-Progress:
-- [ ] Step 1: [Analyze / Prepare input]
-- [ ] Step 2: [Execute main operation / Run script]
-- [ ] Step 3: [Validate output against constraints]
+- **References** *(read on demand)*: [Deep-Dive Guide](references/REFERENCE.md)
+- **Examples** *(read on demand)*: [Worked Example](examples/example.md)
+- **Bundled Scripts (Black-Box)**: Treat `scripts/` as black boxes—run `--help` first to inspect flags and execute directly rather than reading script source into context unless debugging or modifying the script.
+  - `python3 scripts/run.py --help`
 
-### Step 1: [Preparation / Inspection]
-[Concise instructions. Specify defaults, not open menus.]
+---
 
-### Step 2: [Execution]
-[Clear commands or scripts. Reference relative paths e.g. `scripts/run.py`.]
+## Goal & Hard Invariants
 
-```bash
-python3 scripts/run.py --input "$INPUT_FILE"
-```
+- **Goal**: [Observable end-state that defines success.]
+- **Invariant 1**: [Non-negotiable domain rule or constraint.]
+- **Invariant 2**: [Opinionated default + explicit escape hatch.]
+- **Scope Boundary**: Do not use this skill for [near-miss task]; use [sibling skill / `AGENTS.md` / native `/plan` or `/swarm`] instead.
 
-### Step 3: [Validation]
-[Validation loop instructions: how the agent verifies its work before proceeding.]
+---
+
+## Decision Tree & Execution Protocol
+
+Follow **Plan → Use/Verify with Tools → Iterate**:
+
+1. **Inspect & Plan**: Gather concrete inputs/ground truth and determine whether existing constraints or edge cases apply.
+   - *If [branch condition A]* → [take path A / consult `references/REFERENCE.md`].
+   - *If [branch condition B]* → [stop and ask user / fall back to alternative].
+2. **Execute**: Invoke bundled black-box scripts or domain procedures:
+   ```bash
+   python3 scripts/run.py --dry-run --input "$INPUT_FILE"
+   ```
+3. **Iterate**: If validation reports errors, fix all reported defects and re-run until clean.
+
+---
+
+## Verification & Exit Criteria
+
+Do not report completion until every gate passes:
+- [ ] Deterministic check / validator exits `0` (`python3 scripts/run.py --verify ...`).
+- [ ] All hard invariants above are satisfied with concrete evidence.
+- [ ] Output conforms strictly to the Output Contract below.
 
 ---
 
 ## Gotchas & Failure Modes
-- **[Gotcha 1]**: [Non-obvious environment, API, or data quirk that defies reasonable assumptions.]
-- **[Gotcha 2]**: [Common edge case or required flag.]
+
+- **[Gotcha 1]**: [Non-obvious environment, API, or data quirk that contradicts reasonable assumptions.]
+- **[Gotcha 2]**: [Common failure signature and exact remediation.]
 
 ---
 
-## Output Template / Standard Format
-[Provide concrete markdown or JSON skeleton to enforce output structure.]
+## Output Contract
+
+*(Keep inline schemas under ~40 lines; offload larger templates to `examples/` or `references/`.)*
+
+```markdown
+# [Compact output skeleton]
+```

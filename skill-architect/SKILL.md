@@ -1,178 +1,128 @@
 ---
 name: skill-architect
 description: >-
-  Designs, scaffolds, evaluates, and refines agent skills according to the Open Skills specification and Antigravity guidelines. Use this skill whenever creating a new skill, updating or auditing an existing SKILL.md, optimizing trigger descriptions, engineering bundled scripts, or running evals and benchmarks.
+  Designs, scaffolds, audits, evaluates, and validates agent skills adhering to the Open Skills specification, Antigravity layering rules, and repo taxonomy standards. Use on /skill-architect or whenever creating a new skill, auditing or refactoring an existing SKILL.md, checking cross-skill trigger collisions, engineering black-box skill scripts, or running skill evals. Do not use for writing always-on repo rules in AGENTS.md, one-off native workflows (/plan, /swarm, /goal), or standalone CLI scripts outside a skill.
 taxonomy:
   phase: [meta]
   modality: [runbook, harness]
   domain: [agent-meta]
   interaction: interactive
+metadata:
+  model-tier: "deep"
+  effort: "high"
+  invocation: "hybrid"
 ---
 
 # Skill Architect
 
-The meta-skill for creating, auditing, optimizing, and evaluating agent skills in this workspace and across Antigravity ecosystems.
+Meta-skill for designing, scaffolding, auditing, and validating durable agent skills across Antigravity CLI (Gemini 4 / Claude 5.5) and Gemini CLI (Flash 3.8).
 
 ---
 
 ## Quick Reference & Bundled Tools
 
-- **Core References**:
-  - [Open Skills Specification & Antigravity Conventions](references/open-skills-spec.md)
-  - [AI Agent Skills Taxonomy & Classification Guide](references/taxonomy-guide.md)
-  - [Skill Authoring Best Practices](references/best-practices.md)
-  - [Mermaid Diagram Clean Syntax & Linting Guide](references/mermaid-linting.md)
-  - [Description Optimization & Trigger Accuracy](references/description-optimization.md)
-  - [Script Engineering for Skills](references/script-patterns.md)
-  - [Evaluation & Quality Benchmarking](references/eval-methodology.md)
-- **Bundled Utilities**:
-  - `python3 skill-architect/scripts/validate_skill.py <path-to-skill>`: Audits frontmatter, taxonomy, directory naming, line counts, relative links, and Mermaid diagram syntax.
-  - `python3 skill-architect/scripts/lint_mermaid.py <path-to-file-or-dir> [--fix]`: Lints and auto-fixes Mermaid diagrams using `@probelabs/maid` and built-in rules.
-  - `python3 skill-architect/scripts/scaffold_skill.py <skill-name>`: Scaffolds a spec-compliant skill structure with optional scripts, references, taxonomy, and evals.
+- **Core References** (load on demand):
+  - [Harness Layering, Invocation & Model Tiers](references/harness-layering.md) — Gate 0 rubric (Skill vs. Rule vs. Native Workflow vs. Subagent vs. Hook vs. CLI), invocation modes, model tiers.
+  - [Open Skills Specification & Antigravity Conventions](references/open-skills-spec.md) — Manifest schema, `.agents/skills/` discovery, progressive disclosure budgets.
+  - [AI Agent Skills Taxonomy & Classification Guide](references/taxonomy-guide.md) — Faceted `phase` / `modality` / `domain` / `interaction` coordinates.
+  - [Skill Authoring Best Practices](references/best-practices.md) — Guardrail-debt pruning vs. durable leverage, fragility calibration, Plan → Verify → Iterate.
+  - [Description Optimization & Trigger Accuracy](references/description-optimization.md) — Third-person precision, non-triggers, collision checks, trigger evals.
+  - [Script Engineering for Skills](references/script-patterns.md) — Black-box `--help` contract, stream segregation, PEP 723, resilience.
+  - [Mermaid Diagram Clean Syntax & Linting Guide](references/mermaid-linting.md) — Strict syntax rules and `@probelabs/maid` validation.
+  - [Evaluation & Quality Benchmarking](references/eval-methodology.md) — Comparative `with_skill` vs. `without_skill` grading.
 - **Templates**:
   - [SKILL.md Starter Template](assets/skill_template.md)
   - [Evals JSON Starter Template](assets/evals_template.json)
-- **Upstream Standards**:
-  - [Agent Skills Specification](https://agentskills.io/specification.md)
-  - [Antigravity Skills Documentation](https://antigravity.google/docs/skills.md)
+- **Bundled Scripts (Black-Box Contract)**:
+  Treat scripts in `scripts/` as black boxes: run `--help` first to inspect flags and execute them directly rather than reading script source into context (unless debugging or modifying the scripts themselves).
+  - `python3 skill-architect/scripts/validate_skill.py --help` — Audits frontmatter, metadata tiers, taxonomy, body-line budget, black-box script contracts, orphan files, links, Mermaid syntax, and cross-skill collisions (`--all .` for repo-wide audit).
+  - `python3 skill-architect/scripts/scaffold_skill.py --help` — Scaffolds a spec-compliant skill (supports `--dry-run`, taxonomy, metadata tiers, `--with-scripts`, `--with-references`, `--with-examples`, `--with-evals`).
+  - `python3 skill-architect/scripts/lint_mermaid.py --help` — Lints and auto-fixes Mermaid diagrams (`--fix`).
 
 ---
 
-## Workflow 1: Scaffolding a New Skill
+## Hard Invariants
 
-When asked to create a new skill from scratch, follow this 5-stage procedure:
+1. **Gate 0 First**: Never scaffold a skill when an Antigravity native workflow, persistent rule (`AGENTS.md` / `.agents/rules/`), subagent persona, hook, or standalone CLI script is the right layer.
+2. **Durable Leverage Over Micromanagement**: Encode **goal states, hard invariants, decision trees, domain gotchas, and deterministic verification criteria**—not step-by-step reasoning scripts or mandatory scratchpad checklists.
+3. **Progressive Disclosure & Context Economy**: Target ≤ 250 body lines (hard ceiling 500 lines / 5,000 tokens). Offload schemas, large templates (>40 lines), and worked examples into `references/`, `examples/`, or `assets/` linked 1 level deep.
+4. **Black-Box Script Discipline**: Every bundled script must be non-interactive, document all flags via `--help`, separate `stdout` (data) from `stderr` (logs), and be invoked as a black box from `SKILL.md`.
+5. **Dual-Harness Portability**: Use `.agents/skills/<name>/` and relative internal paths; keep hard exit criteria and deterministic validators intact so skills excel on both Antigravity (Gemini 4 / Claude 5.5) and Gemini CLI (Flash 3.8).
 
-### Phase 1: Context Gathering & Grounding
-1. **Extract Domain Expertise**:
-   - Identify the real runbooks, incident reports, code conventions, or tool workflows the skill must encode.
-   - Do not ask an LLM to generate generic advice; ground instructions in exact commands, API schemas, flags, and repository paths.
-2. **Define Boundaries**:
-   - Determine what the skill handles vs. what is out of scope.
-   - Ensure the skill addresses a single, coherent unit of work.
+---
 
-### Phase 2: Directory Scaffolding & Naming
-1. Determine the canonical `skill-name`:
-   - Must be 1–64 characters, lowercase `a-z`, `0-9`, and `-`. No leading/trailing hyphens, no `--`.
-2. Run the scaffolding utility:
-   ```bash
-   python3 skill-architect/scripts/scaffold_skill.py <skill-name> \
-     --description "<imperative description under 1024 chars>" \
-     --phase <explore|deliberate|author|critique|maintain|meta> \
-     --modality <lens|spec|runbook|harness> \
-     --domain <domain-slug> \
-     --with-scripts --with-references --with-evals
-   ```
-   *(Omit `--with-scripts` or `--with-references` if the skill is purely procedural and fits within a concise SKILL.md).*
+## Workflow 1: Creating a New Skill
 
-### Phase 3: Drafting Frontmatter & Taxonomy
-- **`name`**: Must strictly match the directory name.
-- **`description`**: Imperative, pushy, focused on user intent:
-  - Must state **what** the skill accomplishes and **when** the agent should activate it.
-  - Include synonyms, file extensions, and edge situations (e.g. *"even if the user does not explicitly say 'CSV'"*).
-  - Must be strictly $\le 1024$ characters.
-- **`taxonomy`** (Faceted Classification coordinates):
-  - `phase`: 1..n of `[explore, deliberate, author, critique, maintain, meta]` (single-phase recommended).
-  - `modality`: 1..n of `[lens, spec, runbook, harness]`.
-  - `domain`: 1..n domain slugs (e.g. `[architecture-strategy, software-engineering]`).
-  - `interaction` (optional): `[interactive, autonomous]`.
-- **Optional fields**: Specify `compatibility` only if external packages/tools are required (max 500 chars).
+### Gate 0: Should This Be a Skill?
+Check the layering decision table (full rubric in [Harness Layering](references/harness-layering.md)):
+- **Always-on repo standards or forbidden commands** → Persistent Rule (`AGENTS.md`, `GEMINI.md`, `.agents/rules/*.md`).
+- **Generic planning, deep interview, persistence loop, multi-agent fan-out, or memory** → Native Antigravity workflow (`/plan`, `/grill-me`, `/goal`, `/boost`, `/swarm`, `/teamwork`, `run_workflow`, `/learn`, `/schedule`).
+- **Context isolation or read-only sandboxing** → Subagent Persona (`invoke_subagent` / `define_subagent`); pair with a skill only if domain expertise is also needed.
+- **Zero-LLM lifecycle automation** → Hook (`hooks.json`).
+- **Pure deterministic transform/API wrapper needing no judgment** → Standalone CLI script or MCP server.
+- **Reusable on-demand domain procedure, epistemic lens, invariant spec, or validated tool workflow** → Proceed as a **Skill**.
 
-### Phase 4: Authoring the Body (`SKILL.md`)
-Keep the body under 500 lines / 5,000 tokens by adhering to progressive disclosure:
-1. **Progress Checklist**: Use markdown task lists `- [ ] Step N` for multi-step workflows.
-2. **Actionable Procedures over General Declarations**:
-   - Provide concrete commands and exact script invocations with relative paths (`scripts/my_script.py`).
-   - Specify opinionated defaults with escape hatches rather than open menus.
-3. **The "Gotchas" Section**:
-   - Detail domain-specific facts that contradict reasonable assumptions (soft deletes, port collisions, casing mismatches).
-4. **Validation Loops (Plan-Validate-Execute)**:
-   - For stateful or destructive actions, instruct the agent to generate a plan, run a validator, and fix errors before execution.
-5. **Output Format**:
-   - Provide concrete structural markdown or JSON templates.
-6. **Mermaid Diagram Clean Syntax**:
-   - Ensure any Mermaid diagrams adhere to strict syntax (see [Mermaid Diagram Clean Syntax & Linting Guide](references/mermaid-linting.md)): no bare double quotes in edge labels (`48-in` instead of `48"`), standard arrows only (`-->`, `<-->`, `==>`), no trailing semicolons on `classDef`, and quote labels with special characters `Node["Label (Details)"]`.
+### Stage 1: Grounding & Boundaries
+1. Extract real domain expertise from runbooks, transcripts, schemas, incident history, or concrete tool flags—never generate generic LLM advice.
+2. Enforce single-purpose scope (prefer 1 `phase`; 3+ phases indicates a megaskill to decompose).
+3. Decide **Invocation Posture** (`auto` vs. `manual` `/skill-name` vs. `hybrid`) and **Model/Effort Tier** (`fast|standard|deep|orchestrator`, `low|medium|high`).
 
-### Phase 5: Verification
-Run the validation script (which automatically audits YAML, links, line budget, and Mermaid syntax) and resolve any errors or warnings:
+### Stage 2: Scaffold & Draft Manifest
+Preview with `--dry-run`, then scaffold:
+```bash
+python3 skill-architect/scripts/scaffold_skill.py <skill-name> \
+  --description "<third-person capability + Use when... + Do not use for...>" \
+  --phase <explore|deliberate|author|critique|maintain|meta> \
+  --modality <lens|spec|runbook|harness> \
+  --domain <domain-slug> \
+  --model-tier <fast|standard|deep|orchestrator> \
+  --effort <low|medium|high> \
+  --invocation <auto|manual|hybrid> \
+  --with-scripts --with-references --with-examples --with-evals --dry-run
+```
+- **`name`**: 1–64 chars, lowercase `a-z`, `0-9`, `-`, matching directory name.
+- **`description`**: ≤ 1024 chars (target 200–550), **third-person**, states **what** it does, **when** to trigger (including `/skill-name` if `manual`/`hybrid`), and **when NOT to trigger** (`Do not use for...`) to prevent sibling collisions.
+- **`metadata`**: Portable Open Skills string-to-string hints (`model-tier`, `effort`, `invocation`).
+
+### Stage 3: Author Concise Body (`SKILL.md`)
+Structure around **Plan → Discover/Use/Build Tools to Verify → Iterate**:
+- **Goal & Hard Invariants**: Non-negotiable constraints and opinionated defaults with escape hatches.
+- **Decision Tree / Execution Protocol**: Branch/stop conditions and concrete black-box script invocations (`run --help first`). Only use linear `- [ ]` checklists for fragile, strictly ordered destructive sequences.
+- **Verification & Exit Criteria**: Deterministic checks (`--dry-run`, validators, schema checks, tests) that must pass before reporting completion.
+- **Gotchas & Failure Modes**: Domain truths that contradict reasonable assumptions.
+- **Output Contract**: Compact schema/template (offload >40-line examples to `examples/` or `references/`).
+- **Mermaid Hygiene**: Follow [Mermaid Linting Guide](references/mermaid-linting.md) (no bare `"` in edge labels, standard arrows `<-->`/`==>`, no trailing `;` on `classDef`, quote labels with parens `Node["Label (Info)"]`).
+
+### Stage 4: Verification Gate (Mandatory Exit Criteria)
+Run the validator (including cross-skill collision checks against sibling skills) and resolve all errors and actionable warnings:
 ```bash
 python3 skill-architect/scripts/validate_skill.py <path-to-skill>
-
-# Or lint and auto-fix Mermaid diagrams specifically:
+# Optional: audit entire repo collision matrix
+python3 skill-architect/scripts/validate_skill.py --all .
+# Auto-fix Mermaid syntax if needed
 python3 skill-architect/scripts/lint_mermaid.py <path-to-skill> --fix
 ```
 
 ---
 
-## Workflow 2: Auditing & Refining an Existing Skill
+## Workflow 2: Auditing & Upgrading an Existing Skill
 
-When improving an existing skill or troubleshooting performance:
-
-1. **Context Budget Audit**:
-   - Run `validate_skill.py`. If `SKILL.md` exceeds 500 lines, extract detailed tables or manual documentation into `references/*.md`.
-   - Apply the Litmus Test: *"Would the agent get this wrong without this instruction?"* Cut generic programming advice the model already knows.
-2. **Trace Analysis & Failure Review**:
-   - Inspect execution transcripts from previous runs. Identify where the agent wasted steps, pursued incorrect approaches, or misinterpreted instructions.
-   - Clarify ambiguous steps; explain the *why* rather than just adding rigid prohibitions.
-3. **Extract Bundled Scripts**:
-   - If the agent repeatedly re-writes the same parsing or formatting helper on every run, extract that logic into a tested script in `scripts/`.
-4. **Harden Gotchas**:
-   - Every time an agent makes a real error that required human steering, document the exact failure mode in the skill's `Gotchas` section.
+1. **Automated Structural & Collision Gate**: Run `validate_skill.py <skill-dir>` (and `--all .` when touching triggers). Resolve broken links, orphan files, Mermaid errors, and sibling collisions.
+2. **Guardrail-Debt Pruning**: Apply the Litmus Test (*"Would a frontier agent get this wrong without this?"*). Cut reasoning micromanagement, generic advice, and bloated inline templates; keep invariants, gotchas, decision trees, and hard exit gates.
+3. **Context & Black-Box Audit**: If body > 250 lines, offload schemas/examples to `references/` or `examples/`. Ensure bundled scripts are invoked as black boxes (`--help` first) and extract recurring ad-hoc boilerplate into tested scripts.
+4. **Trace-Driven Hardening**: Review failed transcripts and convert recurring mistakes into concrete `Gotchas` or deterministic script checks.
 
 ---
 
-## Workflow 3: Optimizing Triggers & Descriptions
+## Workflow 3: Optimizing Descriptions, Collisions & Invocation
 
-When a skill either fails to activate or activates on irrelevant prompts:
-
-1. **Create Trigger Eval Queries**:
-   - Author ~20 realistic queries (8–10 positives, 8–10 negative near-misses) in `evals/trigger_queries.json`.
-   - Include casual prompts, abbreviations, typos, and requests where the skill's domain is not explicitly named.
-   - Include near-misses (e.g., CSV ETL vs CSV analysis).
-2. **Split Train & Validation Sets**:
-   - 60% Train, 40% Validation with equal positive/negative distribution.
-3. **Execute & Calculate Trigger Rates**:
-   - Run each query 3 times across your agent harness to measure `trigger_rate`.
-4. **Iterative Refinement**:
-   - Diagnose Train set failures.
-   - For false negatives: broaden trigger terms and emphasize user intent.
-   - For false positives: add explicit boundary constraints ("Do not use when...").
-   - Test against the Validation set to confirm generalization without overfitting.
+1. **Collision Scan**: Run `validate_skill.py --all .` to spot taxonomy neighbors (`phase` + `domain` overlap) and high description lexical similarity. Disambiguate colliding siblings explicitly with `Do not use for...` clauses.
+2. **Invocation Calibration**: Move heavy cognitive lenses, destructive workflows, or session-end tools to `invocation: "manual"` (`/skill-name`) if ambient routing causes false positives.
+3. **Trigger Evals (`evals/trigger_queries.json`)**: Author ~20 realistic queries (8–10 positives + 8–10 sibling near-misses), split 60/40 Train/Validation, measure trigger rate across 3 trials, refine on Train failures only, and confirm generalization on Validation (see [Description Optimization](references/description-optimization.md)).
 
 ---
 
-## Workflow 4: Script Engineering for Skills
+## Workflow 4: Script Engineering & Output Quality Benchmarking
 
-When writing scripts in `scripts/`:
-
-1. **Non-Interactive by Design**:
-   - Never use interactive prompts (`input()`, confirmation prompts).
-   - Require arguments via CLI flags or stdin.
-2. **Document via `--help`**:
-   - Ensure the script outputs clean, concise usage information with examples on `--help`.
-3. **Stream Separation**:
-   - `stdout`: Pure structured data (JSON, CSV, markdown tables).
-   - `stderr`: Progress messages, warnings, and diagnostic traces.
-4. **Self-Contained Dependencies**:
-   - For Python: use standard library where possible, or declare PEP 723 inline dependencies.
-   - For Shell: use portable bash commands and set `-euo pipefail`.
-5. **Idempotence & Safety**:
-   - Support `--dry-run` for state-modifying actions.
-
----
-
-## Workflow 5: Output Quality Evaluation & Benchmarking
-
-When testing whether a skill reliably achieves task goals:
-
-1. **Define Test Cases (`evals/evals.json`)**:
-   - Write 2–3 representative prompts with sample input files and expected outputs.
-2. **Run Comparative Baselines**:
-   - Run test cases under `iteration-1/` in an isolated eval workspace:
-     - `with_skill/`: Agent equipped with candidate skill.
-     - `without_skill/` (or `old_skill/`): Baseline comparison.
-3. **Grade Objective Assertions**:
-   - Verify assertions (e.g. file exists, valid schema, no NaN values).
-   - Record pass/fail with concrete evidence in `grading.json`.
-4. **Aggregate & Compare**:
-   - Compute pass rate delta, runtime delta, and token usage delta in `benchmark.json`.
-   - Verify that quality gains justify the token cost.
+- **Bundled Scripts (`scripts/`)**: Must be non-interactive (CLI flags/stdin only), expose concise `--help` with examples, separate `stdout` (machine data) from `stderr` (diagnostics), use stdlib or PEP 723 dependencies, support `--dry-run` for mutations, and be documented as **black boxes** in `SKILL.md` (see [Script Patterns](references/script-patterns.md)).
+- **Quality Evals (`evals/evals.json`)**: Define 2–5 realistic test cases with objective assertions; compare `with_skill/` vs. `without_skill/` (or `old_skill/`) in an isolated workspace, grade with evidence in `grading.json`, and verify pass-rate gain justifies token cost in `benchmark.json` (see [Eval Methodology](references/eval-methodology.md)).

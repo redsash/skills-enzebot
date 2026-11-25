@@ -43,6 +43,11 @@ Examples:
   python3 scripts/extract_metrics.py --format json --output summary.json log.json
 ```
 
+### C. Black-Box Consumption Contract (Context Economy)
+Bundled scripts are **black boxes** to the executing agent. Reading a 400-line Python validator into the context window wastes thousands of tokens that `--help` covers in 15 lines.
+- **In `SKILL.md`**: Explicitly instruct agents to run `python3 scripts/<name>.py --help` first to inspect flags and defaults, then invoke the script directly—**do not** read script source code into context unless debugging a script failure or modifying the skill itself.
+- **In the script**: Make `--help` self-sufficient (every flag, default, output format, and exit code documented) so the agent never needs to open the file to figure out how to call it.
+
 ---
 
 ## 3. Clean Stream Segregation
