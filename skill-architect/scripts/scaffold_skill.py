@@ -301,7 +301,13 @@ def scaffold_skill(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Scaffold a new Agent Skill adhering to Open Skills and Antigravity standards."
+        description="Scaffold a new Agent Skill adhering to Open Skills and Antigravity standards.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/scaffold_skill.py my-skill --phase author --modality runbook --dry-run\n"
+            "  python3 scripts/scaffold_skill.py my-skill --with-scripts --with-evals --output-dir ."
+        ),
     )
     parser.add_argument("name", help="Unique skill name (lowercase, hyphens)")
     parser.add_argument("--description", help="Third-person description with triggers & non-triggers (<=1024 chars)")

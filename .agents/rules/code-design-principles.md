@@ -1,3 +1,8 @@
+---
+trigger: always_on
+description: "Always-on code design tie-breakers (Rule of Three/AHA, Functional Core/Imperative Shell, Immutability by Default, Locality of Behavior, Law of Demeter) and anti-pattern guards."
+---
+
 # Code Design Principles
 
 Always-on engineering heuristics distilled from `programming-fundamentals`. Prefer simple, direct, readable code over speculative abstractions.

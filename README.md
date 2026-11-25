@@ -54,6 +54,8 @@ Always-on coding standards and cross-cutting design heuristics belong in `.agent
 
 - [Code Design Principles](.agents/rules/code-design-principles.md): Tie-breaker heuristics (Rule of Three/AHA, Functional Core/Imperative Shell, Immutability by Default, Locality of Behavior, Law of Demeter vs. pipelines) and anti-pattern guards distilled from the retired `programming-fundamentals` skill.
 
+Antigravity automatically discovers `.agents/rules/*.md` (configured with `trigger: always_on` frontmatter) within this workspace; `npx skills` installs skills only, so symlink or copy the rule file into `~/.gemini/config/rules/` to enable it globally across all projects.
+
 ---
 
 ## Skills Wishlist & Brainstorming

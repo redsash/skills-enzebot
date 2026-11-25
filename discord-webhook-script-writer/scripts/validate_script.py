@@ -315,7 +315,13 @@ def check_dry_run_execution(script_path: Path, sample_args: list) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate a generated Bash Discord webhook script against ShellCheck, structure standards, and Discord API payload schema."
+        description="Validate a generated Bash Discord webhook script against ShellCheck, structure standards, and Discord API payload schema.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/validate_script.py ./send-discord-alert.sh\n"
+            "  python3 scripts/validate_script.py ./send-discord-alert.sh --json"
+        ),
     )
     parser.add_argument("script_path", help="Path to the .sh script to validate")
     parser.add_argument(

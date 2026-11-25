@@ -297,7 +297,13 @@ def lint_markdown_file(file_path: Path, apply_fix: bool = False) -> Dict[str, An
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Lint and validate Mermaid diagram syntax in Markdown files or .mmd documents."
+        description="Lint and validate Mermaid diagram syntax in Markdown files or .mmd documents.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/lint_mermaid.py path/to/my-skill\n"
+            "  python3 scripts/lint_mermaid.py path/to/my-skill/SKILL.md --fix --json"
+        ),
     )
     parser.add_argument("target", help="File or directory to lint")
     parser.add_argument("--fix", action="store_true", help="Automatically fix common safe syntax issues")

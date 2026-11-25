@@ -839,7 +839,13 @@ def _print_human_report(skill_path: Path, result: Dict[str, Any]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Validate Agent Skill(s) against Open Skills, Antigravity layering, context economy, and collision gates."
+        description="Validate Agent Skill(s) against Open Skills, Antigravity layering, context economy, and collision gates.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/validate_skill.py path/to/my-skill\n"
+            "  python3 scripts/validate_skill.py --all . --json"
+        ),
     )
     parser.add_argument("target", help="Path to a skill directory, or a repository root when used with --all")
     parser.add_argument("--all", action="store_true", help="Audit all skills under target directory")
