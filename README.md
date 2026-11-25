@@ -24,7 +24,7 @@ To prevent repository bloat, tag fatigue, and context exhaustion in large agent 
    * `spec`: Hard rules, invariants, and domain constraints.
    * `runbook`: Sequential protocol, ordered checklist, or procedure.
    * `harness`: Executable script, deterministic CLI utility, or validator.
-3. **Domain Vertical (`domain`)**: Subject matter boundary (`architecture-strategy`, `software-engineering`, `operations-reliability`, `editorial-communication`, `physical-spatial-design`, `agent-meta`).
+3. **Domain Vertical (`domain`)**: Subject matter boundary (`architecture-strategy`, `software-engineering`, `operations-reliability`, `editorial-communication`, `physical-spatial-design`, `data-science`, `agent-meta`).
 
 For detailed specifications, see the [Taxonomy & Classification Guide](skill-architect/references/taxonomy-guide.md).
 
@@ -38,7 +38,7 @@ For detailed specifications, see the [Taxonomy & Classification Guide](skill-arc
 | [competing-hypothesis](./competing-hypothesis/SKILL.md) | `deliberate` | `lens` | `architecture-strategy`, `operations-reliability` | `hybrid` | `deep` | Evaluates ambiguous or contradictory evidence against rival hypotheses using Richards Heuer's ACH. |
 | [deeply-investigate](./deeply-investigate/SKILL.md) | `explore` | `runbook` | `software-engineering`, `architecture-strategy` | `hybrid` | `orchestrator` | Investigates nascent architectures, APIs, or documents against primary sources into a progressive-disclosure dossier. |
 | [discord-webhook-script-writer](./discord-webhook-script-writer/SKILL.md) | `author` | `runbook`, `harness` | `software-engineering`, `operations-reliability` | `auto` | `standard` | Interactively crafts and generates robust, ShellCheck-compliant Bash scripts for Discord webhooks. |
-| [engineering-log](./engineering-log/SKILL.md) | `maintain` | `lens`, `spec`, `harness` | `software-engineering`, `operations-reliability`, `agent-meta` | `manual` | `fast` | Captures cross-project epistemic deltas, dead-end signatures, typed graph links, and human-agent loop telemetry into sharded ML-ready JSONL ledgers. |
+| [engineering-log](./engineering-log/SKILL.md) | `maintain` | `lens`, `spec`, `harness` | `software-engineering`, `operations-reliability`, `agent-meta` | `manual` | `fast` | Captures cross-project epistemic deltas, dead-end signatures, typed graph links (with 1–2 hop traversal), and human-agent telemetry into sharded JSONL ledgers and a bounded `INDEX.md`. |
 | [human-readable](./human-readable/SKILL.md) | `critique` | `lens`, `spec` | `editorial-communication` | `auto` | `fast` | Eliminates AI cliches, robotic mannerisms, and throat-clearing from written drafts so they read naturally. |
 | [perspectives](./perspectives/SKILL.md) | `deliberate` | `lens` | `architecture-strategy` | `manual` | `deep` | Stress-tests decisions and architectural forks by simulating a multi-expert advisory panel and cross-debate. |
 | [quant-edge-auditor](./quant-edge-auditor/SKILL.md) | `critique` | `harness` | `data-science` | `hybrid` | `orchestrator` | Audits sports betting and predictive quantitative models for statistical edge, leakage, calibration, and market efficiency. |
@@ -86,15 +86,21 @@ python3 skill-architect/scripts/scaffold_skill.py <skill-name> \
   --dry-run
 ```
 
-To validate an existing skill or audit the entire repository collision matrix:
+To validate an existing skill or audit the entire repository:
 
 ```bash
 python3 skill-architect/scripts/validate_skill.py <path-to-skill>
 python3 skill-architect/scripts/validate_skill.py --all .
 ```
 
-### Running Regression Tests
+---
 
-```bash
-python3 -m unittest discover -s tests -v
-```
+## Quality Gates, Evals & CI
+
+- **Strict Repo Validator (`validate_skill.py --all .`)**: Enforces Open Skills frontmatter, `metadata` execution hints (`model-tier`, `effort`, `invocation`), taxonomy validity, `SKILL.md` context budgets, black-box `--help` contracts, portability (zero hardcoded home paths or repo-prefixed script paths), Mermaid syntax, `evals/evals.json` + `evals/trigger_queries.json` fixture integrity, and cross-skill trigger collision checks (`0 errors, 0 warnings`).
+- **Full Eval Coverage (`11/11`)**: Every skill provides `evals/evals.json` (objective task assertions) and canonical top-level array `evals/trigger_queries.json` (positive prompts paired with sibling near-misses).
+- **Stdlib Regression Suite (`tests/test_repo.py`)**: Verifies validator/scaffolder gates plus end-to-end CLI contracts for `engineering-log`, `quant-edge-auditor`, `cad-floorplan-designer`, `research-journaler`, and `discord-webhook-script-writer` (including ShellCheck when installed):
+  ```bash
+  python3 -m unittest discover -s tests -v
+  ```
+- **GitHub Actions CI**: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and PR to `main`, installing `shellcheck` and enforcing both the strict 0-error/0-warning `validate_skill.py --all . --json` gate and the `unittest` regression suite.

@@ -23,7 +23,7 @@ Design buildable, structurally sound 2D architectural floor plans, spatial circu
 ## Bundled Tools & References
 
 - **Supporting Scripts** *(treat `scripts/` as black boxes: run `python3 scripts/<tool>.py --help` first to inspect flags rather than reading source)*:
-  - `python3 scripts/validate_cmu_grid.py --check-spans "24' 8\"" "16' 0\""`: Validates dimensions against 8" and 16" CMU modular units.
+  - `python3 scripts/validate_cmu_grid.py --check-spans "24' 8\"" "16' 0\"" --strict`: Validates dimensions against 8" and 16" CMU modular units (`--strict` exits `1` on off-grid spans or parse errors).
   - `python3 scripts/validate_cmu_grid.py --site-envelope --lot-width "60' 0\"" --lot-depth "100' 0\"" --side-setback "10' 0\""`: Computes setback envelope snapped to modular increments.
   - `python3 scripts/audit_spatial_ux.py --demo`: Runs 4-pillar validation scorecard (geometry, IRC building codes, furniture clearances, and circulation).
   - `python3 scripts/audit_spatial_ux.py --demo --mermaid`: Generates clean Mermaid circulation graph.

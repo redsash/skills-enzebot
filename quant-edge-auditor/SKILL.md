@@ -29,8 +29,8 @@ An enterprise-grade quantitative auditing, statistical verification, and adversa
 - **Bundled Automation Scripts** *(treat `scripts/` as black boxes: run `python3 scripts/<tool>.py --help` first to inspect flags rather than reading source)*:
   - `python3 scripts/asof_leakage_verifier.py <dataset>`: Forensic bitemporal join, timestamp lookahead, and retroactive closing-odds validator.
   - `python3 scripts/brier_murphy_decomp.py <dataset>`: Decomposes Brier score into Reliability, Resolution, and Uncertainty.
-  - `python3 scripts/devig_market.py <odds...>`: Shin (insider $z$ parameter), Power, and Proportional market devigging.
-  - `python3 scripts/bootstrap_stress_test.py <dataset>`: Stationary block bootstrap, CLV $t$-stat, and Deflated Sharpe Ratio (DSR).
+  - `python3 scripts/devig_market.py <odds...>`: Shin (insider $z$ parameter), Power, Log-Odds, and Proportional market devigging.
+  - `python3 scripts/bootstrap_stress_test.py <dataset>`: Politis-Romano geometric stationary block bootstrap (reproducible via `--seed`), CLV $t$-stat, and skewness/kurtosis-adjusted Deflated Sharpe Ratio (DSR).
   - `python3 scripts/run.py <dataset>`: Master 4-stage audit runner synthesizing the full scorecard and propagating failure exit codes.
 
 ---
@@ -83,13 +83,13 @@ python3 scripts/devig_market.py -110 -110 --method shin
 ```
 
 ### Stage 4: Adversarial Stress Testing & Falsification
-Estimate discarded trial count ($N_{\text{trials}}$) across all tested features/rules and run `scripts/bootstrap_stress_test.py --trials <N>`:
+Estimate discarded trial count ($N_{\text{trials}}$) across all tested features/rules and run `scripts/bootstrap_stress_test.py --trials <N>` (pass `--seed` for reproducible bootstrap/permutation runs):
 - **CLV Significance**: Require $t\text{-stat} \ge 3.0$ over independent games.
 - **Deflated Sharpe Ratio (DSR)**: Require $\text{DSR} > 0.95$; otherwise reject as data snooping.
 - **Null Permutation & Drawdown**: Require scrambled-target $p\text{-value} < 0.01$ and inspect 95% stationary block bootstrap drawdown.
 
 ```bash
-python3 scripts/bootstrap_stress_test.py path/to/dataset.csv --trials 25 --sims 1000
+python3 scripts/bootstrap_stress_test.py path/to/dataset.csv --trials 25 --sims 1000 --seed 42
 ```
 
 ---

@@ -12,6 +12,8 @@ Default store root: `$ENGINEERING_LOG_DIR`, falling back to `~/engineering-log/`
 ~/engineering-log/
 ├── .gitignore
 ├── INDEX.md                                   # Compiled deterministically from ledgers/**/*.jsonl
+├── indexes/
+│   └── by-project/<project>.md                # Compiled per-project overflow shards
 ├── entries/
 │   └── YYYY/MM/<id>_<slug>.md                 # Portable Markdown entry with YAML frontmatter
 ├── ledgers/
@@ -20,6 +22,7 @@ Default store root: `$ENGINEERING_LOG_DIR`, falling back to `~/engineering-log/`
 ```
 
 Exact layout:
+- `INDEX.md` & `indexes/by-project/<project>.md` — Deterministically compiled master index (latest 50 entries, bounded `<= 140`-char rows, and `## Graph Hubs & Concept Map`) plus full per-project overflow shards.
 - `entries/YYYY/MM/<entry_id>_<slug>.md` — Portable Markdown with YAML frontmatter and standard relative links.
 - `ledgers/<stream_id>.jsonl` — Append-only JSONL shard (`--stream` > `$ENGINEERING_LOG_STREAM` > `<user>-<hostname>`). Each machine or teammate writes only to its own shard so `git pull --rebase` never conflicts.
 - `pending/<conv_id>.json` — Lightweight bookmarks written by `SessionEnd` hooks for sessions that closed before logging.
@@ -69,8 +72,8 @@ Pass via `--input payload.json` or stdin (`--input -`). When `--cwd PATH` is pas
   "verification": "automated-test",
   "actor": {
     "harness": "agy",
-    "model": "claude-sonnet-4",
-    "models_used": ["gemini-3.8-flash", "claude-sonnet-4"],
+    "model": "gemini-4-neon",
+    "models_used": ["gemini-4-hydrogen", "gemini-4-neon"],
     "skills_used": ["competing-hypothesis"],
     "conversation_id": "72477760-2f9e-44fa-abf6-11c4bce0be93"
   },

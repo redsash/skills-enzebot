@@ -20,7 +20,7 @@
       "files": [],
       "assertions": [
         "docs/templates/ contains research-log-template.md",
-        "docs/templates/ contains prompt-library-template.md",
+        "docs/templates/ contains prompt-library-template.json",
         ".gitignore excludes heavy outputs and secret files",
         "Repository README.md is present"
       ]

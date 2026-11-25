@@ -44,7 +44,7 @@ Rather than a rigid state machine, **Phase is a Cognitive Stance**. At any given
 | **`explore`** | Problem discovery & landscape mapping | Investigating unknowns, reading docs, tracing architectures | `deeply-investigate` |
 | **`deliberate`** | Decision-making & stress-testing | Evaluating trade-offs, weighing hypotheses, debate, planning | `perspectives`, `competing-hypothesis`, `strategic-thinking-5d` |
 | **`author`** | Generative creation & synthesis | Synthesizing code, CAD diagrams, documentation, scaffolding | `cad-floorplan-designer`, `adr-synthesizer` |
-| **`critique`** | Review, audit, & verification | Auditing safety, checking principles, removing slop, linting | `human-readable`, `programming-fundamentals`, `blast-radius-audit` |
+| **`critique`** | Review, audit, & verification | Auditing safety, checking principles, removing slop, linting | `human-readable`, `quant-edge-auditor`, `blast-radius-audit` |
 | **`maintain`** | Remediation, capture, & cleanup | Fixing flakes, logging journals, postmortems, pruning | `research-journaler`, `dead-code-pruner`, `incident-postmortem` |
 | **`meta`** | Orchestration & self-governance | Authoring skills, configuring agents, benchmarking | `skill-architect` |
 
@@ -59,7 +59,7 @@ While the schema permits multiple phases (`1..n`) to accommodate hybrid transiti
 | Modality | Nature | Mechanics | Examples |
 | :--- | :--- | :--- | :--- |
 | **`lens`** | Epistemic / Cognitive Model | Prompts that reshape *how* the agent reasons (eliminating biases, adopting personas, lateral thinking). | `competing-hypothesis` (ACH), `strategic-thinking-5d` |
-| **`spec`** | Rule / Invariant / Grammar | Hard constraints, design rules, and schema definitions the agent must uphold. | `programming-fundamentals`, CMU modular grids |
+| **`spec`** | Rule / Invariant / Grammar | Hard constraints, design rules, and schema definitions the agent must uphold. | `cad-floorplan-designer` (CMU grids), `engineering-log` (ledger schema) |
 | **`runbook`** | Procedural Protocol | Ordered checklists, investigative workflows, and step-by-step procedures. | `deeply-investigate`, `research-journaler` |
 | **`harness`** | Scripted Automation | Bundled executable code (`scripts/`), deterministic CLI tools, AST analyzers, or linters. | `skill-architect` (`validate_skill.py`), SVG generators |
 
@@ -77,6 +77,7 @@ Canonical domains include:
 * **`operations-reliability`**: SRE, incident response, CI/CD, deployment verification, logging.
 * **`editorial-communication`**: Technical writing, documentation, prose humanization, release notes.
 * **`physical-spatial-design`**: CAD, architectural layout, hardware engineering, physical specifications.
+* **`data-science`**: Statistical modeling, quantitative auditing, evaluation metrics, ML pipelines.
 * **`agent-meta`**: Agent behavior, skill authoring, tool development, prompt optimization.
 
 *Note: New domains can be introduced as ecosystems expand without altering `phase` or `modality`.*

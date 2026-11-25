@@ -47,7 +47,18 @@ This method smoothly shifts probability from longshots to favorites without requ
 
 ---
 
-## 4. Benchmark Markets vs. Soft Books
+## 4. The Additive Log-Odds (Logit) Method
+
+Implemented in `scripts/devig_market.py --method log_odds`, the additive log-odds method shifts each outcome's implied probability in log-odds space by a constant vig offset $c$:
+$$\text{logit}(q_i) = \ln\left(\frac{q_i}{1 - q_i}\right), \qquad \pi_i(c) = \sigma(\text{logit}(q_i) - c) = \frac{1}{1 + e^{-(\text{logit}(q_i) - c)}}$$
+where $c$ is found numerically via bisection root-finding so the fair probabilities sum to unity:
+$$\sum_{i=1}^{n} \pi_i(c) = 1$$
+
+Because probabilities near $0$ and $1$ compress under the logistic transform, subtracting a constant $c$ in logit space naturally pulls excess margin off longshots onto favorites while preserving additive symmetry in 2-way and multi-way markets.
+
+---
+
+## 5. Benchmark Markets vs. Soft Books
 
 When calculating Closing Line Value (CLV):
 - **Benchmark Sharp Books**: Always use Shin-devigged odds from **Pinnacle**, **Circa Sports**, or **Betfair Exchange** (net of 2% commission).

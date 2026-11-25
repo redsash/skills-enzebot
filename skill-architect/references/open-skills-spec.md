@@ -62,10 +62,11 @@ Skills must be authored for progressive disclosure to preserve the model's conte
 2. **Execution Tier (Target ≤ 250 body lines; hard ceiling 500 lines / 5,000 tokens)**: When triggered, the agent loads `SKILL.md`. Keep it focused on goals, invariants, decision trees, black-box script entrypoints, gotchas, and exit criteria.
 3. **On-Demand Tier**: Detailed manuals, large tables, schemas, and worked examples (>40 lines) reside in `references/`, `examples/`, or `assets/` and are read only when needed.
 
-### Relative Linking Rules
+### Relative Linking Rules & Portability
 - Reference bundled files using paths relative to the skill root:
   - `[API Guide](references/api-guide.md)`
   - `[Worked Example](examples/sample-report.md)`
   - `python3 scripts/validate.py --help`
   - `cat assets/template.json`
 - Keep reference chains shallow (1 level deep from `SKILL.md`). Do not leave orphaned files in `references/`, `examples/`, `assets/`, or `scripts/` unlinked from `SKILL.md`.
+- **Portability & Eval Integrity**: Never embed user-specific absolute home paths in skill docs or scripts (use `~/` or environment variables), and always reference bundled scripts via relative `scripts/...` paths rather than repo-root prefixes. Keep `evals/trigger_queries.json` as a top-level JSON array of `{"query": ..., "should_trigger": ...}` objects and ensure every path listed in `evals/evals.json` `files[]` exists inside the skill directory.

@@ -10,7 +10,7 @@ Before scaffolding a new skill, check whether a native harness primitive is a be
 
 | Need / Signal | Right Primitive | Why Not a Skill? |
 | :--- | :--- | :--- |
-| Always-on repo rules, coding standards, forbidden commands, architecture constraints | **Persistent Rule** (`AGENTS.md`, `GEMINI.md`, `.agents/rules/*.md`) | Rules load deterministically by directory scope (dedicated 20k-token budget, 24 KB/file) without relying on prompt-matching triggers. |
+| Always-on repo rules, coding standards, forbidden commands, architecture constraints | **Persistent Rule** (`AGENTS.md`, `GEMINI.md`, `.agents/rules/*.md`, e.g., `.agents/rules/code-design-principles.md`) | Rules load deterministically by directory scope (dedicated 20k-token budget, 24 KB/file) without relying on prompt-matching triggers. |
 | Interactive planning, requirements alignment, or design interviews | **Native `/plan` or `/grill-me`** | Built into Antigravity CLI with structured planning UI and decision loops; duplicating this as a skill adds prompt bloat. |
 | Long-running autonomous persistence ("keep working until verified") | **Native `/goal`** | Native harness manages continuation loops and completion discipline directly. |
 | Deep multi-perspective reasoning or rigorous verification on a hard one-off task | **Native `/boost`** | Uses harness-level deep thinking and verification without carrying permanent startup trigger overhead. |
@@ -36,7 +36,7 @@ Separate **how a skill triggers** (`metadata.invocation`) from **how it behaves 
 
 | Value | Meaning | Best Used For | Description Guidance |
 | :--- | :--- | :--- | :--- |
-| **`auto`** | Agent routes to the skill automatically from user intent. | Low blast-radius, high-precision domain tasks where silent activation adds clear value (e.g., `human-readable`, `programming-fundamentals`, `cad-floorplan-designer`). | Third-person capability + concrete trigger keywords + explicit `Do not use for...` non-triggers. |
+| **`auto`** | Agent routes to the skill automatically from user intent. | Low blast-radius, high-precision domain tasks where silent activation adds clear value (e.g., `human-readable`, `discord-webhook-script-writer`, `cad-floorplan-designer`). | Third-person capability + concrete trigger keywords + explicit `Do not use for...` non-triggers. |
 | **`manual`** | Activated explicitly via `/skill-name` or direct user request; should not hijack routine turns. | High blast-radius actions, session-end capture, heavy cognitive frameworks, or opinionated lenses that alter tone/workflow (e.g., destructive ops, `/engineering-log`, `/perspectives`). | Begin trigger clause with `"Use only when explicitly invoked via /<skill-name> or when the user directly asks for..."` plus explicit non-triggers. |
 | **`hybrid`** | Primary path is `/skill-name`, with narrow, unambiguous ambient triggers. | Meta-tooling and specialized workflows that users often invoke by name but occasionally describe verbatim (e.g., `skill-architect`, `quant-edge-auditor`). | List `/<skill-name>` alongside narrow, unmistakable trigger intents and explicit exclusions. |
 
@@ -58,7 +58,7 @@ metadata:
 | `model-tier` | Typical `effort` | Current Model Calibration | Ideal Skill Profile |
 | :--- | :--- | :--- | :--- |
 | **`fast`** | `low`–`medium` | Gemini 4 Hydrogen, Gemini 4 Carbon, Gemini 3.8 Flash | Scripted capture, deterministic harness runners, linting, single-pass prose cleanup (e.g., `human-readable`, `research-journaler`, scripted `engineering-log`). |
-| **`standard`** | `medium` | Gemini 4 Neon (Medium), Claude 5.5 (Standard) | Standard multi-step authoring, refactoring, CLI script generation, structured reviews (`programming-fundamentals`, `discord-webhook-script-writer`). |
+| **`standard`** | `medium` | Gemini 4 Neon (Medium), Claude 5.5 (Standard) | Standard multi-step authoring, refactoring, CLI script generation, structured reviews (`discord-webhook-script-writer`). |
 | **`deep`** | `high` | Gemini 4 Neon (High), Claude 5.5 (High) | Multi-step build-and-verify, adversarial critique, high-stakes deliberation, complex invariant satisfaction (`skill-architect`, `competing-hypothesis`, `perspectives`, `cad-floorplan-designer`). |
 | **`orchestrator`** | `high` | Orchestrator, or Neon High + subagents / `/swarm` | Multi-stage pipelines with parallel research/audit fan-out and synthesis (`deeply-investigate`, multi-stage `quant-edge-auditor`). |
 

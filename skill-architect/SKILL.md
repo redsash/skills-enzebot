@@ -35,7 +35,7 @@ Meta-skill for designing, scaffolding, auditing, and validating durable agent sk
   - [Evals JSON Starter Template](assets/evals_template.json)
 - **Bundled Scripts (Black-Box Contract)**:
   Treat scripts in `scripts/` as black boxes: run `--help` first to inspect flags and execute them directly rather than reading script source into context (unless debugging or modifying the scripts themselves).
-  - `python3 scripts/validate_skill.py --help` — Audits frontmatter, metadata tiers, taxonomy, body-line budget, black-box script contracts, orphan files, links, Mermaid syntax, and cross-skill collisions (`--all .` for repo-wide audit).
+  - `python3 scripts/validate_skill.py --help` — Audits frontmatter, `metadata` hints, taxonomy, body-line budget, black-box script contracts, portability (home/script paths), orphan files, links, Mermaid syntax, `evals/` integrity, and cross-skill collisions (`--all .` for repo-wide audit).
   - `python3 scripts/scaffold_skill.py --help` — Scaffolds a spec-compliant skill (supports `--dry-run`, taxonomy, metadata tiers, `--with-scripts`, `--with-references`, `--with-examples`, `--with-evals`).
   - `python3 scripts/lint_mermaid.py --help` — Lints and auto-fixes Mermaid diagrams (`--fix`).
 
@@ -107,7 +107,7 @@ python3 scripts/lint_mermaid.py <path-to-skill> --fix
 
 ## Workflow 2: Auditing & Upgrading an Existing Skill
 
-1. **Automated Structural & Collision Gate**: Run `validate_skill.py <skill-dir>` (and `--all .` when touching triggers). Resolve broken links, orphan files, Mermaid errors, and sibling collisions.
+1. **Automated Structural & Collision Gate**: Run `validate_skill.py <skill-dir>` (and `--all .` when touching triggers). Resolve portability issues, `evals/` fixture errors, broken links, orphan files, Mermaid errors, and sibling collisions.
 2. **Guardrail-Debt Pruning**: Apply the Litmus Test (*"Would a frontier agent get this wrong without this?"*). Cut reasoning micromanagement, generic advice, and bloated inline templates; keep invariants, gotchas, decision trees, and hard exit gates.
 3. **Context & Black-Box Audit**: If body > 250 lines, offload schemas/examples to `references/` or `examples/`. Ensure bundled scripts are invoked as black boxes (`--help` first) and extract recurring ad-hoc boilerplate into tested scripts.
 4. **Trace-Driven Hardening**: Review failed transcripts and convert recurring mistakes into concrete `Gotchas` or deterministic script checks.
