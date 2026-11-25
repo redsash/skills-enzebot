@@ -22,9 +22,11 @@ A cognitive framework and decision engine designed to elevate reasoning beyond o
 ## When to Use This Skill
 - **POC & Product Stress-Testing**: Evaluating nascent architecture, prototypes, or venture hypotheses to uncover hidden blockers outside the primary technical domain.
 - **Architectural & Business Trade-offs**: Resolving thorny dilemmas where adding more technical features (horizontal knowing) fails to resolve the underlying friction (vertical understanding).
-- **High-Signal / Anti-Slop Content Creation**: Authoring essays, proposals, RFCs, or manifestos that bypass LLM cliché and statistical-mean homogenization.
 - **Root-Cause Bottleneck Diagnosis**: Pinpointing which adjacent skill-tree deficiency (Altitude) is silently choking a project or team.
-- **Do not use for**: Trivial syntax lookups, routine bug fixes, or mechanical step-by-step shell commands that require no strategic framing.
+- **Do not use for**: Trivial syntax lookups, routine bug fixes, multi-persona debates (`perspectives`), or editorial prose de-slopping (`human-readable`).
+
+> **References & Examples**: See [Theoretical Lineages & Prompt Template](references/REFERENCE.md) and [Worked Example: POC Diagnostic](examples/poc-diagnostic-example.md).
+> **Composition**: Use `/strategic-thinking-5d` for structural AQAL/Kegan/holarchy diagnostics; compose with `human-readable` afterward when polishing prose for external publication.
 
 ---
 
@@ -54,17 +56,9 @@ A cognitive framework and decision engine designed to elevate reasoning beyond o
 
 ---
 
-## Operational Workflows
+## 5D Diagnostic Protocol
 
-Select the operational mode based on the user's objective:
-- **Mode A: Strategic Diagnostic & POC Stress-Testing** (for evaluating ideas, code architectures, or business strategies).
-- **Mode B: High-Signal / Anti-Slop Synthesis** (for writing articles, proposals, RFCs, or documentation).
-
----
-
-### Mode A: Strategic Diagnostic & POC Stress-Testing
-
-#### Step 1: 1D Diagnostic (Knowing vs. Understanding)
+### Step 1: 1D Diagnostic (Knowing vs. Understanding)
 - Disentangle **horizontal facts** (adding more features, code libraries, data, or marketing channels) from **vertical structure** (the mental model and framing of the problem).
 - Ask: *"Are we attempting to solve an operating system problem with an application update?"*
 - Identify what unexamined assumption is being treated as an absolute law.
@@ -91,65 +85,19 @@ Audit the POC or decision across all four quadrants:
 - **1-Year vs. 10-Year Horizon**: What is the trajectory if this decision is made vs. if the status quo remains?
 - **Techno-Economic Wave**: What inevitable paradigm shift (e.g., local sovereign AI, agentic compute, privacy-first infrastructure) does this position itself for?
 
-#### Step 6: Strategic Output Format (Mode A)
+### Step 6: Output Contract
+
+Keep diagnostics compact and structured (see [Worked Example](examples/poc-diagnostic-example.md)):
 
 ```markdown
 # 5D Strategic Diagnostic: [Topic / POC Name]
-
-## 1. Executive Summary & Core Paradigm Shift (1D)
-- **Current Framing (Horizontal)**: [Surface-level problem statement]
-- **Structural Bottleneck (Vertical)**: [The underlying cognitive/framing constraint]
-
-## 2. Multi-Disciplinary Cross-Pollination (2D)
-- **Unexpected Domain Collision**: [Insight from an orthogonal field]
-- **The Altitude Bottleneck**: [The lagging adjacent skill/domain capping growth]
-
-## 3. Cognitive Evolution Matrix (3D)
-- **L1 (The Consensus Dogma)**: [What everyone assumes]
-- **L2 (The Critical Pushback)**: [The contrarian view]
-- **L3 (Second-Tier Synthesis)**: [How both hold true under specific conditions]
-- **L4 (The Generative Paradigm)**: [The novel perspective created]
-
-## 4. The 4-Quadrant Reality Audit (4D)
-| Quadrant | Lens | Critical Diagnostic & Blind Spot |
-| :--- | :--- | :--- |
-| **Upper-Left (UL)** | Psychology / Mindset | [Internal friction, identity defense, fear] |
-| **Upper-Right (UR)** | Behavior / Mechanics | [Observable workflows, telemetry, code path] |
-| **Lower-Left (LL)** | Culture / Community | [Peer consensus, tribal status, shared norms] |
-| **Lower-Right (LR)**| Systems / Infrastructure| [Economic incentives, tech stack, legal constraints] |
-
-## 5. Evolutionary Trajectory & Temporal Stakes (5D)
-- **Foundational Holon (Must Preserve)**: [Base-level stability requirement]
-- **1-Year vs. 10-Year Divergence**: [Trajectory comparison]
-- **The Emerging Wave Alignment**: [How it leverages upcoming paradigm shifts]
-
-## 6. Actionable Decisions & 72-Hour Next Steps
-1. **Decision Gate**: [Go / No-Go threshold]
-2. **Immediate Experiment**: [Concrete action to test the altitude bottleneck]
+1. **1D Shift (Horizontal vs. Vertical)**: [Surface symptom] vs. [Underlying framing constraint]
+2. **2D Cross-Pollination & Altitude**: [Orthogonal domain insight] | **Bottleneck**: [Lagging line]
+3. **3D Evolution**: L1 Consensus -> L2 Contrarian -> L3 Synthesist -> L4 Generative
+4. **4D AQAL Audit**: UL (Mindset) | UR (Mechanics) | LL (Culture) | LR (Systems/Econ)
+5. **5D Trajectory**: [Foundational holon preserved] | [1-yr vs. 10-yr divergence]
+6. **Go / No-Go & 72h Experiment**: [Threshold] | [Concrete test]
 ```
-
----
-
-### Mode B: High-Signal / Anti-Slop Synthesis
-
-Use this mode when generating public writing, technical essays, RFC proposals, or strategic positioning documents.
-
-#### The 5D Anti-Slop Generation Sequence:
-1. **Pre-computation (Do not write prose yet)**:
-   - Extract the 5 findings:
-     1. *Lines*: 3 orthogonal domains $\rightarrow$ select the most surprising.
-     2. *Levels*: State the beginner take (burn it off), then state the 10-year veteran take.
-     3. *Altitude*: Identify the reader's real hidden prerequisite bottleneck.
-     4. *Quadrants*: Internal feeling, actual behavior, peer belief, systemic pressure.
-     5. *Time*: 1-year and 10-year trajectories if unchanged.
-2. **Tone & Style Constraints**:
-   - Plain, punchy, declarative sentences.
-   - Zero generic throat-clearing (*"In today's fast-paced digital world..."*).
-   - Zero unearned motivational hype or cliché closers.
-   - If a sentence could be pasted into any other article on the subject, delete it.
-   - Insert explicit markers `[your real-world example here]` where authentic personal or institutional evidence is required rather than hallucinating generic anecdotes.
-3. **Draft Execution**:
-   - Weave at least 3 of the pre-computed 5D findings directly into the narrative tension.
 
 ---
 
@@ -161,4 +109,3 @@ Use this mode when generating public writing, technical essays, RFC proposals, o
 | **The "Smart-but-Stuck" Loop** | Gathering more books, benchmarks, or articles when stuck. | Stop horizontal information collection. Audit adjacent skill lines (Altitude) to locate the prerequisite block. |
 | **Premature Dogma Defense** | Feeling threatened by an opposing perspective and reacting with pre-programmed talking points. | Notice ego-friction. Re-center in Level 3 (Synthesist): *"What context makes the opposing view valid?"* |
 | **Transcend-without-Include** | Chasing a radical new abstraction while breaking foundational reliability or unit economics. | Verify that foundational holons (lower levels) remain healthy and intact. |
-| **Prompt Averaging (Slop)** | Prompting an LLM with *"Write a comprehensive guide on X"*. | Feed the model the 5D pre-computation constraints first; force it to exhaust the Level 1 take before drafting. |

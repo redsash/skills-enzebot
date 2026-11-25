@@ -74,29 +74,3 @@ Task: Run this POC through the 5D Strategic Thinking diagnostic:
 
 Deliverable: Provide the 5-part diagnostic followed by a concrete Go/No-Go threshold and 3 immediate validation experiments for this week.
 ```
-
----
-
-### Prompt Template 2: Anti-Slop Content & Technical Proposal (Mode B)
-
-```text
-Context: I want to author a high-signal article, proposal, or RFC on this topic. I refuse to publish generic AI slop, shallow platitudes, or statistical-mean filler.
-
-Topic: [Paste topic / core argument here]
-Target Audience: [Paste reader profile / stakeholders here]
-
-Instructions:
-Before writing a single paragraph of prose, execute the 5D pre-computation:
-- Lines: 3 fields outside the obvious domain. Pick the most surprising one.
-- Levels: State the beginner/consensus take everyone already writes. Then state the 10-year veteran take. We will write strictly from the veteran take.
-- Altitude: Name the adjacent weakness blocking the reader/stakeholder on this topic.
-- Quadrants: Detail the reader's private feeling (UL), actual habit (UR), cultural tribe belief (LL), and systemic pressure (LR).
-- Time: The 1-year and 10-year trajectory if nothing changes.
-
-Output the 5 findings as a concise bulleted list.
-Once displayed, write the draft adhering to these criteria:
-- Plain, specific, declarative sentences. No hype, no fluff, no motivational closers.
-- Cut any sentence that could appear in a generic article on this topic.
-- Insert `[your specific case study / metric here]` where authentic first-party proof is required.
-- Weave at least 3 of the pre-computed findings directly into the narrative tension.
-```

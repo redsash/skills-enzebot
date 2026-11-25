@@ -1,0 +1,82 @@
+[
+  {
+    "query": "/perspectives should we extract billing into a microservice or keep a modular monolith?",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation"
+  },
+  {
+    "query": "Simulate a multi-expert advisory panel debating open-core vs closed-source enterprise licensing.",
+    "should_trigger": true,
+    "notes": "Explicit expert panel simulation"
+  },
+  {
+    "query": "Use /perspectives to stage an adversarial cross-debate on switching from Postgres to CockroachDB.",
+    "should_trigger": true,
+    "notes": "Explicit command + cross-debate"
+  },
+  {
+    "query": "What would a skeptical SRE, a CFO, and a staff architect debate about our multi-region active-active proposal? Use /perspectives.",
+    "should_trigger": true,
+    "notes": "Explicit /perspectives multi-persona request"
+  },
+  {
+    "query": "/perspectives",
+    "should_trigger": true,
+    "notes": "Bare slash command"
+  },
+  {
+    "query": "Spin up an adversarial expert panel to red-team our pricing tier migration before launch.",
+    "should_trigger": true,
+    "notes": "Explicit multi-expert adversarial panel request"
+  },
+  {
+    "query": "Run /perspectives on build-vs-buy for our internal feature-flag service.",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation"
+  },
+  {
+    "query": "Simulate an expert cross-debate between security, ops, and product leads on allowing self-hosted runners.",
+    "should_trigger": true,
+    "notes": "Explicit cross-debate request"
+  },
+  {
+    "query": "Run a 5D thinking and Wilber AQAL audit on why our developer platform adoption stalled.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to strategic-thinking-5d"
+  },
+  {
+    "query": "Use ACH to eliminate rival root causes for our intermittent checkout 504 timeouts.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to competing-hypothesis"
+  },
+  {
+    "query": "Help me design a rollout plan for migrating our Redis cluster with zero downtime.",
+    "should_trigger": false,
+    "notes": "Near-miss under manual-only posture: belongs to native /plan or /boost"
+  },
+  {
+    "query": "What do you think are the pros and cons of uv vs poetry?",
+    "should_trigger": false,
+    "notes": "Routine question; should not trigger heavy advisory panel"
+  },
+  {
+    "query": "What is the exact HTTP status code Discord returns on a successful webhook POST?",
+    "should_trigger": false,
+    "notes": "Routine factual lookup"
+  },
+  {
+    "query": "Rewrite this executive summary so it sounds less like an LLM.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to human-readable"
+  },
+  {
+    "query": "Investigate SQLite WAL2 mode against upstream sqlite.org docs into a dossier.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to deeply-investigate"
+  },
+  {
+    "query": "Save today's session learnings to /engineering-log.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  }
+]

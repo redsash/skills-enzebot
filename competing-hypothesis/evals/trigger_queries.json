@@ -1,0 +1,82 @@
+[
+  {
+    "query": "/competing-hypothesis evaluate three rival explanations for intermittent 504 timeouts",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation"
+  },
+  {
+    "query": "Apply Analysis of Competing Hypotheses (ACH) to investigate this suspicious IAM role assumption with conflicting CloudTrail logs.",
+    "should_trigger": true,
+    "notes": "Explicit ACH security investigation"
+  },
+  {
+    "query": "We have contradictory metrics across DB, Redis, and upstream API—help eliminate rival root causes without confirmation bias.",
+    "should_trigger": true,
+    "notes": "Rival root causes + contradictory evidence"
+  },
+  {
+    "query": "Use Richards Heuer's ACH matrix to diagnose why production memory leaks only happen on Canary pods.",
+    "should_trigger": true,
+    "notes": "Explicit ACH methodology"
+  },
+  {
+    "query": "Run /competing-hypothesis on this flaky distributed lock failure where half the team blames etcd and half blames NTP drift.",
+    "should_trigger": true,
+    "notes": "Explicit command + competing incident theories"
+  },
+  {
+    "query": "Which of these four possible causes for the packet drops is least contradicted by our tcpdump evidence?",
+    "should_trigger": true,
+    "notes": "Diagnostic falsification across rival explanations"
+  },
+  {
+    "query": "Structure an intelligence risk assessment weighing three competing explanations for anomalous API scraping traffic.",
+    "should_trigger": true,
+    "notes": "Intelligence/risk scenario with competing hypotheses"
+  },
+  {
+    "query": "Diagnose this elusive race condition where symptoms point to both DNS caching and stale TLS session tickets.",
+    "should_trigger": true,
+    "notes": "Ambiguous multi-theory debugging"
+  },
+  {
+    "query": "Simulate an advisory panel of 4 experts debating whether we should choose Kafka or NATS JetStream.",
+    "should_trigger": false,
+    "notes": "Near-miss: multi-persona debate belongs to perspectives"
+  },
+  {
+    "query": "Run a 5D thinking and AQAL quadrant audit on our product strategy.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to strategic-thinking-5d"
+  },
+  {
+    "query": "Fix this Python TypeError: 'NoneType' object is not subscriptable at line 44 of parser.py.",
+    "should_trigger": false,
+    "notes": "Deterministic single-cause stack trace bug"
+  },
+  {
+    "query": "Research how Postgres 17 implements logical replication failover slots against official docs.",
+    "should_trigger": false,
+    "notes": "Near-miss: primary-source research belongs to deeply-investigate"
+  },
+  {
+    "query": "Audit this sports betting model's backtest for lookahead bias and Shin devigging.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to quant-edge-auditor"
+  },
+  {
+    "query": "Polish this incident postmortem email so it sounds human and less robotic.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to human-readable"
+  },
+  {
+    "query": "Record today's debugging dead ends and belief revisions into /engineering-log.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  },
+  {
+    "query": "Write a bash script to post server disk alerts to a Discord webhook.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to discord-webhook-script-writer"
+  }
+]

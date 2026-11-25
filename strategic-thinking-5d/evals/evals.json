@@ -1,0 +1,39 @@
+{
+  "skill_name": "strategic-thinking-5d",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run /strategic-thinking-5d on our B2B onboarding POC: engineering keeps adding more integration connectors, yet enterprise trial-to-paid conversion is flat at 4%. Diagnose the structural bottleneck.",
+      "expected_output": "5D diagnostic separating horizontal feature addition from vertical framing, pinpointing the lagging non-technical altitude line, evaluating all 4 AQAL quadrants, and defining a 72-hour validation experiment.",
+      "files": [],
+      "assertions": [
+        "Separates horizontal additions (more connectors) from vertical framing in 1D",
+        "Identifies at least one orthogonal domain insight and a non-technical Altitude bottleneck in 2D",
+        "Audits all four AQAL quadrants (UL, UR, LL, LR) in 4D",
+        "Includes a Go/No-Go threshold and concrete 72-hour experiment"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Apply /strategic-thinking-5d to evaluate migrating our monolith to event-sourced microservices while keeping unit economics and operational reliability intact.",
+      "expected_output": "Tier-1 vs Tier-2 evolution matrix (L1-L4), Transcend-and-Include preservation constraints (5D), and explicit AQAL blind spots.",
+      "files": [],
+      "assertions": [
+        "Articulates L1 consensus, L2 contrarian critique, L3 synthesis, and L4 generative framing in 3D",
+        "Explicitly states foundational baseline invariants preserved under Transcend and Include (5D)",
+        "Avoids generic pros/cons summary and provides measurable Go/No-Go criteria"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Stress-test an AI coding assistant rollout using AQAL and Kegan stages: developers praise autocomplete speed, yet PR review queues doubled and senior engineers refuse to adopt it.",
+      "expected_output": "4-quadrant reality audit exposing identity/cultural friction (UL/LL) alongside workflow mechanics and economics (UR/LR), plus 1-year vs 10-year trajectory.",
+      "files": [],
+      "assertions": [
+        "Diagnoses senior engineer resistance across UL (psychology/trust) and LL (engineering norms)",
+        "Connects UR review metrics to LR team incentives",
+        "Compares 1-year and 10-year trajectories under status quo vs intervention"
+      ]
+    }
+  ]
+}

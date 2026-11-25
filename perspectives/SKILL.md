@@ -60,46 +60,24 @@ Close the debate with a unified, actionable synthesis:
 
 ---
 
-## Output Format Template
+## Output Contract
+
+Force genuine cross-talk and an actionable Go/No-Go synthesis (see [Worked Example: Architecture Debate](examples/architecture-debate-example.md)):
 
 ```markdown
 ## Expert Panel Lineup
-| Expert | Archetype & Perspective | Focus Area |
+| Expert | Hyper-Specific Archetype | Primary Angle |
 | :--- | :--- | :--- |
-| **[Name 1]** | [Hyper-specific title / background] | [Primary angle / agenda] |
-| **[Name 2]** | [The Skeptic / Red Teamer] | [Failure modes & risk exposure] |
-| **[Name 3]** | [The Pragmatic Operator] | [Execution & operational reality] |
-| **[Name 4]** | [The Visionary] | [Upside & long-term leverage] |
 
----
+## Live Adversarial Cross-Debate
+**[Name 1]**: "[Opening thesis...]"
+**[Name 2 (Skeptic)]**: "[Direct rebuttal naming Name 1...]"
+*(2–3 high-density rounds of direct back-and-forth challenge)*
 
-## The Cross-Debate: Live Discussion
-
-**[Name 1]**: "[Opening argument establishing the core thesis...]"
-
-**[Name 2 (Skeptic)]**: "[Direct pushback, pointing out an unexamined failure mode...]"
-
-**[Name 3 (Operator)]**: "[Intervenes with operational realities and trade-offs...]"
-
-**[Name 4 (Visionary)]**: "[Re-frames the risk and identifies the strategic opportunity...]"
-
-*(2–3 rounds of lively, high-density exchange)*
-
----
-
-## Executive Synthesis & Recommendation
-
-### 1. Critical Blind Spots Surfaced
-- **[Blind Spot 1]**: [Explanation of what was hidden]
-- **[Blind Spot 2]**: [Explanation of risk]
-
-### 2. Decision Framework & Go / No-Go Criteria
-- **PROCEED IF**: [Specific measurable criteria are met]
-- **HALT / RE-EVALUATE IF**: [Specific red flags or failure signals emerge]
-
-### 3. Immediate Action Plan (Next 72 Hours)
-1. [Actionable next step]
-2. [Actionable next step]
+## Executive Synthesis
+- **Critical Blind Spots Surfaced**: [Dismantled assumptions]
+- **Go / No-Go Criteria**: PROCEED IF [...] | HALT IF [...]
+- **Immediate 72-Hour Next Steps**: [1..2 concrete de-risking actions]
 ```
 
 ---

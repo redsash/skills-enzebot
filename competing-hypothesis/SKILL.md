@@ -62,53 +62,18 @@ Deliver a clear summary naming the leading hypothesis, the primary alternative, 
 
 ---
 
-## Output Format Template
+## Output Contract
+
+Keep ACH reports concise and falsification-driven (see [Worked Example: Payment 504 Incident](examples/incident-ach-example.md)):
 
 ```markdown
 # Analysis of Competing Hypotheses: [Focal Question]
-
-### 1. Focal Issue & Candidate Hypotheses
-- **H1**: [Clear description of Hypothesis 1]
-- **H2**: [Clear description of Hypothesis 2]
-- **H3**: [Clear description of Hypothesis 3]
-
----
-
-### 2. Evidence Assessment
-- **E1**: [Observed fact, metric, or log] *(Credibility: High | Diagnosticity: High)*
-- **E2**: [Observed fact, metric, or log] *(Credibility: Moderate | Diagnosticity: High)*
-- **E3**: [Nondiagnostic background state] *(Diagnosticity: Low / Neutral)*
-
----
-
-### 3. ACH Consistency Matrix
-
-| Evidence Item | H1: [Name] | H2: [Name] | H3: [Name] | Notes / Context |
-| :--- | :---: | :---: | :---: | :--- |
-| **E1**: [Description] | `++` | `-` | `0` | [Why it conflicts with H2] |
-| **E2**: [Description] | `+` | `--` | `+` | [Contradiction for H2] |
-| **E3**: [Description] | `-` | `+` | `++` | [Inconsistency for H1] |
-
-*(Legend: `++` Strongly Consistent, `+` Consistent, `0` Neutral, `-` Inconsistent, `--` Strongly Inconsistent)*
-
----
-
-### 4. Hypothesis Ranking & Inconsistency Analysis
-1. **Leading Hypothesis (H#)**: [Fewest critical inconsistencies; explanation of fit]
-2. **Primary Alternative (H#)**: [Close runner-up; what prevents it from being #1]
-3. **Eliminated Hypotheses (H#)**: [Disproved by explicit negative evidence]
-
----
-
-### 5. Sensitivity Analysis & Diagnostic Gaps
-- **Key Vulnerability**: [Which piece of evidence carries the most weight, and what happens if it is flawed?]
-- **High-Value Next Probe**: [Specific log query, unit test, or metric probe that cleanly separates H1 and H2]
-
----
-
-### 6. Assessment & Falsification Triggers
-- **Confidence**: [Low | Moderate | High]
-- **What Would Change This Assessment**: [Specific observation that would disprove the leading hypothesis]
+1. **Candidate Hypotheses**: H1..Hn (mutually exclusive, including non-obvious defaults)
+2. **Diagnostic Evidence Inventory**: E1..Em (tag credibility & diagnosticity; exclude correlated dupes)
+3. **ACH Consistency Matrix**: Table mapping `E_i` x `H_j` with `++ | + | 0 | - | --`
+4. **Inconsistency Ranking**: Rank by fewest `-` / `--` contradictions (never count `+` marks)
+5. **Sensitivity & Next Probe**: Single most fragile assumption + highest-leverage discriminating test
+6. **Confidence & Falsification Trigger**: `[Low|Moderate|High]` + exact observation disproving leader
 ```
 
 ---

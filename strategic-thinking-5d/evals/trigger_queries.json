@@ -1,0 +1,82 @@
+[
+  {
+    "query": "/strategic-thinking-5d stress-test our offline sync POC before Q2 roadmap freeze",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation"
+  },
+  {
+    "query": "Apply 5D thinking and Wilber's AQAL quadrants to diagnose why our developer platform adoption stalled.",
+    "should_trigger": true,
+    "notes": "Explicit 5D thinking and AQAL framework invocation"
+  },
+  {
+    "query": "Run a Kegan stages and integral holarchy audit on this product architecture proposal via /strategic-thinking-5d.",
+    "should_trigger": true,
+    "notes": "Explicit Kegan + holarchy + slash command"
+  },
+  {
+    "query": "Use Dan Koe's 5D strategic framework to pinpoint our altitude bottleneck across product, culture, and systems.",
+    "should_trigger": true,
+    "notes": "Explicit Dan Koe 5D + altitude framing"
+  },
+  {
+    "query": "/strategic-thinking-5d",
+    "should_trigger": true,
+    "notes": "Bare slash command"
+  },
+  {
+    "query": "Let's evaluate this B2B SaaS pivot using integral strategy (UL, UR, LL, LR) and transcend-and-include.",
+    "should_trigger": true,
+    "notes": "Explicit AQAL quadrant / integral strategy invocation"
+  },
+  {
+    "query": "Use /strategic-thinking-5d to separate horizontal feature churn from our vertical framing bottleneck.",
+    "should_trigger": true,
+    "notes": "Explicit invocation with 1D framing cues"
+  },
+  {
+    "query": "Diagnose our startup's strategic genius bottleneck using 5D thinking (Lines, Levels, Altitude).",
+    "should_trigger": true,
+    "notes": "Explicit 5D thinking invocation"
+  },
+  {
+    "query": "Simulate a 4-expert advisory panel debate between a skeptical SRE and a product visionary on monolith vs microservices.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to perspectives (/perspectives)"
+  },
+  {
+    "query": "Use ACH to weigh three competing root causes for intermittent 504 gateway timeouts in checkout.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to competing-hypothesis"
+  },
+  {
+    "query": "Rewrite this technical RFC so it sounds natural and removes AI cliches and em-dash padding.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to human-readable (Mode B split)"
+  },
+  {
+    "query": "Stress-test our database migration plan and ask me clarifying questions about downtime tolerance.",
+    "should_trigger": false,
+    "notes": "Near-miss: manual-only posture; generic architecture review belongs to /grill-me or /boost"
+  },
+  {
+    "query": "Fix the off-by-one pagination bug in src/api/orders.ts.",
+    "should_trigger": false,
+    "notes": "Routine bug fix"
+  },
+  {
+    "query": "What is the Postgres syntax for creating a partial GIN index on JSONB?",
+    "should_trigger": false,
+    "notes": "Quick syntax lookup"
+  },
+  {
+    "query": "Research PostgreSQL 17 logical replication failover slots from official docs and save a dossier.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to deeply-investigate"
+  },
+  {
+    "query": "Log today's architecture session dead ends and belief revisions into /engineering-log.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  }
+]
