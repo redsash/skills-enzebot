@@ -1,0 +1,82 @@
+[
+  {
+    "query": "/skill-architect audit every skill in this repository against Open Skills and layering standards",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation for repo-wide audit"
+  },
+  {
+    "query": "Scaffold a new agent skill for auditing Terraform plans with scripts/ and evals/.",
+    "should_trigger": true,
+    "notes": "Creating a new skill"
+  },
+  {
+    "query": "Refactor this bloated 400-line SKILL.md for progressive disclosure and prune Flash 3.8 guardrail debt.",
+    "should_trigger": true,
+    "notes": "Auditing/refactoring an existing SKILL.md"
+  },
+  {
+    "query": "Check all skill descriptions in our repo for cross-skill trigger collisions and missing non-triggers.",
+    "should_trigger": true,
+    "notes": "Cross-skill trigger collision check"
+  },
+  {
+    "query": "Engineer a black-box validation script in scripts/ for my skill following --help and stdout/stderr segregation.",
+    "should_trigger": true,
+    "notes": "Engineering black-box skill scripts"
+  },
+  {
+    "query": "Design trigger_queries.json and evals.json benchmarks for my existing agent skill.",
+    "should_trigger": true,
+    "notes": "Running/authoring skill evals"
+  },
+  {
+    "query": "Use /skill-architect to decide whether a capability should be a skill, a persistent rule, or a native workflow.",
+    "should_trigger": true,
+    "notes": "Explicit Gate 0 layering evaluation"
+  },
+  {
+    "query": "Validate my skill's YAML frontmatter, metadata model-tier hints, and Mermaid diagrams with validate_skill.py.",
+    "should_trigger": true,
+    "notes": "Skill validation workflow"
+  },
+  {
+    "query": "Add an always-on coding rule to AGENTS.md requiring strict TypeScript types across src/.",
+    "should_trigger": false,
+    "notes": "Near-miss: writing always-on repo rules in AGENTS.md"
+  },
+  {
+    "query": "Use /plan to break down our database migration into a step-by-step rollout.",
+    "should_trigger": false,
+    "notes": "Near-miss: one-off native /plan workflow"
+  },
+  {
+    "query": "Start a /swarm of parallel agents to fix lint errors across five microservices.",
+    "should_trigger": false,
+    "notes": "Near-miss: native /swarm orchestration"
+  },
+  {
+    "query": "Run /goal to keep working autonomously until the entire integration test suite passes.",
+    "should_trigger": false,
+    "notes": "Near-miss: native /goal loop"
+  },
+  {
+    "query": "Write a standalone Python CLI script in bin/sync-s3.py to mirror buckets daily.",
+    "should_trigger": false,
+    "notes": "Near-miss: standalone CLI script outside a skill"
+  },
+  {
+    "query": "Log today's debugging session to /engineering-log.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  },
+  {
+    "query": "Polish this SKILL.md prose? No, rewrite my blog post draft so it sounds human.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to human-readable"
+  },
+  {
+    "query": "Investigate OpenTelemetry collector tail sampling from official docs.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to deeply-investigate"
+  }
+]

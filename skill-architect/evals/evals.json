@@ -1,0 +1,38 @@
+{
+  "skill_name": "skill-architect",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Use /skill-architect to scaffold a new skill called 'sql-plan-auditor' in phase critique, modality harness, domain software-engineering, model-tier standard, effort medium, invocation hybrid, using --dry-run first.",
+      "expected_output": "Previews the scaffolded directory tree using scripts/scaffold_skill.py --dry-run with third-person description, non-triggers, metadata hints, and black-box script contract.",
+      "files": [],
+      "assertions": [
+        "Runs scripts/scaffold_skill.py --help or --dry-run without hardcoding non-portable paths",
+        "Frontmatter includes valid name, third-person description with Use when and Do not use for, taxonomy, and metadata hints",
+        "Does not leave orphaned files or body > 250 lines"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit an existing skill directory with validate_skill.py --all ., identify cross-skill taxonomy collisions and Flash 3.8 guardrail debt, and propose concrete pruning and disambiguation fixes.",
+      "expected_output": "Executes validate_skill.py --all ., diagnoses sibling overlaps and linear scratchpad checklists, and outputs actionable refactoring steps aligned with Open Skills and progressive disclosure.",
+      "files": [],
+      "assertions": [
+        "Invokes scripts/validate_skill.py --all . directly as a black box",
+        "Flags missing Do not use for non-triggers and sibling collisions",
+        "Applies the Litmus Test to prune guardrail debt while keeping hard invariants and exit gates"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A teammate wants to create a new skill that enforces 'always use snake_case in Python and never use bare except' across our repo. Run Gate 0 layering analysis via /skill-architect.",
+      "expected_output": "Applies Gate 0 to reject creating a skill and routes always-on repo coding policy to AGENTS.md or .agents/rules/*.md instead.",
+      "files": [],
+      "assertions": [
+        "Evaluates Gate 0 layering rules before scaffolding",
+        "Recommends AGENTS.md or .agents/rules/ persistent rules instead of a triggerable skill",
+        "Explains why deterministic directory-scoped rules beat prompt-matched skill triggers for always-on policy"
+      ]
+    }
+  ]
+}

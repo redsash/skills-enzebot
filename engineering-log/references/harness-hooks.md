@@ -95,6 +95,6 @@ Whenever `eng_log.py context` or `agy-start` detects files in `pending/`, surfac
 ### Verifying Installed Enhancers
 Run `context` against any workspace to inspect detected tools:
 ```bash
-python3 engineering-log/scripts/eng_log.py context --cwd .
+python3 scripts/eng_log.py context --cwd .
 ```
 Check the `"tools"` map in the JSON output (`{"git": true, "sem": false, "inspect": false, "duckdb": true}`).

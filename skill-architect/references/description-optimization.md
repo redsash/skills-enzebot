@@ -38,7 +38,7 @@ Use the canonical 3-part pattern: **`[Third-person capability] + [Explicit trigg
 
 Before writing trigger evals, run the repo-wide collision check to identify sibling skills sharing the same `phase` + `domain` or high lexical overlap:
 ```bash
-python3 skill-architect/scripts/validate_skill.py --all .
+python3 scripts/validate_skill.py --all .
 ```
 Every colliding sibling skill must become a **negative near-miss** in `evals/trigger_queries.json` and be explicitly disambiguated in both skills' descriptions.
 

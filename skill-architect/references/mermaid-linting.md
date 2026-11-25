@@ -56,10 +56,10 @@ Always begin the Mermaid fence with a recognized diagram keyword on the first li
 Standalone CLI that scans Markdown files or `.mmd` files:
 ```bash
 # Validate diagrams
-python3 skill-architect/scripts/lint_mermaid.py <path-to-file-or-dir>
+python3 scripts/lint_mermaid.py <path-to-file-or-dir>
 
 # Automatically fix common errors (quotes, semicolons, invalid arrows)
-python3 skill-architect/scripts/lint_mermaid.py <path-to-file-or-dir> --fix
+python3 scripts/lint_mermaid.py <path-to-file-or-dir> --fix
 ```
 
 ### 2. Modern CLI Validator (`@probelabs/maid`)
@@ -70,4 +70,4 @@ npx -y @probelabs/maid <markdown-file>
 `maid` is a fast parser specifically tuned for AI-generated Mermaid code blocks, identifying unclosed quotes, broken arrows, and malformed styling within milliseconds without spinning up a headless browser.
 
 ### 3. Integrated in `validate_skill.py`
-Whenever `python3 skill-architect/scripts/validate_skill.py <skill-dir>` runs, all Mermaid diagrams across `SKILL.md` and `references/` are automatically validated. Any syntax defect blocks validation until resolved.
+Whenever `python3 scripts/validate_skill.py <skill-dir>` runs, all Mermaid diagrams across `SKILL.md` and `references/` are automatically validated. Any syntax defect blocks validation until resolved.

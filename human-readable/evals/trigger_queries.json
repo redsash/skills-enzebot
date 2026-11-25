@@ -1,0 +1,82 @@
+[
+  {
+    "query": "This PR description sounds very AI-generated right now—remove the robotic phrasing and make it sound natural.",
+    "should_trigger": true,
+    "notes": "Explicit AI-prose humanization on PR description"
+  },
+  {
+    "query": "Polish this release announcement so it doesn't read like an LLM wrote it.",
+    "should_trigger": true,
+    "notes": "Explicit de-LLM prose edit"
+  },
+  {
+    "query": "Rewrite these docs to strip corporate throat-clearing, em-dash padding, and staccato fragments.",
+    "should_trigger": true,
+    "notes": "Direct prose anti-tic cleanup"
+  },
+  {
+    "query": "Make this architectural proposal sound human without changing any technical facts.",
+    "should_trigger": true,
+    "notes": "Humanization of technical proposal"
+  },
+  {
+    "query": "Clean up the stilted, formulaic phrasing in this engineering blog draft.",
+    "should_trigger": true,
+    "notes": "Blog draft human-readable pass"
+  },
+  {
+    "query": "Edit this commit message and changelog summary so it reads cleanly and drops generic hype words.",
+    "should_trigger": true,
+    "notes": "Commit message / release summary polish"
+  },
+  {
+    "query": "Our postmortem summary uses 'delve', 'pivotal', and 'testament' everywhere—make it read like a human engineer wrote it.",
+    "should_trigger": true,
+    "notes": "Elevated AI cliche cleanup"
+  },
+  {
+    "query": "Tighten this RFC introduction so it drops 'At its core' and states causal links directly.",
+    "should_trigger": true,
+    "notes": "Preamble stripping and causal connectives"
+  },
+  {
+    "query": "Refactor this Python service to extract shared retry logic and eliminate duplicated functions.",
+    "should_trigger": false,
+    "notes": "Near-miss: code refactoring / technical logic change"
+  },
+  {
+    "query": "Run /strategic-thinking-5d using AQAL and Kegan stages to stress-test our onboarding POC.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to strategic-thinking-5d"
+  },
+  {
+    "query": "Run /engineering-log to capture dead ends and belief revisions from today's debugging session.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  },
+  {
+    "query": "Stage an expert debate using /perspectives on whether to migrate from REST to gRPC.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to perspectives"
+  },
+  {
+    "query": "Apply ACH via /competing-hypothesis to evaluate three rival causes for our memory leak.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to competing-hypothesis"
+  },
+  {
+    "query": "Investigate PostgreSQL 17 logical replication failover slots from official docs into a dossier.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to deeply-investigate"
+  },
+  {
+    "query": "Write a bash script to send formatted Discord webhook alerts on CI failure.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to discord-webhook-script-writer"
+  },
+  {
+    "query": "Fix the syntax error on line 18 of src/routes.ts.",
+    "should_trigger": false,
+    "notes": "Technical code bug fix"
+  }
+]

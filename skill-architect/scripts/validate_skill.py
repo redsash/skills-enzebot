@@ -5,7 +5,7 @@ against the Open Skills Specification, Antigravity layering standards, and
 repo taxonomy/collision rules.
 
 Usage:
-    python3 skill-architect/scripts/validate_skill.py [OPTIONS] <skill-or-repo-dir>
+    python3 scripts/validate_skill.py [OPTIONS] <skill-or-repo-dir>
 
 Options:
     --all                  Audit every skill under <dir> (and build collision matrix)
@@ -15,9 +15,9 @@ Options:
     --help, -h             Show this help message and exit
 
 Examples:
-    python3 skill-architect/scripts/validate_skill.py skill-architect
-    python3 skill-architect/scripts/validate_skill.py --all .
-    python3 skill-architect/scripts/validate_skill.py --json engineering-log
+    python3 scripts/validate_skill.py skill-architect
+    python3 scripts/validate_skill.py --all .
+    python3 scripts/validate_skill.py --json engineering-log
 
 Exit Codes:
     0  Validation passed (warnings allowed)
@@ -74,6 +74,9 @@ SCRIPT_HELP_MARKERS_RE = re.compile(
     r"(argparse|optparse|click|typer|getopts|--help|-h\b|usage\s*\(|Usage:)",
     re.IGNORECASE,
 )
+HOME_PATH_RE = re.compile(r"/(?:home|Users)/([A-Za-z0-9._-]+)/")
+BENIGN_HOME_USERS = {"user", "username", "youruser", "yourname", "dev", "alice", "bob", "runner", "me"}
+REQUIRED_META_HINTS = ("model-tier", "effort", "invocation")
 
 STOPWORDS: Set[str] = {
     "a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "does", "for",
@@ -451,38 +454,42 @@ def validate_skill(
         elif len(compat) > 500:
             errors.append(f"Compatibility field length ({len(compat)}) exceeds maximum allowed 500 characters.")
 
-    # 4. Validate metadata (optional, Open Skills string-to-string map + known execution hints)
+    # 4. Validate metadata (recommended, Open Skills string-to-string map + execution hints)
     meta = frontmatter.get("metadata")
-    if meta is not None:
-        if not isinstance(meta, dict):
-            errors.append("Optional 'metadata' must be a key-value dictionary mapping string keys to string values.")
-        else:
-            meta_hints: Dict[str, str] = {}
-            for k, v in meta.items():
-                if not isinstance(k, str) or not isinstance(v, str):
-                    errors.append(f"Metadata entries must be string-to-string. Invalid pair: {k}={v}")
-                    continue
-                if k == "model-tier":
-                    if v not in VALID_MODEL_TIERS:
-                        errors.append(f"Invalid metadata.model-tier '{v}'. Allowed: {sorted(VALID_MODEL_TIERS)}")
-                    else:
-                        meta_hints[k] = v
-                elif k == "effort":
-                    if v not in VALID_EFFORTS:
-                        errors.append(f"Invalid metadata.effort '{v}'. Allowed: {sorted(VALID_EFFORTS)}")
-                    else:
-                        meta_hints[k] = v
-                elif k == "invocation":
-                    if v not in VALID_INVOCATIONS:
-                        errors.append(f"Invalid metadata.invocation '{v}'. Allowed: {sorted(VALID_INVOCATIONS)}")
-                    else:
-                        meta_hints[k] = v
-                        if v == "manual" and name and f"/{name}" not in desc_clean and "explicit" not in desc_clean.lower():
-                            warnings.append(
-                                f"metadata.invocation is 'manual', but description does not mention '/{name}' or explicit invocation."
-                            )
-            if meta_hints:
-                details["metadata_hints"] = meta_hints
+    if meta is None:
+        warnings.append("Missing 'metadata' execution hints (model-tier, effort, invocation).")
+    elif not isinstance(meta, dict):
+        errors.append("Optional 'metadata' must be a key-value dictionary mapping string keys to string values.")
+    else:
+        meta_hints: Dict[str, str] = {}
+        for k, v in meta.items():
+            if not isinstance(k, str) or not isinstance(v, str):
+                errors.append(f"Metadata entries must be string-to-string. Invalid pair: {k}={v}")
+                continue
+            if k == "model-tier":
+                if v not in VALID_MODEL_TIERS:
+                    errors.append(f"Invalid metadata.model-tier '{v}'. Allowed: {sorted(VALID_MODEL_TIERS)}")
+                else:
+                    meta_hints[k] = v
+            elif k == "effort":
+                if v not in VALID_EFFORTS:
+                    errors.append(f"Invalid metadata.effort '{v}'. Allowed: {sorted(VALID_EFFORTS)}")
+                else:
+                    meta_hints[k] = v
+            elif k == "invocation":
+                if v not in VALID_INVOCATIONS:
+                    errors.append(f"Invalid metadata.invocation '{v}'. Allowed: {sorted(VALID_INVOCATIONS)}")
+                else:
+                    meta_hints[k] = v
+                    if v == "manual" and name and f"/{name}" not in desc_clean and "explicit" not in desc_clean.lower():
+                        warnings.append(
+                            f"metadata.invocation is 'manual', but description does not mention '/{name}' or explicit invocation."
+                        )
+        missing_hints = [k for k in REQUIRED_META_HINTS if k not in meta]
+        if missing_hints:
+            warnings.append(f"metadata missing recommended execution hint(s): {missing_hints}.")
+        if meta_hints:
+            details["metadata_hints"] = meta_hints
 
     # 5. Validate taxonomy (recommended)
     taxonomy = frontmatter.get("taxonomy")
@@ -641,6 +648,104 @@ def validate_skill(
         warnings.append(
             "Skill bundles scripts/ but SKILL.md does not instruct agents to run '--help' first (black-box script pattern)."
         )
+
+    # 9b. Portability checks: hardcoded home paths & repo-prefixed script paths
+    for script_file in executable_scripts:
+        try:
+            src = script_file.read_text(encoding="utf-8", errors="ignore")
+            for hm in HOME_PATH_RE.finditer(src):
+                uname = hm.group(1)
+                if uname.lower() in BENIGN_HOME_USERS or uname.startswith("<"):
+                    continue
+                errors.append(
+                    f"Hardcoded absolute home path '{hm.group(0)}' in scripts/{script_file.name}; "
+                    "use Path.home() or env vars for portability."
+                )
+        except Exception:
+            pass
+
+    doc_files_to_check = [skill_file]
+    for doc_subdir in ("references", "examples"):
+        d = skill_dir / doc_subdir
+        if d.is_dir():
+            doc_files_to_check.extend(sorted(d.glob("*.md")))
+
+    for doc_f in doc_files_to_check:
+        try:
+            doc_txt = doc_f.read_text(encoding="utf-8", errors="ignore")
+            rel_doc = str(doc_f.relative_to(skill_dir))
+            for hm in HOME_PATH_RE.finditer(doc_txt):
+                uname = hm.group(1)
+                if uname.lower() in BENIGN_HOME_USERS or uname.startswith("<"):
+                    continue
+                warnings.append(
+                    f"Hardcoded absolute home path '{hm.group(0)}' in {rel_doc}; use '~/' or relative paths for portability."
+                )
+            if scripts_dir.is_dir() and doc_f.parent.name != "examples":
+                prefixed = f"{dir_name}/scripts/"
+                if prefixed in doc_txt:
+                    warnings.append(
+                        f"Repo-prefixed script path '{prefixed}...' in {rel_doc}; "
+                        "use relative 'scripts/...' for standalone install portability."
+                    )
+        except Exception:
+            pass
+
+    # 9c. Validate evals/ integrity if present
+    evals_dir = skill_dir / "evals"
+    evals_json = evals_dir / "evals.json"
+    if evals_json.is_file():
+        try:
+            ev_data = json.loads(evals_json.read_text(encoding="utf-8"))
+            if not isinstance(ev_data, dict) or not isinstance(ev_data.get("evals"), list) or not ev_data["evals"]:
+                errors.append("evals/evals.json must be a JSON object with a non-empty 'evals' list.")
+            else:
+                for idx, ev_item in enumerate(ev_data["evals"]):
+                    if not isinstance(ev_item, dict):
+                        errors.append(f"evals/evals.json evals[{idx}] must be an object.")
+                        continue
+                    if not isinstance(ev_item.get("prompt"), str) or not ev_item["prompt"].strip():
+                        errors.append(f"evals/evals.json evals[{idx}] missing non-empty 'prompt'.")
+                    if not isinstance(ev_item.get("assertions"), list) or not ev_item["assertions"]:
+                        errors.append(f"evals/evals.json evals[{idx}] missing non-empty 'assertions' list.")
+                    for fpath in ev_item.get("files") or []:
+                        if not isinstance(fpath, str) or not (skill_dir / fpath).exists():
+                            errors.append(f"evals/evals.json references missing fixture file: '{fpath}'")
+        except Exception as e:
+            errors.append(f"Invalid JSON in evals/evals.json: {e}")
+
+    tq_json = evals_dir / "trigger_queries.json"
+    if tq_json.is_file():
+        try:
+            tq_data = json.loads(tq_json.read_text(encoding="utf-8"))
+            if isinstance(tq_data, dict):
+                warnings.append(
+                    "evals/trigger_queries.json should be a top-level JSON array [...], not an object wrapper."
+                )
+            elif not isinstance(tq_data, list):
+                errors.append("evals/trigger_queries.json must be a JSON array.")
+            else:
+                has_pos = False
+                has_neg = False
+                for idx, q_item in enumerate(tq_data):
+                    if not isinstance(q_item, dict):
+                        errors.append(f"evals/trigger_queries.json[{idx}] must be an object.")
+                        continue
+                    if not isinstance(q_item.get("query"), str) or not q_item["query"].strip():
+                        errors.append(f"evals/trigger_queries.json[{idx}] missing non-empty 'query'.")
+                    st = q_item.get("should_trigger")
+                    if not isinstance(st, bool):
+                        errors.append(f"evals/trigger_queries.json[{idx}].should_trigger must be a boolean.")
+                    elif st is True:
+                        has_pos = True
+                    else:
+                        has_neg = True
+                if not has_pos or not has_neg:
+                    warnings.append(
+                        "evals/trigger_queries.json should include both should_trigger=true and should_trigger=false queries."
+                    )
+        except Exception as e:
+            errors.append(f"Invalid JSON in evals/trigger_queries.json: {e}")
 
     # 10. Validate Mermaid syntax in SKILL.md, references/, and examples/
     md_files_to_check = [skill_file]

@@ -4,7 +4,7 @@ Scaffolds a new Agent Skill adhering to the Open Skills Specification,
 Antigravity layering standards, progressive disclosure, and repo taxonomy.
 
 Usage:
-    python3 skill-architect/scripts/scaffold_skill.py <skill-name> [OPTIONS]
+    python3 scripts/scaffold_skill.py <skill-name> [OPTIONS]
 
 Options:
     --description TEXT         Third-person description with triggers & non-triggers (<=1024 chars)
@@ -24,8 +24,8 @@ Options:
     --help, -h                 Show this help message and exit
 
 Examples:
-    python3 skill-architect/scripts/scaffold_skill.py log-triage --phase explore --modality runbook --dry-run
-    python3 skill-architect/scripts/scaffold_skill.py schema-guard --phase critique --modality harness --with-scripts --with-evals
+    python3 scripts/scaffold_skill.py log-triage --phase explore --modality runbook --dry-run
+    python3 scripts/scaffold_skill.py schema-guard --phase critique --modality harness --with-scripts --with-evals
 """
 
 import argparse
