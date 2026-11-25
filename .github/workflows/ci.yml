@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run skill-architect strict repo gate
+        run: |
+          python3 - <<'PY'
+          import json, subprocess, sys
+          proc = subprocess.run(
+              [sys.executable, "skill-architect/scripts/validate_skill.py", "--all", ".", "--json"],
+              text=True,
+              capture_output=True,
+          )
+          print(proc.stdout)
+          if proc.stderr:
+              print(proc.stderr, file=sys.stderr)
+          assert proc.returncode == 0
+          report = json.loads(proc.stdout)
+          assert report["valid"] is True
+          for item in report["results"]:
+              assert not item["errors"], item
+              assert not item["warnings"], item
+          print(f"Strict skill audit passed: {report['total_skills']} skills, 0 errors, 0 warnings.")
+          PY
+
+      - name: Run regression test suite
+        run: python3 -m unittest discover -s tests -v

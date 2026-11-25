@@ -92,3 +92,9 @@ To validate an existing skill or audit the entire repository collision matrix:
 python3 skill-architect/scripts/validate_skill.py <path-to-skill>
 python3 skill-architect/scripts/validate_skill.py --all .
 ```
+
+### Running Regression Tests
+
+```bash
+python3 -m unittest discover -s tests -v
+```
