@@ -18,7 +18,7 @@ metadata:
 Conducts deep-dive investigations of technical domains, APIs, protocols, and architectural trade-offs against canonical primary sources. Compiles findings into a structured, progressive-disclosure Markdown dossier designed for rapid executive understanding and multi-turn iterative deep dives.
 
 > [!TIP]
-> When executing in an environment that supports subagents, delegate the investigation to a background `research` subagent (e.g. via `invoke_subagent`). This prevents high-volume document fetching, web scraping, and raw dumps from overwhelming the primary conversation context.
+> Antigravity's built-in `research` subagent runs in an **offline read-only sandbox**. Use it to ingest local repositories, PDFs, schemas, and logs without bloating main context; use the primary agent's web search or network-capable tools when fetching external RFCs, vendor docs, or upstream repositories.
 
 ---
 
@@ -39,18 +39,11 @@ Conducts deep-dive investigations of technical domains, APIs, protocols, and arc
 
 ## Workflow / Procedure
 
-### Step 1: Ingest Seed Inputs
-1. Inspect and read all user-provided local documents, URLs, and seeds first.
-2. For local PDFs or structured data, use available CLI tools (`pdftotext`, Python parsers) to extract clean text.
-3. Establish the research baseline: What problem is the user solving? What constraints are known?
+### Step 1: Ingest Seed Inputs & Bridge Vocabulary
+1. Read user-provided local artifacts, URLs, and seeds first (extract PDFs/CSVs cleanly via CLI tools rather than dumping raw bytes).
+2. Translate colloquial phrasing into canonical specification terms, surface hidden prerequisites, and frame critical architect questions (failure modes, concurrency limits, state persistence, version bounds).
 
-### Step 2: Frame Concepts & Bridge Knowledge Gaps
-If the user's inquiry is open-ended or uses informal phrasing:
-- **Map to canonical vocabulary**: Translate colloquial terms to formal industry terminology and official specification concepts.
-- **Anticipate unasked expert questions**: Formulate the critical questions an architect in this domain would ask: failure modes, concurrency limits, state persistence, backward compatibility, performance boundaries.
-- **Expose hidden assumptions**: Uncover prerequisites and dependencies that the initial seed took for granted.
-
-### Step 3: Canonical Primary Source Verification
+### Step 2: Canonical Primary Source Verification
 - **Prioritize Tier-1 Sources**:
   1. Upstream source code (GitHub/GitLab repos, commit history, issue trackers, PR discussions).
   2. Formal specifications and standards (RFCs, W3C, ISO, OpenAPI/AsyncAPI specs).
@@ -61,61 +54,28 @@ If the user's inquiry is open-ended or uses informal phrasing:
 - **Verify Version Alignment**:
   - Check the exact version of the runtime, library, or protocol. Guard against deprecated APIs or documentation drift.
 
-### Step 4: File Placement & Naming
-Check existing repository conventions for research or documentation notes (e.g., `docs/research/`, `notes/`, `architecture/decisions/`).
-- If a convention exists, conform to its structure.
-- If no convention exists, default to:
-  `docs/research/YYYY-MM-DD-<topic-slug>.md`
+### Step 3: File Placement & Naming
+Conform to existing repository research doc conventions (`docs/research/`, `notes/`, `architecture/decisions/`), or default to `docs/research/YYYY-MM-DD-<topic-slug>.md`.
 
-### Step 5: Deliver Executive Summary & Next Vectors
-Upon writing the dossier:
-- Print the exact relative path of the generated markdown file.
-- Provide a concise 2–3 paragraph executive brief in the main conversation.
-- Present 3 concrete next-turn exploration prompts for continued work.
+### Step 4: Deliver Executive Summary & Next Vectors
+Print the generated dossier's path, give a concise 2–3 paragraph executive brief in chat, and propose 3 concrete next-turn exploration prompts.
 
 ---
 
-## Dossier Output Specification
+## Dossier Output Contract
 
-The generated markdown dossier must follow this structure:
+Structure dossiers for progressive disclosure (full skeleton in [Dossier Template](examples/dossier-template.md)):
 
-````markdown
+```markdown
 # [Topic / System Name]: Technical Dossier
-
-**Date:** YYYY-MM-DD  
-**Status:** Completed | Iterative  
-**Primary Seeds:** [List of seed URLs, files, or initial prompts ingested]
-
----
+**Date:** YYYY-MM-DD | **Status:** Completed | Iterative | **Seeds:** [...]
 
 ## 1. Executive Brief & Mental Model
-- High-level synthesis (2-3 concise paragraphs) establishing the core mental model.
-- High-level conceptual diagram or ASCII flow if visualizing architecture/data lifecycle clarifies the system.
-- Plain-English definition of domain-specific concepts that were implicit or unfamiliar in the initial query.
-
 ## 2. Core Mechanics & Verified Findings
-- Detailed breakdown of technical facts, APIs, data flows, and configurations.
-- Direct inline code snippets, interface schemas, or config examples where relevant.
-- Concrete trade-offs, constraints, and known edge cases discovered during investigation.
-
 ## 3. Gap Analysis & Resolved Prerequisites
-- Foundational concepts, protocols, or platform dependencies uncovered that were not explicit in the original prompt.
-- Misconceptions corrected (e.g., "Feature X is often described as Y, but the spec shows it operates as Z").
-
-## 4. Primary Source Reference Index
-Structured table of canonical sources consulted:
-
-| Source / Spec / Repo | Entity / Authority | Specific Anchor / Section | Key Takeaway |
-| :--- | :--- | :--- | :--- |
-| `https://...` | Official Docs / RFC | `#section-name` | Core guarantee |
-
-## 5. Next-Turn Exploration Vectors
-Provide 3–5 concrete, pre-formulated subtopic prompts for subsequent agent turns:
-1. **[Vector Name]**: Specific operational, architectural, or implementation angle to explore next.
-   - *Suggested Follow-Up Prompt:* `"..."`
-2. **[Vector Name]**: Specific operational, architectural, or implementation angle to explore next.
-   - *Suggested Follow-Up Prompt:* `"..."`
-````
+## 4. Primary Source Reference Index   (table: Source | Authority | Anchor | Takeaway)
+## 5. Next-Turn Exploration Vectors    (3-5 follow-up prompts)
+```
 
 ---
 

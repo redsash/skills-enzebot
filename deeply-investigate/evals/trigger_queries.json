@@ -1,0 +1,82 @@
+[
+  {
+    "query": "/deeply-investigate PostgreSQL 17 logical replication failover slots against official docs",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation for primary-source dossier"
+  },
+  {
+    "query": "Deeply investigate SQLite WAL vs WAL2 mode in upstream sqlite.org source and write a technical dossier in docs/research/.",
+    "should_trigger": true,
+    "notes": "Primary-source dossier request"
+  },
+  {
+    "query": "Verify this vendor SDK's rate-limiting behavior directly against its upstream GitHub repo and RFC specs before we integrate.",
+    "should_trigger": true,
+    "notes": "Canonical primary-source API verification"
+  },
+  {
+    "query": "Read these three protocol whitepapers and RFC 9110 PDFs and synthesize a progressive-disclosure architectural dossier.",
+    "should_trigger": true,
+    "notes": "Heavy specification ingestion into dossier"
+  },
+  {
+    "query": "Use /deeply-investigate to map out how Linux io_uring SQPOLL handles registered buffers from kernel source.",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation"
+  },
+  {
+    "query": "Conduct in-depth research on DuckDB zero-copy Arrow streaming constraints from primary maintainer docs and issues.",
+    "should_trigger": true,
+    "notes": "Explicit in-depth primary-source research"
+  },
+  {
+    "query": "Compile a technical dossier comparing OpenTelemetry Collector tail sampling vs head sampling using official specs.",
+    "should_trigger": true,
+    "notes": "Technical dossier from official specs"
+  },
+  {
+    "query": "Verify whether HTTP/3 0-RTT replay guarantees in our reverse proxy match RFC 9114.",
+    "should_trigger": true,
+    "notes": "Specification verification against RFC"
+  },
+  {
+    "query": "Initialize a repo-local research journal entry in entries/ with logs.md and prompts.json to track prompt iterations.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to research-journaler"
+  },
+  {
+    "query": "Run /engineering-log to save today's debugging dead ends and belief revisions.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  },
+  {
+    "query": "What is the flag to show hidden files in ls?",
+    "should_trigger": false,
+    "notes": "Quick one-line syntax lookup"
+  },
+  {
+    "query": "Use ACH to eliminate rival root causes for our intermittent 504 timeouts.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to competing-hypothesis"
+  },
+  {
+    "query": "Run /perspectives to debate whether to adopt Temporal or BullMQ.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to perspectives"
+  },
+  {
+    "query": "Audit this sports betting model's calibration and Shin devigging.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to quant-edge-auditor"
+  },
+  {
+    "query": "Rewrite this architecture RFC draft so it doesn't sound like an LLM.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to human-readable"
+  },
+  {
+    "query": "Write a bash Discord webhook script for CI/CD deployment notifications.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to discord-webhook-script-writer"
+  }
+]

@@ -16,7 +16,7 @@ metadata:
 
 # Research Journaler
 
-A repository-enforced research journal engine designed to prevent context drift and capture reproducible research trails across multi-agent workflows (Antigravity CLI, Gemini CLI, Gemini Spark).
+A repository-enforced research journal engine designed to prevent context drift and capture reproducible research trails across Antigravity CLI and Gemini CLI workflows.
 
 ---
 
@@ -56,8 +56,9 @@ See [Architecture & Multi-Agent Reference](references/REFERENCE.md) for global a
 > Treat `scripts/log_research.py` as a black box: run `python3 scripts/log_research.py --help` (and `<subcommand> --help`) first to inspect flags rather than reading source.
 
 ### Step 1: Initialize Workspace (First-Time Only)
-If the repository has not been initialized with journal structures:
+If the repository has not been initialized with journal structures (supports `--dry-run`):
 ```bash
+python3 scripts/log_research.py init-repo --dry-run
 python3 scripts/log_research.py init-repo
 ```
 This generates `docs/templates/`, `.gitignore`, and base directories without overwriting existing files.
@@ -84,12 +85,12 @@ Open the generated `logs.md` (instantiated from [Research Log Template](assets/t
 3. Keep prose concise, focusing on what was learned and what surprised you.
 
 ### Step 4: Track Prompt Iterations in `prompts.json`
-Whenever significant prompts, system configurations, or model responses are tested:
+Whenever significant prompts, system configurations, or model responses are tested (deterministically scrubs common tokens/keys before writing; supports `--dry-run`):
 ```bash
 python3 scripts/log_research.py add-prompt \
   --topic "ebpf-tracing" \
   --prompt "Analyze kernel probe latency using bpftrace" \
-  --model "gemini-3.8-flash" \
+  --model "gemini-4-hydrogen" \
   --response-summary "Generated working probe script; verified kernel symbol availability"
 ```
 The helper script updates `prompts.json` atomically and increments iteration counts safely.

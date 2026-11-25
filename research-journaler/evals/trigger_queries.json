@@ -1,0 +1,82 @@
+[
+  {
+    "query": "/research-journaler start a repo-local research journal entry for ebpf-tracing",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation"
+  },
+  {
+    "query": "Initialize a repo-local research journal with logs.md and prompts.json in this project.",
+    "should_trigger": true,
+    "notes": "Explicit repo-local journal initialization"
+  },
+  {
+    "query": "Log this prompt iteration and model flags to prompts.json using research-journaler.",
+    "should_trigger": true,
+    "notes": "Explicit prompts.json tracking"
+  },
+  {
+    "query": "/research-journaler",
+    "should_trigger": true,
+    "notes": "Bare slash command"
+  },
+  {
+    "query": "Scaffold a new chronological research journal entry in entries/YYYY-MM/YYYY-MM-DD_topic-slug/ for our benchmark spike.",
+    "should_trigger": true,
+    "notes": "Explicit research journal directory structure"
+  },
+  {
+    "query": "Run /research-journaler to list all repo-local research entries and record validated insights in logs.md.",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation + logs.md"
+  },
+  {
+    "query": "Manage our repo-local research journal prompts.json and sources/ artifacts for the vector-index experiment.",
+    "should_trigger": true,
+    "notes": "Explicit repo-local research journal management"
+  },
+  {
+    "query": "Use /research-journaler to add a new prompt trial to our academic-research logs.md.",
+    "should_trigger": true,
+    "notes": "Explicit command + logs.md"
+  },
+  {
+    "query": "Run /engineering-log to capture dead ends, belief revisions, and telemetry into ~/engineering-log.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  },
+  {
+    "query": "Investigate PostgreSQL 17 logical replication failover slots against official docs and produce a dossier in docs/research/.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to deeply-investigate"
+  },
+  {
+    "query": "Fix the typo in README.md and commit the single-line change.",
+    "should_trigger": false,
+    "notes": "Ephemeral one-off edit"
+  },
+  {
+    "query": "Wrap up this debugging session and save cross-project learnings to my second brain.",
+    "should_trigger": false,
+    "notes": "Near-miss: cross-project retrospective logging belongs to engineering-log (manual)"
+  },
+  {
+    "query": "Write a technical dossier comparing SQLite WAL and WAL2 modes from sqlite.org.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to deeply-investigate"
+  },
+  {
+    "query": "Polish logs.md prose so it doesn't read like an LLM wrote it.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to human-readable"
+  },
+  {
+    "query": "Run /competing-hypothesis on three possible causes for the flaky CI build.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to competing-hypothesis"
+  },
+  {
+    "query": "Update CHANGELOG.md for release v1.3.0.",
+    "should_trigger": false,
+    "notes": "Release changelog edit"
+  }
+]

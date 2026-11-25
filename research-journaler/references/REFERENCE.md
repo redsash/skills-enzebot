@@ -25,7 +25,7 @@ mkdir -p ~/.gemini/config/skills
 cp -r /path/to/skills-enzebot/research-journaler ~/.gemini/config/skills/
 ```
 
-### C. Gemini Spark & Interactive IDE Sessions
+### C. Workspace Rules (`AGENTS.md` / `GEMINI.md`)
 For environments that read project rules, reference the journal commands in `AGENTS.md` or `GEMINI.md` at the project root:
 ```markdown
 ## Research Journal Protocol
@@ -62,4 +62,4 @@ entries/
 When `log_research.py` captures environment metadata:
 - Git branch and short commit hash are recorded.
 - Python and runtime versions are saved.
-- **Secret Scrubbing**: Never write `.env` variables, API keys, bearer tokens, or password strings into `prompts.json` or `logs.md`. The helper script explicitly avoids dumping `os.environ` to preserve credential security.
+- **Secret Scrubbing**: Never write `.env` variables, API keys, bearer tokens, or password strings into `prompts.json` or `logs.md`. `log_research.py` avoids dumping `os.environ` and deterministically scrubs PEM keys, GitHub/API/Slack/AWS tokens, Bearer tokens, credentialed URLs, and inline `*_KEY=`/`*_TOKEN=`/`*_PASSWORD=` values in `add-prompt` (supports `--dry-run` on `init-repo`, `new-entry`, and `add-prompt`).
