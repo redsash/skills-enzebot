@@ -1,12 +1,16 @@
 ---
 name: competing-hypothesis
 description: >-
-  Evaluates complex, ambiguous, or contradictory evidence against multiple mutually exclusive explanations using Richards Heuer's Analysis of Competing Hypotheses (ACH) methodology. Use when diagnosing elusive production bugs, investigating security incidents, evaluating intelligence/risk scenarios, or choosing among rival technical root causes while eliminating confirmation bias.
+  Evaluates ambiguous or contradictory evidence against mutually exclusive explanations using Richards Heuer's Analysis of Competing Hypotheses (ACH). Use on /competing-hypothesis or when diagnosing elusive bugs, investigating incidents, or choosing among rival root causes. Do not use for deterministic stack-trace bugs, multi-persona advisory debates (perspectives), or integral/AQAL strategic framing (strategic-thinking-5d).
 taxonomy:
   phase: [deliberate]
   modality: [lens]
   domain: [architecture-strategy, operations-reliability]
   interaction: interactive
+metadata:
+  model-tier: "deep"
+  effort: "high"
+  invocation: "hybrid"
 ---
 
 # Analysis of Competing Hypotheses (ACH)
@@ -24,14 +28,6 @@ A rigorous methodology developed by Richards Heuer at the CIA to evaluate multip
 ---
 
 ## Workflow / Procedure
-
-Progress:
-- [ ] Step 1: Formulate the focal question and exhaust candidate hypotheses
-- [ ] Step 2: Inventory evidence and isolate diagnostic items
-- [ ] Step 3: Construct the ACH consistency matrix
-- [ ] Step 4: Analyze inconsistencies and rank hypotheses
-- [ ] Step 5: Perform sensitivity analysis and identify critical information gaps
-- [ ] Step 6: Report leading conclusions, confidence level, and falsification triggers
 
 ### Step 1: Hypotheses Generation
 1. State the focal question in a specific, testable form (e.g., *"What is causing the 504 timeouts on the checkout service?"*).

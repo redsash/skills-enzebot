@@ -1,12 +1,16 @@
 ---
 name: perspectives
 description: >-
-  Stress-tests decisions, strategic dilemmas, and complex architectural forks by simulating a multi-expert advisory panel and adversarial cross-debate. Use when the user asks for multiple perspectives, says "what would experts think", asks to stress-test a strategy or design, evaluates high-stakes trade-offs, or faces a difficult crossroads.
+  Stress-tests decisions, strategic dilemmas, and complex architectural forks by simulating a multi-expert advisory panel and adversarial cross-debate. Use only on /perspectives or when explicitly asked for a multi-expert advisory panel or adversarial persona cross-debate. Do not use for routine factual lookups, forensic root-cause falsification (competing-hypothesis), or AQAL/5D strategic framing (strategic-thinking-5d).
 taxonomy:
   phase: [deliberate]
   modality: [lens]
   domain: [architecture-strategy]
   interaction: interactive
+metadata:
+  model-tier: "deep"
+  effort: "high"
+  invocation: "manual"
 ---
 
 # Perspectives (Expert Advisory Panel)
@@ -24,12 +28,6 @@ Stress-tests decisions, resolves strategic dilemmas, and evaluates architectural
 ---
 
 ## Workflow / Procedure
-
-Progress:
-- [ ] Step 1: Deconstruct the dilemma and identify core tensions
-- [ ] Step 2: Seed a 4–5 person hyper-specific expert panel
-- [ ] Step 3: Simulate the live adversarial cross-debate
-- [ ] Step 4: Synthesize blind spots and deliver executive recommendation
 
 ### Step 1: Frame the Dilemma & Extract Constraints
 Analyze the user's situation to isolate:

@@ -1,13 +1,17 @@
 ---
 name: engineering-log
 description: >-
-  Distill an engineering, debugging, architecture, or brainstorming session into a cross-project epistemic flight recorder stored in ~/engineering-log (or $ENGINEERING_LOG_DIR / --dir). Captures belief revisions, verbatim dead-end signatures, typed graph links, human-agent loop telemetry, and ML-ready sharded JSONL ledgers with deterministic secret scrubbing and INDEX.md compilation. Use on /engineering-log, when wrapping up a meaningful or frustrating session, to recall prior cross-project learnings, or to compute engineering stats. Do not use for repo-local prompt journals (use research-journaler) or CHANGELOG/release notes.
+  Distills engineering, debugging, architecture, or brainstorming sessions into a cross-project epistemic flight recorder in ~/engineering-log ($ENGINEERING_LOG_DIR / --dir) with belief revisions, dead-end signatures, graph links, telemetry, secret scrubbing, and INDEX.md compilation. Use only on /engineering-log or when explicitly asked to log a session, query engineering-log entries, or compute engineering-log stats. Do not use for repo-local prompt journals (research-journaler), CHANGELOGs, or runtime log debugging.
 compatibility: Requires Python 3.8+ (stdlib only); optional progressive enhancement with git, sem, inspect, and duckdb.
 taxonomy:
   phase: [maintain]
   modality: [lens, spec, harness]
   domain: [software-engineering, operations-reliability, agent-meta]
   interaction: autonomous
+metadata:
+  model-tier: "fast"
+  effort: "medium"
+  invocation: "manual"
 ---
 
 # Engineering Log (Knowledge & Thoroughness)
@@ -20,11 +24,12 @@ An epistemic flight recorder and cross-project second-brain capture engine. Dist
 
 - **Schema & Analytics Contract**: [Schema, Vocabularies & DuckDB Recipes](references/schema.md)
 - **Hooks & Optional CLIs**: [Harness Hooks, Exit Prompts & Optional Enhancers](references/harness-hooks.md)
-- **CLI Engine (`scripts/eng_log.py`)**:
+- **CLI Engine (`scripts/eng_log.py`)** *(treat as a black box: run `python3 scripts/eng_log.py --help` and `<subcommand> --help` first rather than reading source)*:
   - `python3 scripts/eng_log.py init [--dir DIR]`
   - `python3 scripts/eng_log.py context [--cwd PATH] [--query TEXT] [--tech CSV] [--concepts CSV]`
   - `python3 scripts/eng_log.py write [--input FILE|-] [--dry-run]`
   - `python3 scripts/eng_log.py append --id <ENTRY_ID> [--input FILE|-] [--dry-run]`
+  - `python3 scripts/eng_log.py rebuild-index [--dir DIR]`
   - `python3 scripts/eng_log.py query [--project X] [--tech X] [--text X] [--exclude-superseded] [--format markdown]`
   - `python3 scripts/eng_log.py stats [--project X] [--since YYYY-MM-DD] [--format markdown]`
   - `python3 scripts/eng_log.py validate [--dir DIR]`
@@ -58,13 +63,6 @@ flowchart TD
     DryRun -->|Errors| FixPayload["Fix enum or schema error"] --> DryRun
     DryRun -->|Clean| CommitWrite["5. Commit write or append and confirm"]
 ```
-
-Progress:
-- [ ] Step 1: Initialize store if needed (`init`) and harvest workspace/graph context (`context`)
-- [ ] Step 2: Inspect `related_entries` and choose typed graph edges (`builds_on`, `supersedes`, `contradicts`, `same_root_cause`, `spawns`)
-- [ ] Step 3: Draft structured JSON payload adhering to `references/schema.md`
-- [ ] Step 4: Validate and preview redactions with `write --dry-run`
-- [ ] Step 5: Execute `write` (or `append --id`) and report concise confirmation
 
 ### Step 1: Harvest Context & Related Nodes
 Run `context` while conversation memory is hot:

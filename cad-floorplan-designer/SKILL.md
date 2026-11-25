@@ -1,12 +1,17 @@
 ---
 name: cad-floorplan-designer
-description: "Designs buildable, structurally sound 2D architectural CAD floor plans, spatial layouts, and circulation maps adhering to modular masonry (CMU), zoning setbacks, island resilience, and spatial UX principles. Use whenever asked to design floor plans, architectural layouts, bubble diagrams, room circulation flow, or generate 2D CAD SVG drawings with schedules."
+description: >-
+  Designs buildable, structurally sound 2D architectural CAD floor plans, spatial layouts, and circulation maps adhering to modular masonry (CMU), zoning setbacks, island resilience, and spatial UX principles. Use whenever asked to design floor plans, architectural layouts, bubble diagrams, room circulation flow, or generate 2D CAD SVG drawings with schedules. Do not use for 3D structural FEA, MEP engineering calculations, or purely decorative interior styling.
 compatibility: Standard markdown and SVG viewer; Python 3.8+ for bundled scripts
 taxonomy:
   phase: [author]
   modality: [spec, harness]
   domain: [physical-spatial-design]
   interaction: interactive
+metadata:
+  model-tier: "deep"
+  effort: "high"
+  invocation: "auto"
 ---
 
 # CAD Floorplan Designer
@@ -17,13 +22,13 @@ Design buildable, structurally sound 2D architectural floor plans, spatial circu
 
 ## Bundled Tools & References
 
-- **Supporting Scripts**:
-  - `python3 cad-floorplan-designer/scripts/validate_cmu_grid.py --check-spans "24' 8\"" "16' 0\""`: Validates dimensions against 8" and 16" CMU modular units.
-  - `python3 cad-floorplan-designer/scripts/validate_cmu_grid.py --site-envelope --lot-width "60' 0\"" --lot-depth "100' 0\"" --side-setback "10' 0\""`: Computes setback envelope snapped to modular increments.
-  - `python3 cad-floorplan-designer/scripts/audit_spatial_ux.py --demo`: Runs 4-pillar validation scorecard (geometry, IRC building codes, furniture clearances, and circulation).
-  - `python3 cad-floorplan-designer/scripts/audit_spatial_ux.py --demo --mermaid`: Generates clean Mermaid circulation graph.
-  - `python3 cad-floorplan-designer/scripts/estimate_construction_cost.py --demo`: Computes AACE Class 4 construction cost range (-15% to +25%) with material and resilience takeoffs.
-  - `python3 cad-floorplan-designer/scripts/render_floorplan_svg.py --demo -o plan.svg`: Renders 2D CAD SVG floorplans with alphanumeric grid lines and circulation path overlays.
+- **Supporting Scripts** *(treat `scripts/` as black boxes: run `python3 scripts/<tool>.py --help` first to inspect flags rather than reading source)*:
+  - `python3 scripts/validate_cmu_grid.py --check-spans "24' 8\"" "16' 0\""`: Validates dimensions against 8" and 16" CMU modular units.
+  - `python3 scripts/validate_cmu_grid.py --site-envelope --lot-width "60' 0\"" --lot-depth "100' 0\"" --side-setback "10' 0\""`: Computes setback envelope snapped to modular increments.
+  - `python3 scripts/audit_spatial_ux.py --demo`: Runs 4-pillar validation scorecard (geometry, IRC building codes, furniture clearances, and circulation).
+  - `python3 scripts/audit_spatial_ux.py --demo --mermaid`: Generates clean Mermaid circulation graph.
+  - `python3 scripts/estimate_construction_cost.py --demo`: Computes AACE Class 4 construction cost range (-15% to +25%) with material and resilience takeoffs.
+  - `python3 scripts/render_floorplan_svg.py --demo -o plan.svg`: Renders 2D CAD SVG floorplans with alphanumeric grid lines and circulation path overlays.
 - **Deep-Dive References**:
   - [Floor Plan AI Validation Framework](references/validation-framework.md): 5-pillar validation standard (Geometry, Building Codes, Furniture Fit, Metrics, Expert Review).
   - [Construction Cost Estimation Guide](references/construction-cost-estimation.md): Parametric takeoff formulas, slope multipliers, and AACE Class 4 confidence bands.

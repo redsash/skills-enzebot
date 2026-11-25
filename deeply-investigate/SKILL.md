@@ -1,12 +1,16 @@
 ---
 name: deeply-investigate
 description: >-
-  Investigates complex technical topics, nascent architectural concepts, external APIs, or local documents (PDFs, specifications, data) against canonical primary sources. Use when tasked with conducting in-depth research, architectural discovery, API verification, or compiling a progressive-disclosure technical dossier, especially when delegating heavy exploration to a background subagent.
+  Investigates complex technical topics, nascent architectures, external APIs, or local documents against canonical primary sources. Use on /deeply-investigate or when tasked with in-depth primary-source research, API verification, or compiling a technical dossier. Do not use for quick syntax lookups, repo-local lab notebooks (research-journaler), or retrospective cross-project session logging (engineering-log).
 taxonomy:
   phase: [explore]
   modality: [runbook]
   domain: [software-engineering, architecture-strategy]
   interaction: autonomous
+metadata:
+  model-tier: "orchestrator"
+  effort: "high"
+  invocation: "hybrid"
 ---
 
 # Deeply Investigate
@@ -34,13 +38,6 @@ Conducts deep-dive investigations of technical domains, APIs, protocols, and arc
 ---
 
 ## Workflow / Procedure
-
-Progress:
-- [ ] Step 1: Ingest seed inputs and extract local context
-- [ ] Step 2: Deconstruct domain concepts and identify knowledge gaps
-- [ ] Step 3: Verify claims strictly against canonical primary sources
-- [ ] Step 4: Write the progressive-disclosure dossier to disk
-- [ ] Step 5: Report findings with executive summary and follow-up vectors
 
 ### Step 1: Ingest Seed Inputs
 1. Inspect and read all user-provided local documents, URLs, and seeds first.

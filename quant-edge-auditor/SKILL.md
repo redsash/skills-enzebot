@@ -1,12 +1,16 @@
 ---
 name: quant-edge-auditor
 description: >-
-  Audits sports betting and predictive quantitative models for genuine statistical edge, data leakage, probability calibration, and market efficiency. Activates whenever evaluating sports prediction models, backtesting validity, closing line value (CLV), Brier score decomposition, Shin devigging, look-ahead bias, correlated risk, or stress-testing betting portfolios against sharp market-makers. Dynamically inspects available models and skills to orchestrate optimal subagent execution tiers.
+  Audits sports betting and predictive quantitative models for genuine statistical edge, data leakage, probability calibration, and market efficiency (CLV, Brier Murphy decomposition, Shin devigging, look-ahead bias, DSR). Use on /quant-edge-auditor or when evaluating sports prediction models, betting backtests, or market-maker odds. Do not use for general ML classification outside betting/prediction markets, casual sports commentary, or generic accounting.
 taxonomy:
   phase: [critique]
   modality: [harness]
   domain: [data-science]
   interaction: autonomous
+metadata:
+  model-tier: "orchestrator"
+  effort: "high"
+  invocation: "hybrid"
 ---
 
 # Quantitative Edge Auditor (`quant-edge-auditor`)
@@ -22,13 +26,13 @@ An enterprise-grade quantitative auditing, statistical verification, and adversa
   - [Multiple Testing Corrections & Deflated Sharpe](references/multiple_testing_limits.md)
   - [Temporal Purging, Embargoing & As-Of Joins](references/temporal_purging.md)
   - [Human-Readable Skill Rationale & Deep Architecture](README.md)
-- **Bundled Automation Scripts**:
-  - `python3 quant-edge-auditor/scripts/detect_environment.py`: Discovers runtime models and installed skills; outputs dynamic subagent tier assignments.
-  - `python3 quant-edge-auditor/scripts/asof_leakage_verifier.py <dataset>`: Forensic bitemporal join and timestamp lookahead validator.
-  - `python3 quant-edge-auditor/scripts/brier_murphy_decomp.py <dataset>`: Decomposes Brier score into Reliability, Resolution, and Uncertainty.
-  - `python3 quant-edge-auditor/scripts/devig_market.py <odds...>`: Shin (insider $z$ parameter), Power, and Proportional market devigging.
-  - `python3 quant-edge-auditor/scripts/bootstrap_stress_test.py <dataset>`: Stationary block bootstrap, CLV $t$-stat, and Deflated Sharpe Ratio (DSR).
-  - `python3 quant-edge-auditor/scripts/run.py <dataset>`: Master 4-stage audit runner synthesizing the full scorecard.
+- **Bundled Automation Scripts** *(treat `scripts/` as black boxes: run `python3 scripts/<tool>.py --help` first to inspect flags rather than reading source)*:
+  - `python3 scripts/detect_environment.py`: Discovers runtime models and installed skills; outputs dynamic subagent tier assignments.
+  - `python3 scripts/asof_leakage_verifier.py <dataset>`: Forensic bitemporal join and timestamp lookahead validator.
+  - `python3 scripts/brier_murphy_decomp.py <dataset>`: Decomposes Brier score into Reliability, Resolution, and Uncertainty.
+  - `python3 scripts/devig_market.py <odds...>`: Shin (insider $z$ parameter), Power, and Proportional market devigging.
+  - `python3 scripts/bootstrap_stress_test.py <dataset>`: Stationary block bootstrap, CLV $t$-stat, and Deflated Sharpe Ratio (DSR).
+  - `python3 scripts/run.py <dataset>`: Master 4-stage audit runner synthesizing the full scorecard.
 
 ---
 
@@ -37,7 +41,7 @@ An enterprise-grade quantitative auditing, statistical verification, and adversa
 Before delegating audit sub-tasks to subagents, the orchestrating agent MUST invoke the environment discovery utility:
 
 ```bash
-python3 quant-edge-auditor/scripts/detect_environment.py --summary
+python3 scripts/detect_environment.py --summary
 ```
 
 ### Delegation Strategy by Tier & Skill Discovery
@@ -75,7 +79,7 @@ When auditing a sports prediction model or historical betting record, execute th
 - [ ] Screen feature headers for post-kickoff stats (`final_score`, `boxscore`, `actual_yards`).
 
 ```bash
-python3 quant-edge-auditor/scripts/asof_leakage_verifier.py path/to/dataset.csv
+python3 scripts/asof_leakage_verifier.py path/to/dataset.csv
 ```
 
 ### Stage 2: Probability Calibration & Discrimination
@@ -86,7 +90,7 @@ python3 quant-edge-auditor/scripts/asof_leakage_verifier.py path/to/dataset.csv
 - [ ] Evaluate Expected Calibration Error (ECE) using equal-frequency quantile bins.
 
 ```bash
-python3 quant-edge-auditor/scripts/brier_murphy_decomp.py path/to/dataset.csv --strategy quantile --bins 10
+python3 scripts/brier_murphy_decomp.py path/to/dataset.csv --strategy quantile --bins 10
 ```
 
 ### Stage 3: Market Microstructure & CLV Benchmark
@@ -96,7 +100,7 @@ python3 quant-edge-auditor/scripts/brier_murphy_decomp.py path/to/dataset.csv --
 - [ ] Measure account degradation and realistic execution costs (margin, commissions, exchange fees).
 
 ```bash
-python3 quant-edge-auditor/scripts/devig_market.py -110 -110 --method shin
+python3 scripts/devig_market.py -110 -110 --method shin
 ```
 
 ### Stage 4: Adversarial Stress Testing & Falsification
@@ -108,7 +112,7 @@ python3 quant-edge-auditor/scripts/devig_market.py -110 -110 --method shin
   - **Stationary Block Bootstrap**: Inspect 95% worst-case drawdown.
 
 ```bash
-python3 quant-edge-auditor/scripts/bootstrap_stress_test.py path/to/dataset.csv --trials 25 --sims 1000
+python3 scripts/bootstrap_stress_test.py path/to/dataset.csv --trials 25 --sims 1000
 ```
 
 ---

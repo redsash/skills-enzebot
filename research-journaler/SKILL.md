@@ -1,13 +1,17 @@
 ---
 name: research-journaler
 description: >-
-  Initializes, structures, and logs reproducible research sessions into chronological journal entries (entries/YYYY-MM/YYYY-MM-DD_topic-slug/). Use when starting a research inquiry, logging experimental findings, recording prompt iterations, or wrapping up research milestones across software engineering, academic, or data analysis domains.
+  Initializes, structures, and logs reproducible repo-local research sessions into chronological entries (entries/YYYY-MM/YYYY-MM-DD_topic-slug/). Use only on /research-journaler or when explicitly asked to manage a repo-local research journal (logs.md, prompts.json). Do not use for cross-project retrospective session logging (engineering-log), one-shot primary-source dossiers (deeply-investigate), or ephemeral edits.
 compatibility: Requires Python 3.8+
 taxonomy:
   phase: [maintain]
   modality: [runbook, harness]
   domain: [operations-reliability, software-engineering]
   interaction: autonomous
+metadata:
+  model-tier: "fast"
+  effort: "low"
+  invocation: "manual"
 ---
 
 # Research Journaler
@@ -49,13 +53,7 @@ See [Architecture & Multi-Agent Reference](references/REFERENCE.md) for global a
 
 ## Workflow / Procedure
 
-Progress:
-- [ ] Step 1: Ensure repository structure and templates exist
-- [ ] Step 2: Scaffold the chronological entry directory
-- [ ] Step 3: Record the core hypothesis and investigation baseline in `logs.md`
-- [ ] Step 4: Log prompt iterations and system parameters to `prompts.json`
-- [ ] Step 5: Place artifacts in `outputs/` and raw files in `sources/`
-- [ ] Step 6: Synthesize final takeaways and update topic status
+> Treat `scripts/log_research.py` as a black box: run `python3 scripts/log_research.py --help` (and `<subcommand> --help`) first to inspect flags rather than reading source.
 
 ### Step 1: Initialize Workspace (First-Time Only)
 If the repository has not been initialized with journal structures:

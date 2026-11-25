@@ -1,12 +1,16 @@
 ---
 name: strategic-thinking-5d
 description: >-
-  Applies Dan Koe's 5D Thinking framework (grounded in Ken Wilber's Integral AQAL, Robert Kegan's developmental psychology, and holarchies) to diagnose bottlenecks, stress-test architectural decisions, evaluate product POCs, and eliminate one-dimensional AI slop. Use when analyzing complex strategic dilemmas, designing or reviewing products/POCs, authoring high-conviction technical proposals, or when the user invokes 5D thinking, strategic genius, Dan Koe, AQAL, or integral strategy.
+  Applies Dan Koe's 5D Thinking framework (Wilber's AQAL, Kegan stages, holarchies) to diagnose systemic bottlenecks and stress-test POCs or architectures. Use only on /strategic-thinking-5d or when explicitly invoking 5D thinking, AQAL, Kegan stages, or integral holarchy diagnostics. Do not use for multi-persona debates (perspectives), forensic root-cause falsification (competing-hypothesis), or editorial prose de-slopping (human-readable).
 taxonomy:
   phase: [deliberate]
   modality: [lens]
   domain: [architecture-strategy]
   interaction: interactive
+metadata:
+  model-tier: "deep"
+  effort: "high"
+  invocation: "manual"
 ---
 
 # 5D Strategic Thinking
@@ -59,14 +63,6 @@ Select the operational mode based on the user's objective:
 ---
 
 ### Mode A: Strategic Diagnostic & POC Stress-Testing
-
-Progress:
-- [ ] Step 1: 1D Diagnostic — Horizontal vs. Vertical Separation
-- [ ] Step 2: 2D Audit — Lateral Domain Collisions & Skill-Tree Altitude
-- [ ] Step 3: 3D Evolution — Exhausting Dogma and Finding Second-Tier Synthesis
-- [ ] Step 4: 4D Integral Mapping — Upper-Left, Upper-Right, Lower-Left, Lower-Right
-- [ ] Step 5: 5D Evolutionary Holarchy — Transcend & Include and Temporal Trajectory
-- [ ] Step 6: Strategic Diagnostic Synthesis & Go/No-Go Framework
 
 #### Step 1: 1D Diagnostic (Knowing vs. Understanding)
 - Disentangle **horizontal facts** (adding more features, code libraries, data, or marketing channels) from **vertical structure** (the mental model and framing of the problem).

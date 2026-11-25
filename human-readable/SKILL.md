@@ -1,12 +1,16 @@
 ---
 name: human-readable
 description: >-
-  Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from written drafts to make them sound natural and human-authored. Use when a draft "sounds like AI", "reads like an LLM", or feels stilted, corporate, or formulaic across PR descriptions, proposals, documentation, announcements, commit messages, or blog posts.
+  Removes AI cliches, robotic mannerisms, staccato phrasing, and throat-clearing from written drafts to make them sound natural and human-authored. Use when a draft "sounds like AI", "reads like an LLM", or feels stilted, corporate, or formulaic across PR descriptions, proposals, documentation, announcements, commit messages, or blog posts. Do not use for code refactoring, technical logic changes, or strategic framework diagnostics (strategic-thinking-5d).
 taxonomy:
   phase: [critique]
   modality: [lens, spec]
   domain: [editorial-communication]
   interaction: autonomous
+metadata:
+  model-tier: "fast"
+  effort: "low"
+  invocation: "auto"
 ---
 
 # Make Fit for Human Consumption
@@ -23,12 +27,6 @@ Working prose optimizes for completeness; human-facing prose optimizes for a rea
 ---
 
 ## Workflow / Procedure
-
-Progress:
-- [ ] Step 1: Strip throat-clearing preambles and corporate hype
-- [ ] Step 2: Execute the de-LLM tic sweep
-- [ ] Step 3: Enforce vocabulary discipline and causality
-- [ ] Step 4: Conduct the read-aloud self-check
 
 ### Step 1: Strip Preambles & Hype
 Delete empty introductions, sycophantic wrap-ups, and generic corporate puffery. Jump straight to the substance:

@@ -1,12 +1,17 @@
 ---
 name: discord-webhook-script-writer
-description: "Interactively crafts and generates robust, ShellCheck-compliant Bash scripts that send formatted messages, rich embeds, and file attachments to Discord channels via curl webhooks. Activates when asked to create, automate, or parameterize Discord notification scripts, alert webhooks, CI/CD pipeline triggers, or cron monitoring notifiers in Bash."
+description: >-
+  Interactively crafts and generates robust, ShellCheck-compliant Bash scripts that send formatted messages, rich embeds, and file attachments to Discord channels via curl webhooks. Use when creating, automating, or parameterizing Discord notification scripts, CI/CD triggers, or cron notifiers in Bash. Do not use for interactive Discord bot frameworks (discord.py/discord.js), Slack/Teams webhooks, or non-Bash SDK integrations.
 compatibility: Bash 4.0+, curl, jq, ShellCheck; Python 3.8+ for bundled validation script
 taxonomy:
   phase: [author]
   modality: [runbook, harness]
   domain: [software-engineering, operations-reliability]
   interaction: interactive
+metadata:
+  model-tier: "standard"
+  effort: "medium"
+  invocation: "auto"
 ---
 
 # Discord Webhook Script Writer
@@ -17,10 +22,10 @@ Interactively design, parameterize, and generate production-ready Bash scripts t
 
 ## Bundled Tools & References
 
-- **Supporting Scripts**:
-  - `python3 discord-webhook-script-writer/scripts/validate_script.py <script.sh>`: Runs static analysis, ShellCheck linting, dry-run execution, and Discord webhook payload JSON schema validation.
-  - `python3 discord-webhook-script-writer/scripts/validate_script.py <script.sh> --sample-args "--title Test --status success"`: Tests dry-run execution with sample arguments.
-  - `python3 discord-webhook-script-writer/scripts/validate_script.py <script.sh> --json`: Emits validation diagnostics in structured JSON.
+- **Supporting Scripts** *(treat `scripts/` as a black box: run `python3 scripts/validate_script.py --help` first to inspect flags rather than reading source)*:
+  - `python3 scripts/validate_script.py <script.sh>`: Runs static analysis, ShellCheck linting, dry-run execution, and Discord webhook payload JSON schema validation.
+  - `python3 scripts/validate_script.py <script.sh> --sample-args "--title Test --status success"`: Tests dry-run execution with sample arguments.
+  - `python3 scripts/validate_script.py <script.sh> --json`: Emits validation diagnostics in structured JSON.
 - **Deep-Dive References**:
   - [Discord Webhook API & curl Reference](references/discord-api-reference.md): Payload schemas, embed field constraints, decimal colors, mentions, rate limits, and multipart upload specs.
   - [Bash Scripting Standard](references/bash-scripting-standard.md): Mandatory shell safety conventions (`set -euo pipefail`, `IFS=$'\n\t'`), dual-source webhook resolution, `jq` payload construction, and retry patterns.
@@ -140,7 +145,7 @@ Before presenting the generated script to the user, execute the validation scrip
 chmod +x ./send-discord-alert.sh
 
 # Run comprehensive validation
-python3 discord-webhook-script-writer/scripts/validate_script.py ./send-discord-alert.sh --sample-args "--status success"
+python3 scripts/validate_script.py ./send-discord-alert.sh --sample-args "--status success"
 ```
 
 The validator checks:

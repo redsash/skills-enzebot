@@ -35,9 +35,9 @@ Meta-skill for designing, scaffolding, auditing, and validating durable agent sk
   - [Evals JSON Starter Template](assets/evals_template.json)
 - **Bundled Scripts (Black-Box Contract)**:
   Treat scripts in `scripts/` as black boxes: run `--help` first to inspect flags and execute them directly rather than reading script source into context (unless debugging or modifying the scripts themselves).
-  - `python3 skill-architect/scripts/validate_skill.py --help` — Audits frontmatter, metadata tiers, taxonomy, body-line budget, black-box script contracts, orphan files, links, Mermaid syntax, and cross-skill collisions (`--all .` for repo-wide audit).
-  - `python3 skill-architect/scripts/scaffold_skill.py --help` — Scaffolds a spec-compliant skill (supports `--dry-run`, taxonomy, metadata tiers, `--with-scripts`, `--with-references`, `--with-examples`, `--with-evals`).
-  - `python3 skill-architect/scripts/lint_mermaid.py --help` — Lints and auto-fixes Mermaid diagrams (`--fix`).
+  - `python3 scripts/validate_skill.py --help` — Audits frontmatter, metadata tiers, taxonomy, body-line budget, black-box script contracts, orphan files, links, Mermaid syntax, and cross-skill collisions (`--all .` for repo-wide audit).
+  - `python3 scripts/scaffold_skill.py --help` — Scaffolds a spec-compliant skill (supports `--dry-run`, taxonomy, metadata tiers, `--with-scripts`, `--with-references`, `--with-examples`, `--with-evals`).
+  - `python3 scripts/lint_mermaid.py --help` — Lints and auto-fixes Mermaid diagrams (`--fix`).
 
 ---
 
@@ -70,7 +70,7 @@ Check the layering decision table (full rubric in [Harness Layering](references/
 ### Stage 2: Scaffold & Draft Manifest
 Preview with `--dry-run`, then scaffold:
 ```bash
-python3 skill-architect/scripts/scaffold_skill.py <skill-name> \
+python3 scripts/scaffold_skill.py <skill-name> \
   --description "<third-person capability + Use when... + Do not use for...>" \
   --phase <explore|deliberate|author|critique|maintain|meta> \
   --modality <lens|spec|runbook|harness> \
@@ -96,11 +96,11 @@ Structure around **Plan → Discover/Use/Build Tools to Verify → Iterate**:
 ### Stage 4: Verification Gate (Mandatory Exit Criteria)
 Run the validator (including cross-skill collision checks against sibling skills) and resolve all errors and actionable warnings:
 ```bash
-python3 skill-architect/scripts/validate_skill.py <path-to-skill>
+python3 scripts/validate_skill.py <path-to-skill>
 # Optional: audit entire repo collision matrix
-python3 skill-architect/scripts/validate_skill.py --all .
+python3 scripts/validate_skill.py --all .
 # Auto-fix Mermaid syntax if needed
-python3 skill-architect/scripts/lint_mermaid.py <path-to-skill> --fix
+python3 scripts/lint_mermaid.py <path-to-skill> --fix
 ```
 
 ---
