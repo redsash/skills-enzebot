@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+trigger: model_decision
 description: "Always-on code design tie-breakers (Rule of Three/AHA, Functional Core/Imperative Shell, Immutability by Default, Locality of Behavior, Law of Demeter) and anti-pattern guards."
 ---
 
