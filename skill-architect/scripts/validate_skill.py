@@ -682,10 +682,10 @@ def validate_skill(
                     f"Hardcoded absolute home path '{hm.group(0)}' in {rel_doc}; use '~/' or relative paths for portability."
                 )
             if scripts_dir.is_dir() and doc_f.parent.name != "examples":
-                prefixed = f"{dir_name}/scripts/"
-                if prefixed in doc_txt:
+                prefixed_re = re.compile(rf"(?<!skills/)\b{re.escape(dir_name)}/scripts/")
+                if prefixed_re.search(doc_txt):
                     warnings.append(
-                        f"Repo-prefixed script path '{prefixed}...' in {rel_doc}; "
+                        f"Repo-prefixed script path '{dir_name}/scripts/...' in {rel_doc}; "
                         "use relative 'scripts/...' for standalone install portability."
                     )
         except Exception:
