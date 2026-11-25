@@ -32,19 +32,27 @@ For detailed specifications, see the [Taxonomy & Classification Guide](skill-arc
 
 ## Skills Index
 
-| Skill | Phase | Modality | Domain | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| [cad-floorplan-designer](./cad-floorplan-designer/SKILL.md) | `author` | `spec`, `harness` | `physical-spatial-design` | Designs buildable 2D architectural CAD floor plans and spatial layouts adhering to CMU modularity. |
-| [competing-hypothesis](./competing-hypothesis/SKILL.md) | `deliberate` | `lens` | `architecture-strategy`, `operations-reliability` | Evaluates ambiguous or contradictory evidence against rival hypotheses using Richards Heuer's ACH. |
-| [deeply-investigate](./deeply-investigate/SKILL.md) | `explore` | `runbook` | `software-engineering`, `architecture-strategy` | Investigates nascent architectures, APIs, or documents against primary sources into a progressive-disclosure dossier. |
-| [discord-webhook-script-writer](./discord-webhook-script-writer/SKILL.md) | `author` | `runbook`, `harness` | `software-engineering`, `operations-reliability` | Interactively crafts and generates robust, ShellCheck-compliant Bash scripts for Discord webhooks. |
-| [engineering-log](./engineering-log/SKILL.md) | `maintain` | `lens`, `spec`, `harness` | `software-engineering`, `operations-reliability`, `agent-meta` | Captures cross-project epistemic deltas, dead-end signatures, typed graph links, and human-agent loop telemetry into sharded ML-ready JSONL ledgers. |
-| [human-readable](./human-readable/SKILL.md) | `critique` | `lens`, `spec` | `editorial-communication` | Eliminates AI cliches, robotic mannerisms, and throat-clearing from written drafts so they read naturally. |
-| [perspectives](./perspectives/SKILL.md) | `deliberate` | `lens` | `architecture-strategy` | Stress-tests decisions and architectural forks by simulating a multi-expert advisory panel and cross-debate. |
-| [programming-fundamentals](./programming-fundamentals/SKILL.md) | `critique`, `author` | `spec` | `software-engineering` | Applies timeless engineering principles (DRY, KISS, YAGNI, SRP, Demeter, POLA, SoC) to review and simplify code. |
-| [research-journaler](./research-journaler/SKILL.md) | `maintain` | `runbook`, `harness` | `operations-reliability`, `software-engineering` | Initializes, structures, and logs reproducible research sessions into chronological journal entries. |
-| [skill-architect](./skill-architect/SKILL.md) | `meta` | `runbook`, `harness` | `agent-meta` | Designs, scaffolds, evaluates, and validates agent skills according to Open Skills and taxonomy standards. |
-| [strategic-thinking-5d](./strategic-thinking-5d/SKILL.md) | `deliberate` | `lens` | `architecture-strategy` | Applies 5D Thinking (AQAL, Kegan stages, holarchies) to diagnose bottlenecks, stress-test POCs, and eliminate slop. |
+| Skill | Phase | Modality | Domain | Invocation | Tier | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| [cad-floorplan-designer](./cad-floorplan-designer/SKILL.md) | `author` | `spec`, `harness` | `physical-spatial-design` | `auto` | `deep` | Designs buildable 2D architectural CAD floor plans and spatial layouts adhering to CMU modularity. |
+| [competing-hypothesis](./competing-hypothesis/SKILL.md) | `deliberate` | `lens` | `architecture-strategy`, `operations-reliability` | `hybrid` | `deep` | Evaluates ambiguous or contradictory evidence against rival hypotheses using Richards Heuer's ACH. |
+| [deeply-investigate](./deeply-investigate/SKILL.md) | `explore` | `runbook` | `software-engineering`, `architecture-strategy` | `hybrid` | `orchestrator` | Investigates nascent architectures, APIs, or documents against primary sources into a progressive-disclosure dossier. |
+| [discord-webhook-script-writer](./discord-webhook-script-writer/SKILL.md) | `author` | `runbook`, `harness` | `software-engineering`, `operations-reliability` | `auto` | `standard` | Interactively crafts and generates robust, ShellCheck-compliant Bash scripts for Discord webhooks. |
+| [engineering-log](./engineering-log/SKILL.md) | `maintain` | `lens`, `spec`, `harness` | `software-engineering`, `operations-reliability`, `agent-meta` | `manual` | `fast` | Captures cross-project epistemic deltas, dead-end signatures, typed graph links, and human-agent loop telemetry into sharded ML-ready JSONL ledgers. |
+| [human-readable](./human-readable/SKILL.md) | `critique` | `lens`, `spec` | `editorial-communication` | `auto` | `fast` | Eliminates AI cliches, robotic mannerisms, and throat-clearing from written drafts so they read naturally. |
+| [perspectives](./perspectives/SKILL.md) | `deliberate` | `lens` | `architecture-strategy` | `manual` | `deep` | Stress-tests decisions and architectural forks by simulating a multi-expert advisory panel and cross-debate. |
+| [quant-edge-auditor](./quant-edge-auditor/SKILL.md) | `critique` | `harness` | `data-science` | `hybrid` | `orchestrator` | Audits sports betting and predictive quantitative models for statistical edge, leakage, calibration, and market efficiency. |
+| [research-journaler](./research-journaler/SKILL.md) | `maintain` | `runbook`, `harness` | `operations-reliability`, `software-engineering` | `manual` | `fast` | Initializes, structures, and logs reproducible repo-local research sessions into chronological journal entries. |
+| [skill-architect](./skill-architect/SKILL.md) | `meta` | `runbook`, `harness` | `agent-meta` | `hybrid` | `deep` | Designs, scaffolds, evaluates, and validates agent skills according to Open Skills, layering, and taxonomy standards. |
+| [strategic-thinking-5d](./strategic-thinking-5d/SKILL.md) | `deliberate` | `lens` | `architecture-strategy` | `manual` | `deep` | Applies 5D Thinking (AQAL, Kegan stages, holarchies) to diagnose systemic bottlenecks and stress-test POCs or architectures. |
+
+---
+
+## Persistent Rules
+
+Always-on coding standards and cross-cutting design heuristics belong in `.agents/rules/` rather than triggerable on-demand skills (per [Gate 0 harness layering](skill-architect/references/harness-layering.md)):
+
+- [Code Design Principles](.agents/rules/code-design-principles.md): Tie-breaker heuristics (Rule of Three/AHA, Functional Core/Imperative Shell, Immutability by Default, Locality of Behavior, Law of Demeter vs. pipelines) and anti-pattern guards distilled from the retired `programming-fundamentals` skill.
 
 ---
 
@@ -64,18 +72,23 @@ Candidate skills planned for development, pre-classified into the taxonomy matri
 
 ## Creating & Validating Skills
 
-To scaffold a new skill with taxonomy metadata using `skill-architect`:
+To scaffold a new skill with taxonomy and execution hints using `skill-architect`:
 
 ```bash
 python3 skill-architect/scripts/scaffold_skill.py <skill-name> \
-  --description "<one-line imperative description>" \
+  --description "<third-person capability + Use when... + Do not use for...>" \
   --phase <explore|deliberate|author|critique|maintain|meta> \
   --modality <lens|spec|runbook|harness> \
-  --domain <domain-slug>
+  --domain <domain-slug> \
+  --model-tier <fast|standard|deep|orchestrator> \
+  --effort <low|medium|high> \
+  --invocation <auto|manual|hybrid> \
+  --dry-run
 ```
 
-To validate an existing skill (verifying frontmatter, taxonomy, line budget, links, and Mermaid syntax):
+To validate an existing skill or audit the entire repository collision matrix:
 
 ```bash
 python3 skill-architect/scripts/validate_skill.py <path-to-skill>
+python3 skill-architect/scripts/validate_skill.py --all .
 ```
