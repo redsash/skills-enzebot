@@ -65,6 +65,8 @@ def audit_file(
     violations = []
     total_rows = 0
     clean_rows = 0
+    odds_compared = 0
+    exact_closing_matches = 0
     suspicious_features = set()
 
     with open(filepath, "r", encoding="utf-8") as f:
@@ -111,11 +113,17 @@ def audit_file(
 
         # Check 3: Placed odds == Closing odds (retrospective execution bias)
         if placed_odds_col and closing_odds_col:
-            p_odds = row.get(placed_odds_col)
-            c_odds = row.get(closing_odds_col)
-            if p_odds and c_odds and float(p_odds) == float(c_odds):
-                # Flag if 100% of rows match, handled in summary
-                pass
+            p_raw = row.get(placed_odds_col)
+            c_raw = row.get(closing_odds_col)
+            if p_raw not in (None, "") and c_raw not in (None, ""):
+                try:
+                    p_val = float(p_raw)
+                    c_val = float(c_raw)
+                    odds_compared += 1
+                    if abs(p_val - c_val) < 1e-9:
+                        exact_closing_matches += 1
+                except (TypeError, ValueError):
+                    pass
 
         if row_errors:
             violations.append({
@@ -126,12 +134,32 @@ def audit_file(
         else:
             clean_rows += 1
 
+    closing_match_rate_pct = (
+        round((exact_closing_matches / odds_compared) * 100.0, 2)
+        if odds_compared > 0
+        else 0.0
+    )
+    retroactive_odds_leakage = odds_compared >= 5 and closing_match_rate_pct >= 90.0
+    dataset_warnings: List[str] = []
+    if retroactive_odds_leakage:
+        dataset_warnings.append(
+            f"Retroactive closing-odds leakage: {exact_closing_matches}/{odds_compared} "
+            f"({closing_match_rate_pct}%) rows have {placed_odds_col} == {closing_odds_col}."
+        )
+
     return {
         "total_records_checked": total_rows,
         "clean_records": clean_rows,
         "violation_count": len(violations),
         "causal_integrity_rate": round((clean_rows / total_rows) * 100, 2) if total_rows > 0 else 0,
         "suspicious_feature_names": sorted(list(suspicious_features)),
+        "closing_odds_match_stats": {
+            "odds_compared": odds_compared,
+            "exact_closing_matches": exact_closing_matches,
+            "closing_match_rate_pct": closing_match_rate_pct,
+            "retroactive_odds_leakage": retroactive_odds_leakage,
+        },
+        "dataset_warnings": dataset_warnings,
         "violations_sample": violations[:10]  # First 10
     }
 
@@ -161,20 +189,33 @@ def main():
     if args.json:
         print(json.dumps(results, indent=2))
     else:
+        if results.get("error"):
+            print(f"### Forensic Temporal Integrity Error\n- {results['error']}")
+            sys.exit(1)
         print("### Forensic Temporal Integrity Report\n")
         print(f"- **Total Rows Audited**: `{results['total_records_checked']}`")
         print(f"- **Causal Integrity Rate**: `{results['causal_integrity_rate']}%` ({results['clean_records']} clean rows)")
         print(f"- **Temporal Violations**: `{results['violation_count']}`")
+        cm = results.get("closing_odds_match_stats", {})
+        if cm.get("odds_compared", 0) > 0:
+            print(
+                f"- **Placed vs. Closing Exact Matches**: `{cm['exact_closing_matches']}/{cm['odds_compared']}` "
+                f"(`{cm['closing_match_rate_pct']}%`, leakage=`{cm['retroactive_odds_leakage']}`)"
+            )
 
         if results["suspicious_feature_names"]:
             print(f"- **Warning: Suspicious Post-Game Features Detected in Feature Space**: {', '.join(results['suspicious_feature_names'])}")
+
+        for dw in results.get("dataset_warnings", []):
+            print(f"- **CRITICAL LEAKAGE**: {dw}")
 
         if results["violations_sample"]:
             print("\n#### Sample Violations Detected:")
             for v in results["violations_sample"]:
                 print(f"- Row `{v['row_identifier']}` (Idx {v['row_index']}): {'; '.join(v['errors'])}")
 
-    if results.get("violation_count", 0) > 0:
+    has_retro_leakage = results.get("closing_odds_match_stats", {}).get("retroactive_odds_leakage", False)
+    if results.get("error") or results.get("violation_count", 0) > 0 or has_retro_leakage:
         sys.exit(1)
     sys.exit(0)
 

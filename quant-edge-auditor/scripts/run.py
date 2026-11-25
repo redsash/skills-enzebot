@@ -25,6 +25,23 @@ def run_command(cmd):
     return res.returncode, res.stdout, res.stderr
 
 
+def _invoke_stage(stage_name: str, cmd: list, stage_exit_codes: dict) -> tuple:
+    ret, out, err = run_command(cmd)
+    stage_exit_codes[stage_name] = ret
+    if err and err.strip():
+        sys.stderr.write(f"[{stage_name} stderr] {err.strip()}\n")
+    try:
+        parsed = json.loads(out) if out.strip() else {}
+        ok = (ret == 0) and not parsed.get("error")
+        return parsed, ok
+    except Exception as exc:
+        return {
+            "error": f"Failed to parse JSON output ({exc})",
+            "raw_output": out,
+            "stderr": err,
+        }, False
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Master Quantitative Edge Auditor Runner."
@@ -35,56 +52,78 @@ def main():
     parser.add_argument("--json", action="store_true", help="Output full JSON audit summary")
     args = parser.parse_args()
 
-    # Step 0: Detect environment
-    _, env_out, _ = run_command([sys.executable, str(SCRIPT_DIR / "detect_environment.py")])
-    try:
-        env_data = json.loads(env_out)
-    except Exception:
-        env_data = {}
-
+    stage_exit_codes = {}
+    overall_passed = True
     audit_summary = {
         "dataset": args.file,
-        "runtime_environment": env_data.get("runtime", {}),
-        "stage_results": {}
+        "overall_passed": False,
+        "overall_verdict": "INCOMPLETE_DATA",
+        "stage_exit_codes": stage_exit_codes,
+        "stage_results": {},
     }
 
     # Step 1: Temporal Causal Integrity
-    ret, out_leak, _ = run_command([
-        sys.executable, str(SCRIPT_DIR / "asof_leakage_verifier.py"), args.file, "--json"
-    ])
-    try:
-        audit_summary["stage_results"]["stage_1_temporal_integrity"] = json.loads(out_leak)
-    except Exception:
-        audit_summary["stage_results"]["stage_1_temporal_integrity"] = {"raw_output": out_leak}
+    s1_res, s1_ok = _invoke_stage(
+        "stage_1_temporal_integrity",
+        [sys.executable, str(SCRIPT_DIR / "asof_leakage_verifier.py"), args.file, "--json"],
+        stage_exit_codes,
+    )
+    audit_summary["stage_results"]["stage_1_temporal_integrity"] = s1_res
+    if not s1_ok:
+        overall_passed = False
 
     # Step 2: Probability Calibration & Murphy
-    ret, out_brier, _ = run_command([
-        sys.executable, str(SCRIPT_DIR / "brier_murphy_decomp.py"), args.file, "--json"
-    ])
-    try:
-        audit_summary["stage_results"]["stage_2_calibration"] = json.loads(out_brier)
-    except Exception:
-        audit_summary["stage_results"]["stage_2_calibration"] = {"raw_output": out_brier}
+    s2_res, s2_ok = _invoke_stage(
+        "stage_2_calibration",
+        [sys.executable, str(SCRIPT_DIR / "brier_murphy_decomp.py"), args.file, "--json"],
+        stage_exit_codes,
+    )
+    audit_summary["stage_results"]["stage_2_calibration"] = s2_res
+    if not s2_ok:
+        overall_passed = False
 
     # Step 3: Market Microstructure & Devig
     if args.odds:
-        ret, out_devig, _ = run_command([
-            sys.executable, str(SCRIPT_DIR / "devig_market.py"), *args.odds, "--json", "--method", "all"
-        ])
-        try:
-            audit_summary["stage_results"]["stage_3_devig"] = json.loads(out_devig)
-        except Exception:
-            audit_summary["stage_results"]["stage_3_devig"] = {"raw_output": out_devig}
+        s3_res, s3_ok = _invoke_stage(
+            "stage_3_devig",
+            [sys.executable, str(SCRIPT_DIR / "devig_market.py"), *args.odds, "--json", "--method", "all"],
+            stage_exit_codes,
+        )
+        audit_summary["stage_results"]["stage_3_devig"] = s3_res
+        if not s3_ok:
+            overall_passed = False
 
     # Step 4: Stress Testing, CLV & Deflated Sharpe
-    ret, out_stress, _ = run_command([
-        sys.executable, str(SCRIPT_DIR / "bootstrap_stress_test.py"), args.file,
-        "--trials", str(args.trials), "--json"
-    ])
-    try:
-        audit_summary["stage_results"]["stage_4_stress_test"] = json.loads(out_stress)
-    except Exception:
-        audit_summary["stage_results"]["stage_4_stress_test"] = {"raw_output": out_stress}
+    s4_res, s4_ok = _invoke_stage(
+        "stage_4_stress_test",
+        [
+            sys.executable,
+            str(SCRIPT_DIR / "bootstrap_stress_test.py"),
+            args.file,
+            "--trials",
+            str(args.trials),
+            "--json",
+        ],
+        stage_exit_codes,
+    )
+    audit_summary["stage_results"]["stage_4_stress_test"] = s4_res
+    if not s4_ok:
+        overall_passed = False
+
+    has_leakage = (
+        stage_exit_codes.get("stage_1_temporal_integrity", 0) != 0
+        or s1_res.get("violation_count", 0) > 0
+        or s1_res.get("closing_odds_match_stats", {}).get("retroactive_odds_leakage", False)
+    )
+    overfit = s4_res.get("overfitting_and_significance", {})
+    if has_leakage:
+        final_verdict = "REJECTED_LEAKAGE"
+        overall_passed = False
+    else:
+        final_verdict = overfit.get("edge_verdict", "INCOMPLETE_DATA")
+
+    audit_summary["overall_passed"] = overall_passed
+    audit_summary["overall_verdict"] = final_verdict
 
     if args.json:
         print(json.dumps(audit_summary, indent=2))
@@ -93,26 +132,28 @@ def main():
         print(f"**Target Dataset**: `{args.file}`")
         print(f"**Prior Discarded Trials ($N_{{trials}}$)**: `{args.trials}`\n")
 
-        s1 = audit_summary["stage_results"].get("stage_1_temporal_integrity", {})
         print("### 1. Forensic Causal Integrity")
-        print(f"- Integrity Rate: `{s1.get('causal_integrity_rate', 'N/A')}%` | Violations: `{s1.get('violation_count', 'N/A')}`")
+        print(
+            f"- Integrity Rate: `{s1_res.get('causal_integrity_rate', 'N/A')}%` | "
+            f"Violations: `{s1_res.get('violation_count', 'N/A')}` | "
+            f"Retroactive Odds Leakage: `{s1_res.get('closing_odds_match_stats', {}).get('retroactive_odds_leakage', 'N/A')}`"
+        )
 
-        s2 = audit_summary["stage_results"].get("stage_2_calibration", {})
         print("\n### 2. Probability Calibration & Decomposition")
-        print(f"- Brier Score: `{s2.get('overall_brier_score', 'N/A')}` | Log Loss: `{s2.get('log_loss', 'N/A')}`")
-        murphy = s2.get("murphy_decomposition", {})
+        print(f"- Brier Score: `{s2_res.get('overall_brier_score', 'N/A')}` | Log Loss: `{s2_res.get('log_loss', 'N/A')}`")
+        murphy = s2_res.get("murphy_decomposition", {})
         print(f"- Reliability Penalty: `{murphy.get('reliability_penalty', 'N/A')}` | Resolution: `{murphy.get('resolution_discrimination', 'N/A')}`")
-        cal = s2.get("calibration_metrics", {})
+        cal = s2_res.get("calibration_metrics", {})
         print(f"- Expected Calibration Error (ECE): `{cal.get('expected_calibration_error_ece', 'N/A')}`")
 
-        s4 = audit_summary["stage_results"].get("stage_4_stress_test", {})
         print("\n### 3. Market Efficiency & Stress Testing")
-        clv = s4.get("clv_analysis", {})
+        clv = s4_res.get("clv_analysis", {})
         print(f"- Mean CLV: `{clv.get('mean_clv_pct', 'N/A')}%` (t-stat: `{clv.get('clv_t_statistic', 'N/A')}` -> {clv.get('clv_verdict', 'N/A')})")
-        overfit = s4.get("overfitting_and_significance", {})
         print(f"- Deflated Sharpe Ratio (DSR): `{overfit.get('deflated_sharpe_ratio_dsr', 'N/A')}`")
         print(f"- Null Permutation p-value: `{overfit.get('null_permutation_p_value', 'N/A')}`")
-        print(f"\n## OVERALL VERDICT: **{overfit.get('edge_verdict', 'INCOMPLETE_DATA')}**")
+        print(f"\n## OVERALL VERDICT: **{final_verdict}**")
+
+    sys.exit(0 if overall_passed else 1)
 
 
 if __name__ == "__main__":

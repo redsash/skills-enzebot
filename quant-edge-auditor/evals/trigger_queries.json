@@ -1,0 +1,82 @@
+[
+  {
+    "query": "/quant-edge-auditor audit this NFL ATS backtest CSV for leakage, calibration, and DSR",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation"
+  },
+  {
+    "query": "Evaluate our sports betting model's Closing Line Value (CLV) and run Shin devigging on -450 / +350 market-maker odds.",
+    "should_trigger": true,
+    "notes": "Core CLV and Shin devigging triggers"
+  },
+  {
+    "query": "Run Murphy Brier score decomposition and quantile ECE on these historical NBA prediction probabilities.",
+    "should_trigger": true,
+    "notes": "Core Brier Murphy calibration audit"
+  },
+  {
+    "query": "Check whether our sports betting backtest suffers from lookahead bias, retroactive closing-odds leakage, or multiple-testing overfitting.",
+    "should_trigger": true,
+    "notes": "Core leakage and Deflated Sharpe Ratio audit"
+  },
+  {
+    "query": "Use /quant-edge-auditor to compute Deflated Sharpe Ratio with 30 discarded trials and stationary block bootstrap drawdown.",
+    "should_trigger": true,
+    "notes": "Explicit slash invocation + DSR + block bootstrap"
+  },
+  {
+    "query": "Stress-test our MLB moneyline portfolio against Pinnacle closing lines using Shin's z parameter.",
+    "should_trigger": true,
+    "notes": "Sharp market-maker stress testing"
+  },
+  {
+    "query": "Run as-of temporal purging verification on predictions.csv before we deploy this betting model.",
+    "should_trigger": true,
+    "notes": "As-of leakage verification for betting model"
+  },
+  {
+    "query": "De-vig these three-way soccer odds (+140, +230, +200) using Shin vs Power methods and compute fair decimal odds.",
+    "should_trigger": true,
+    "notes": "Market de-vigging trigger"
+  },
+  {
+    "query": "Evaluate precision, recall, and ROC-AUC on this credit-card fraud XGBoost classifier.",
+    "should_trigger": false,
+    "notes": "Near-miss: general ML classification outside betting/prediction markets"
+  },
+  {
+    "query": "Who do you think will win Sunday's NFL game between the Chiefs and Bills?",
+    "should_trigger": false,
+    "notes": "Near-miss: casual sports commentary"
+  },
+  {
+    "query": "Reconcile our Q3 SaaS accounts receivable ledger and compute EBITDA margin.",
+    "should_trigger": false,
+    "notes": "Generic financial accounting"
+  },
+  {
+    "query": "Use /competing-hypothesis to diagnose why our webhook worker times out at peak traffic.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to competing-hypothesis"
+  },
+  {
+    "query": "Research how OddsPapi v4 formats WebSocket alt-spread deltas from official API docs.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to deeply-investigate"
+  },
+  {
+    "query": "Write a bash Discord webhook script to notify our channel when cron picks finish.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to discord-webhook-script-writer"
+  },
+  {
+    "query": "Log today's v3 ATS model hardening session to /engineering-log.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  },
+  {
+    "query": "Design a 2D CMU floorplan for a 60x100 coastal lot.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to cad-floorplan-designer"
+  }
+]

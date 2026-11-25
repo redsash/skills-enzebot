@@ -5,7 +5,7 @@
       "id": 1,
       "prompt": "Audit historical NFL prediction dataset for temporal lookahead bias and verify that all knowledge timestamps precede prediction and kickoff timestamps.",
       "expected_output": "Identification of any records where knowledge_time > prediction_time or prediction_time >= event_start_time, reporting an exact causal integrity rate.",
-      "files": ["tests/sample_bets.csv"],
+      "files": ["evals/files/sample_bets.csv"],
       "assertions": [
         "The script asof_leakage_verifier.py executes without crash",
         "Sample violations are flagged with exact row timestamps",
@@ -27,7 +27,7 @@
       "id": 3,
       "prompt": "Evaluate a sports betting log claiming 18% ROI over 450 bets after testing 30 different qualification variations.",
       "expected_output": "Deflated Sharpe Ratio calculation penalizing the reported Sharpe for 30 prior discarded trials, reporting whether the edge is durable or rejected as data snooping.",
-      "files": ["tests/sample_bets.csv"],
+      "files": ["evals/files/sample_bets.csv"],
       "assertions": [
         "Deflated Sharpe Ratio (DSR) is computed using Bailey & Lopez de Prado's formula",
         "Null permutation test scrambles target outcomes",

@@ -82,15 +82,7 @@ To eliminate self-deception and prompt biases, the audit harness evaluates again
 
 ---
 
-## 6. Runtime Adaptation: Model & Skill Discovery
+## 6. Portable Composition & Self-Contained Execution
 
-The skill executes sub-stages dynamically by inspecting the runtime environment via `scripts/detect_environment.py`:
-- **Model Tiers**:
-  - `Tier 1: Heavy Reasoning` (e.g. DeepThink / Pro): Allocated to adversarial red-teaming, competing root-cause analysis, and final audit synthesis.
-  - `Tier 2: Code Execution & Fast Analysis` (e.g. Medium / Flash): Allocated to script execution, schema validation, and numerical pipeline runs.
-  - `Tier 3: Rapid Formatting`: Allocated to raw data transformation and table formatting.
-- **Skill Discovery**:
-  - Detects if `competing-hypothesis` is available to stress-test rival explanations for apparent edge.
-  - Detects if `planning-with-files` is available to maintain multi-step audit logs.
-  - Detects if `human-readable` is available to polish the audit synthesis for stakeholders.
-- **Self-Contained Fallback**: If external skills or heavy models are unavailable, bundled Python scripts execute all mathematical operations deterministically without degrading audit rigor.
+- **No External Harness Assumptions**: All causal, calibration, Shin de-vigging, and Deflated Sharpe math runs deterministically inside bundled Python scripts (`scripts/run.py`) without runtime model-probing heuristics.
+- **Optional Skill Composition**: Pair Stage 4 adversarial falsification with `competing-hypothesis` when weighing rival edge hypotheses, and optionally polish executive summaries with `human-readable`.

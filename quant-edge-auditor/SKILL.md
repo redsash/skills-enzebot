@@ -25,91 +25,68 @@ An enterprise-grade quantitative auditing, statistical verification, and adversa
   - [Market De-vigging Methodologies (Shin, Power, Log-Odds)](references/devigging_methodologies.md)
   - [Multiple Testing Corrections & Deflated Sharpe](references/multiple_testing_limits.md)
   - [Temporal Purging, Embargoing & As-Of Joins](references/temporal_purging.md)
-  - [Human-Readable Skill Rationale & Deep Architecture](README.md)
+  - [Quantitative Rationale & External Oracles](references/rationale-and-oracles.md)
 - **Bundled Automation Scripts** *(treat `scripts/` as black boxes: run `python3 scripts/<tool>.py --help` first to inspect flags rather than reading source)*:
-  - `python3 scripts/detect_environment.py`: Discovers runtime models and installed skills; outputs dynamic subagent tier assignments.
-  - `python3 scripts/asof_leakage_verifier.py <dataset>`: Forensic bitemporal join and timestamp lookahead validator.
+  - `python3 scripts/asof_leakage_verifier.py <dataset>`: Forensic bitemporal join, timestamp lookahead, and retroactive closing-odds validator.
   - `python3 scripts/brier_murphy_decomp.py <dataset>`: Decomposes Brier score into Reliability, Resolution, and Uncertainty.
   - `python3 scripts/devig_market.py <odds...>`: Shin (insider $z$ parameter), Power, and Proportional market devigging.
   - `python3 scripts/bootstrap_stress_test.py <dataset>`: Stationary block bootstrap, CLV $t$-stat, and Deflated Sharpe Ratio (DSR).
-  - `python3 scripts/run.py <dataset>`: Master 4-stage audit runner synthesizing the full scorecard.
+  - `python3 scripts/run.py <dataset>`: Master 4-stage audit runner synthesizing the full scorecard and propagating failure exit codes.
 
 ---
 
-## Dynamic Runtime Adaptation
-
-Before delegating audit sub-tasks to subagents, the orchestrating agent MUST invoke the environment discovery utility:
-
-```bash
-python3 scripts/detect_environment.py --summary
-```
-
-### Delegation Strategy by Tier & Skill Discovery
+## Subagent & Skill Composition
 
 ```mermaid
 flowchart TD
-    Env["detect_environment.py"] --> Alloc["Stage Orchestration Matrix"]
-    Alloc --> S1["Stage 1: Forensic Causal Integrity (Tier 2 Code)"]
-    Alloc --> S2["Stage 2: Probability Calibration (Tier 2 Code)"]
-    Alloc --> S3["Stage 3: Market Microstructure (Tier 2 Code)"]
-    Alloc --> S4["Stage 4: Adversarial Stress Test (Tier 1 Reasoning)"]
-
-    S1 -.->|"If available"| P1["planning-with-files"]
-    S4 -.->|"If available"| P2["competing-hypothesis"]
-    S4 -.->|"If available"| P3["human-readable"]
+    S1["Stage 1: Forensic Causal Integrity"] --> S2["Stage 2: Probability Calibration"]
+    S2 --> S3["Stage 3: Market Microstructure"]
+    S3 --> S4["Stage 4: Adversarial Stress Test"]
+    S4 -.->|Optional| P2["competing-hypothesis"]
+    S4 -.->|Optional| P3["human-readable"]
 ```
 
-- **Tier 2 Models (`flash`, `medium`, `inherit`)**: Assigned to Stages 1, 2, and 3 where execution of mathematical scripts and JSON validation dominates.
-- **Tier 1 Models (`pro`, `deepthink`, `o1`)**: Assigned to Stage 4 (Adversarial Red-Teaming) to formulate rival hypotheses for why an apparent edge may be a statistical artifact.
-- **Skill Reuse**:
-  - If `competing-hypothesis` is detected, invoke it during Stage 4 to systematically pit genuine edge against data snooping, market latency, and luck.
-  - If `planning-with-files` is detected, write `task_plan.md` to track multi-stage progress across large datasets.
-  - If `human-readable` is detected, use it to polish final audit scorecards.
+- **Execution Tiers**: Delegate script-heavy numerical audits (Stages 1–3) to fast/standard workers and reserve deep reasoning for Stage 4 adversarial falsification, or run `scripts/run.py` end-to-end in a single turn.
+- **Optional Skill Reuse**: Pair Stage 4 with `competing-hypothesis` to pit genuine edge against data snooping/latency, and optionally apply `human-readable` to executive audit summaries.
 
 ---
 
 ## 4-Stage Operational Audit Protocol
 
-When auditing a sports prediction model or historical betting record, execute the following 4-stage checklist:
+Execute stages strictly in order; **Stage 1 leakage rejects the model immediately** regardless of downstream Brier or ROI metrics.
 
-### Stage 1: Forensic Causal Integrity & Lineage
-- [ ] Run `scripts/asof_leakage_verifier.py` on the input dataset.
-- [ ] Confirm $T_{\text{knowledge}} \le T_{\text{decision}} < T_{\text{event}}$ holds on 100% of rows.
-- [ ] Verify that placed odds are not retroactively set to closing odds.
-- [ ] Screen feature headers for post-kickoff stats (`final_score`, `boxscore`, `actual_yards`).
+### Stage 1: Forensic Causal Integrity & Lineage (Hard Gate)
+Run `scripts/asof_leakage_verifier.py` first to verify:
+- $T_{\text{knowledge}} \le T_{\text{decision}} < T_{\text{event}}$ holds across 100% of rows (`causal_integrity_rate == 100%`).
+- `placed_odds` are not retroactively cloned from `closing_odds` (`retroactive_odds_leakage == false`).
+- Zero post-kickoff stats (`final_score`, `boxscore`, `actual_yards`) appear in feature headers.
 
 ```bash
 python3 scripts/asof_leakage_verifier.py path/to/dataset.csv
 ```
 
 ### Stage 2: Probability Calibration & Discrimination
-- [ ] Run `scripts/brier_murphy_decomp.py` on out-of-sample predictions.
-- [ ] Record the Murphy Brier Decomposition:
-  - **Reliability Penalty**: Must approach $0.0$. High reliability penalty indicates overconfidence in extreme probabilities.
-  - **Resolution**: Must be strictly positive. Measures ability to separate winners from losers.
-- [ ] Evaluate Expected Calibration Error (ECE) using equal-frequency quantile bins.
+Run `scripts/brier_murphy_decomp.py` on out-of-sample predictions and record Murphy's Brier Decomposition plus equal-frequency quantile ECE:
+- **Reliability Penalty**: Must approach $0.0$ (high penalty signals overconfidence in extreme probabilities).
+- **Resolution**: Must be strictly positive (measures separation of winners from losers).
 
 ```bash
 python3 scripts/brier_murphy_decomp.py path/to/dataset.csv --strategy quantile --bins 10
 ```
 
 ### Stage 3: Market Microstructure & CLV Benchmark
-- [ ] For quoted odds, run `scripts/devig_market.py` using **Shin's Method** to remove bookmaker overround and recover true fair probabilities.
-- [ ] Compute Closing Line Value (CLV) against sharp benchmark books (Pinnacle/Circa):
-  $$\text{CLV} = \frac{O_{\text{placed}}}{O_{\text{benchmark\_shin\_fair}}} - 1$$
-- [ ] Measure account degradation and realistic execution costs (margin, commissions, exchange fees).
+Run `scripts/devig_market.py` using **Shin's Method** to strip bookmaker overround and recover fair probabilities, then benchmark CLV against sharp closers (Pinnacle/Circa) accounting for commissions and execution slippage:
+$$\text{CLV} = \frac{O_{\text{placed}}}{O_{\text{benchmark\_shin\_fair}}} - 1$$
 
 ```bash
 python3 scripts/devig_market.py -110 -110 --method shin
 ```
 
 ### Stage 4: Adversarial Stress Testing & Falsification
-- [ ] Determine the total number of discarded model versions, qualification rules, or feature configurations ($N_{\text{trials}}$).
-- [ ] Run `scripts/bootstrap_stress_test.py` with `--trials <N>`:
-  - **CLV Significance**: Verify $t\text{-stat} \ge 3.0$ over independent games.
-  - **Deflated Sharpe Ratio (DSR)**: Confirm $\text{DSR} > 0.95$. If $\text{DSR} \le 0.95$, reject the edge as a product of data mining.
-  - **Null Permutation Test**: Verify scrambled target outcome $p\text{-value} < 0.01$.
-  - **Stationary Block Bootstrap**: Inspect 95% worst-case drawdown.
+Estimate discarded trial count ($N_{\text{trials}}$) across all tested features/rules and run `scripts/bootstrap_stress_test.py --trials <N>`:
+- **CLV Significance**: Require $t\text{-stat} \ge 3.0$ over independent games.
+- **Deflated Sharpe Ratio (DSR)**: Require $\text{DSR} > 0.95$; otherwise reject as data snooping.
+- **Null Permutation & Drawdown**: Require scrambled-target $p\text{-value} < 0.01$ and inspect 95% stationary block bootstrap drawdown.
 
 ```bash
 python3 scripts/bootstrap_stress_test.py path/to/dataset.csv --trials 25 --sims 1000
