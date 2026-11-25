@@ -79,7 +79,7 @@ def estimate_floorplan_cost(
         r_id = r.get("id", "")
         r_name = r.get("name", r_id).lower()
         zone = r.get("zone", "")
-        area = float(r.get("area_sqft", 0))
+        area = float(r["area_sqft"]) if r.get("area_sqft") is not None else float(r.get("w", 0)) * float(r.get("h", 0))
 
         if zone == "exterior" or "terrace" in r_id or "lanai" in r_name:
             area_covered_terrace += area
@@ -202,7 +202,7 @@ def estimate_floorplan_cost(
     cost_per_sqft_total = total_project_expected / total_constructed_area if total_constructed_area > 0 else 0
 
     return {
-        "project": layout.get("project", "Resilient Building Layout"),
+        "project": layout.get("project") or layout.get("project_name") or "Resilient Building Layout",
         "parameters": {
             "location": location,
             "location_multiplier": loc_mult,

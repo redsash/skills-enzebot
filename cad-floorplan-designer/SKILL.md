@@ -30,6 +30,7 @@ Design buildable, structurally sound 2D architectural floor plans, spatial circu
   - `python3 scripts/estimate_construction_cost.py --demo`: Computes AACE Class 4 construction cost range (-15% to +25%) with material and resilience takeoffs.
   - `python3 scripts/render_floorplan_svg.py --demo -o plan.svg`: Renders 2D CAD SVG floorplans with alphanumeric grid lines and circulation path overlays.
 - **Deep-Dive References**:
+  - [Canonical Floorplan JSON Spec Schema](references/floorplan-spec-schema.md): Single unified JSON input format shared across `audit_spatial_ux.py`, `estimate_construction_cost.py`, and `render_floorplan_svg.py`.
   - [Floor Plan AI Validation Framework](references/validation-framework.md): 5-pillar validation standard (Geometry, Building Codes, Furniture Fit, Metrics, Expert Review).
   - [Construction Cost Estimation Guide](references/construction-cost-estimation.md): Parametric takeoff formulas, slope multipliers, and AACE Class 4 confidence bands.
   - [CMU Modular Masonry Guide](references/cmu-masonry-guide.md): Standard block dimensions, courses, lintel spans, and bond beams.
@@ -54,7 +55,7 @@ Design buildable, structurally sound 2D architectural floor plans, spatial circu
 ## Workflow Steps
 
 ### Step 1: Project Intake & Calibration
-- **User Intake Check**: If the user has not provided a project name or description, **prompt the user using `ask_user` (or `ask_question`)** to supply a project name and a brief summary of site conditions, program goals, or target style before generating the layout.
+- **User Intake Check**: If the user has not provided a project name or description, **prompt the user using `ask_question`** to supply a project name and a brief summary of site conditions, program goals, or target style before generating the layout.
 - Define lot dimensions and mandatory setbacks (*retranqueos* for front, rear, and side boundaries).
 - Account for natural slope, slope direction, and high-erosion buffers (e.g., cliff edges).
 - Compute the maximum allowable footprint and snap the outer dimensions inward to the nearest structural modular increment (8" or 16" for CMU) using `validate_cmu_grid.py`.

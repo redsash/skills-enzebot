@@ -1,0 +1,82 @@
+[
+  {
+    "query": "Design a 2-bedroom coastal hillside villa floor plan on a 60x100 lot with CMU 16-inch grid alignment and 2D CAD SVG output.",
+    "should_trigger": true,
+    "notes": "Core CMU floorplan + SVG design request"
+  },
+  {
+    "query": "Audit this proposed residential floor plan for IRC R310 egress windows, corridor widths, and acoustic decoupling.",
+    "should_trigger": true,
+    "notes": "Spatial UX + building code audit"
+  },
+  {
+    "query": "Generate a schematic AACE Class 4 construction cost range and CMU block takeoff for a 1,600 sq ft island residence.",
+    "should_trigger": true,
+    "notes": "Construction cost estimation + CMU takeoff"
+  },
+  {
+    "query": "Draw a Mermaid circulation diagram and room adjacency bubble map for our 3-bedroom house layout.",
+    "should_trigger": true,
+    "notes": "Circulation map / bubble diagram trigger"
+  },
+  {
+    "query": "Calculate the buildable setback envelope on a 24ft infill lot and snap spans to 8-inch/16-inch masonry increments.",
+    "should_trigger": true,
+    "notes": "CMU grid + setback envelope calibration"
+  },
+  {
+    "query": "Fix the door-to-door collision and front-entry sightline into the powder room in this architectural layout.",
+    "should_trigger": true,
+    "notes": "Spatial UX circulation & privacy fix"
+  },
+  {
+    "query": "Render a dark-themed 2D CAD SVG floorplan with structural grid bubbles and arterial circulation paths.",
+    "should_trigger": true,
+    "notes": "2D CAD SVG rendering trigger"
+  },
+  {
+    "query": "Integrate an off-grid resilience utility core (1,000-gal cistern, inverter/battery room, ATS) into our house floor plan.",
+    "should_trigger": true,
+    "notes": "Island resilience core layout trigger"
+  },
+  {
+    "query": "Pick a coastal minimalist throw-pillow palette, walnut dining chairs, and rug textures for my living room.",
+    "should_trigger": false,
+    "notes": "Near-miss: purely decorative interior styling"
+  },
+  {
+    "query": "Run a 3D finite-element structural load simulation in ANSYS on a reinforced concrete cantilever beam.",
+    "should_trigger": false,
+    "notes": "Near-miss: 3D structural FEA engineering"
+  },
+  {
+    "query": "Size three-phase HVAC duct static pressure and electrical breaker panel load calculations per NEC.",
+    "should_trigger": false,
+    "notes": "Near-miss: MEP engineering calculations"
+  },
+  {
+    "query": "Plan a drought-tolerant native plant garden layout for my backyard patio.",
+    "should_trigger": false,
+    "notes": "Near-miss: landscape gardening"
+  },
+  {
+    "query": "Design a dark-mode Tailwind CSS dashboard layout for a SaaS analytics app.",
+    "should_trigger": false,
+    "notes": "Near-miss: frontend web UI layout"
+  },
+  {
+    "query": "Stage an expert debate using /perspectives on whether to build a concrete or steel-frame house.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to perspectives"
+  },
+  {
+    "query": "Write a bash Discord webhook script for deployment notifications.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to discord-webhook-script-writer"
+  },
+  {
+    "query": "Record today's CAD scripting schema alignment into /engineering-log.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  }
+]

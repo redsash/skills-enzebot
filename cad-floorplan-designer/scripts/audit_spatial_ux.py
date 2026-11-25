@@ -18,8 +18,13 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 
 DEMO_LAYOUT = {
+    "schema_version": 1,
     "project": "Villa Resiliente",
+    "level_name": "Level 1 - Main Floor Plan",
     "gross_footprint_sqft": 1800,
+    "story_height_ft": 10.0,
+    "grid_x": [0, 8, 28, 32, 40, 48],
+    "grid_y": [0, 6, 12, 26, 36, 46],
     "rooms": [
         {
             "id": "entry",
@@ -146,7 +151,21 @@ DEMO_LAYOUT = {
         {"room_a": "mech", "room_b": "bed_guest", "acoustic_decoupled": True, "wall_type": "8in CMU with resilient channel"},
         {"room_a": "powder", "room_b": "living", "acoustic_decoupled": True, "wall_type": "Insulated drywall"},
     ],
+    "doors": [
+        {"x": 4, "y": 24, "width_ft": 3.0, "orientation": "horizontal"},
+        {"x": 8, "y": 18, "width_ft": 3.5, "orientation": "vertical"},
+        {"x": 20, "y": 26, "width_ft": 6.0, "orientation": "horizontal"},
+    ],
 }
+
+
+def _room_area_sqft(room: Dict[str, Any]) -> float:
+    """Return explicit area_sqft or auto-compute from w * h."""
+    if room.get("area_sqft") is not None:
+        return float(room["area_sqft"])
+    if room.get("w") is not None and room.get("h") is not None:
+        return float(room["w"]) * float(room["h"])
+    return 0.0
 
 
 STANDARD_FURNITURE_ENVELOPES = {
@@ -192,7 +211,7 @@ def audit_geometry(layout: Dict[str, Any]) -> Tuple[List[Dict[str, str]], List[D
         })
 
     # 2. Dimensional Conservation Check
-    net_interior_area = sum(r.get("area_sqft", 0) for r in rooms if r.get("zone") != "exterior")
+    net_interior_area = sum(_room_area_sqft(r) for r in rooms if r.get("zone") != "exterior")
     gross_footprint = layout.get("gross_footprint_sqft", 0)
     if gross_footprint > 0:
         wall_and_circ_buffer = gross_footprint - net_interior_area
@@ -231,7 +250,7 @@ def audit_building_codes(layout: Dict[str, Any]) -> Tuple[List[Dict[str, str]], 
     for r in rooms:
         r_name = r.get("name", r.get("id"))
         zone = r.get("zone", "")
-        area = r.get("area_sqft", 0)
+        area = _room_area_sqft(r)
         is_sleeping = r.get("is_sleeping_room", False) or (zone == "private" and ("bed" in r_name.lower() or "suite" in r_name.lower()))
         is_habitable = zone in ["public", "private"] and r.get("id") not in ["powder", "bath", "laundry", "mech", "cistern"]
 
@@ -621,7 +640,7 @@ def run_full_validation_suite(layout: Dict[str, Any]) -> Dict[str, Any]:
     warns = [i for i in all_issues if i["level"] == "WARN"]
 
     return {
-        "project": layout.get("project", "Floorplan Program"),
+        "project": layout.get("project") or layout.get("project_name") or "Floorplan Program",
         "total_rooms": len(layout.get("rooms", [])),
         "total_connections": len(layout.get("connections", [])),
         "is_valid": len(fails) == 0,

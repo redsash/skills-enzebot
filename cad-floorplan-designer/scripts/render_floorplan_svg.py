@@ -20,6 +20,61 @@ import sys
 from typing import Any, Dict, List, Optional
 
 
+def _derive_grid_axes(rooms: List[Dict[str, Any]], layout: Dict[str, Any]) -> tuple:
+    """Use explicit grid_x/grid_y or derive unique sorted axes from room extents."""
+    positioned = [r for r in rooms if all(k in r for k in ("x", "y", "w", "h"))]
+    grid_x = layout.get("grid_x")
+    if not grid_x:
+        if positioned:
+            xs = {0}
+            for r in positioned:
+                xs.add(r["x"])
+                xs.add(r["x"] + r["w"])
+            grid_x = sorted(xs)
+        else:
+            grid_x = [0, 16, 32, 48]
+
+    grid_y = layout.get("grid_y")
+    if not grid_y:
+        if positioned:
+            ys = {0}
+            for r in positioned:
+                ys.add(r["y"])
+                ys.add(r["y"] + r["h"])
+            grid_y = sorted(ys)
+        else:
+            grid_y = [0, 16, 32, 44]
+
+    return grid_x, grid_y
+
+
+def _derive_circulation_paths(
+    rooms: List[Dict[str, Any]], layout: Dict[str, Any]
+) -> List[Dict[str, Any]]:
+    """Use explicit circulation_paths or derive center-to-center edges from connections[]."""
+    explicit = layout.get("circulation_paths")
+    if explicit:
+        return explicit
+
+    connections = layout.get("connections", [])
+    if not connections:
+        return []
+
+    centers = {
+        r["id"]: [r["x"] + (r["w"] / 2.0), r["y"] + (r["h"] / 2.0)]
+        for r in rooms
+        if r.get("id") and all(k in r for k in ("x", "y", "w", "h"))
+    }
+    derived = []
+    for conn in connections:
+        c_from = centers.get(conn.get("from"))
+        c_to = centers.get(conn.get("to"))
+        if c_from and c_to:
+            tier = "arterial" if conn.get("traffic") == "high" or conn.get("type") == "arterial_corridor" else "secondary"
+            derived.append({"tier": tier, "points_ft": [c_from, c_to]})
+    return derived
+
+
 def render_svg(layout: Dict[str, Any], show_circulation: bool = True) -> str:
     vb_w = layout.get("viewbox_width", 1400)
     vb_h = layout.get("viewbox_height", 950)
@@ -27,16 +82,14 @@ def render_svg(layout: Dict[str, Any], show_circulation: bool = True) -> str:
     origin_x = layout.get("origin_x", 180)
     origin_y = layout.get("origin_y", 160)
 
-    project_name = layout.get("project_name", "Resilient Architectural Layout")
+    project_name = layout.get("project") or layout.get("project_name") or "Resilient Architectural Layout"
     level_name = layout.get("level_name", "Level 1 - Main Floor Plan")
 
-    grid_x = layout.get("grid_x", [0, 16, 32, 48])  # in feet from origin
-    grid_y = layout.get("grid_y", [0, 16, 32, 44])
-
     rooms = layout.get("rooms", [])
+    grid_x, grid_y = _derive_grid_axes(rooms, layout)
     doors = layout.get("doors", [])
     windows = layout.get("windows", [])
-    circulation_paths = layout.get("circulation_paths", [])
+    circulation_paths = _derive_circulation_paths(rooms, layout)
 
     svg_parts = []
     svg_parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {vb_w} {vb_h}" width="100%" height="100%">')
@@ -104,11 +157,13 @@ def render_svg(layout: Dict[str, Any], show_circulation: bool = True) -> str:
     svg_parts.append('  <!-- Rooms & Footprints -->')
     svg_parts.append('  <g id="rooms">')
     for r in rooms:
+        if not all(k in r for k in ("x", "y", "w", "h")):
+            continue
         rx = origin_x + (r["x"] * scale)
         ry = origin_y + (r["y"] * scale)
         rw = r["w"] * scale
         rh = r["h"] * scale
-        is_ext = r.get("is_exterior_wall", True)
+        is_ext = r.get("is_exterior_wall", r.get("zone") != "circulation")
         wall_class = "ext-wall" if is_ext else "int-wall"
 
         # Room rectangle
@@ -119,8 +174,9 @@ def render_svg(layout: Dict[str, Any], show_circulation: bool = True) -> str:
         cy = ry + (rh / 2.0)
         dim_str = f"{r['w']}'-0\" x {r['h']}'-0\""
         ffl = r.get("ffl", "+0.00' FFL")
+        r_title = r.get("name", r.get("id", "Room"))
 
-        svg_parts.append(f'    <text x="{cx}" y="{cy - 12}" class="room-title">{r["name"]}</text>')
+        svg_parts.append(f'    <text x="{cx}" y="{cy - 12}" class="room-title">{r_title}</text>')
         svg_parts.append(f'    <text x="{cx}" y="{cy + 8}" class="room-dim">{dim_str}</text>')
         svg_parts.append(f'    <text x="{cx}" y="{cy + 25}" class="room-ffl">{ffl}</text>')
     svg_parts.append('  </g>')
@@ -203,20 +259,29 @@ def render_svg(layout: Dict[str, Any], show_circulation: bool = True) -> str:
 
 
 DEFAULT_LAYOUT_SPEC = {
-    "project_name": "Resilient Coastal Hillside Villa",
+    "schema_version": 1,
+    "project": "Resilient Coastal Hillside Villa",
     "level_name": "Level 1 - Main Floor Plan",
+    "gross_footprint_sqft": 2300,
     "scale_px_per_foot": 15.0,
     "origin_x": 160,
     "origin_y": 140,
     "grid_x": [0, 16, 32, 48, 64],
     "grid_y": [0, 16, 32, 44],
     "rooms": [
-        {"name": "Main Foyer", "x": 0, "y": 16, "w": 16, "h": 16, "is_exterior_wall": True, "ffl": "+0.00' FFL"},
-        {"name": "Great Room & Dining", "x": 16, "y": 0, "w": 32, "h": 32, "is_exterior_wall": True, "ffl": "+0.00' FFL"},
-        {"name": "Kitchen & Pantry", "x": 48, "y": 0, "w": 16, "h": 16, "is_exterior_wall": True, "ffl": "+0.00' FFL"},
-        {"name": "Primary Suite", "x": 0, "y": 0, "w": 16, "h": 16, "is_exterior_wall": True, "ffl": "+0.00' FFL"},
-        {"name": "Covered Lanai / Terrace", "x": 16, "y": 32, "w": 32, "h": 12, "is_exterior_wall": True, "ffl": "-0.15' FFL (-2\" step)"},
-        {"name": "Resilience Core (Power/Cistern)", "x": 48, "y": 16, "w": 16, "h": 16, "is_exterior_wall": True, "ffl": "+0.00' FFL"},
+        {"id": "entry", "name": "Main Foyer", "zone": "public", "x": 0, "y": 16, "w": 16, "h": 16, "area_sqft": 256, "is_exterior_wall": True, "ffl": "+0.00' FFL", "windows": [{"width_ft": 4.0, "height_ft": 5.5}]},
+        {"id": "living", "name": "Great Room & Dining", "zone": "public", "x": 16, "y": 0, "w": 32, "h": 32, "area_sqft": 1024, "is_exterior_wall": True, "ffl": "+0.00' FFL", "windows": [{"width_ft": 12.0, "height_ft": 7.0}]},
+        {"id": "kitchen", "name": "Kitchen & Pantry", "zone": "public", "x": 48, "y": 0, "w": 16, "h": 16, "area_sqft": 256, "is_exterior_wall": True, "ffl": "+0.00' FFL", "windows": [{"width_ft": 4.0, "height_ft": 5.5}]},
+        {"id": "bed_master", "name": "Primary Suite", "zone": "private", "is_sleeping_room": True, "x": 0, "y": 0, "w": 16, "h": 16, "area_sqft": 256, "is_exterior_wall": True, "ffl": "+0.00' FFL", "windows": [{"width_ft": 6.0, "height_ft": 4.0, "clear_width_in": 28, "clear_height_in": 40, "sill_height_in": 36}]},
+        {"id": "terrace", "name": "Covered Lanai / Terrace", "zone": "exterior", "x": 16, "y": 32, "w": 32, "h": 12, "area_sqft": 384, "is_exterior_wall": True, "ffl": "-0.15' FFL (-2\" step)"},
+        {"id": "mech", "name": "Resilience Core (Power/Cistern)", "zone": "service", "x": 48, "y": 16, "w": 16, "h": 16, "area_sqft": 256, "is_exterior_wall": True, "ffl": "+0.00' FFL"},
+    ],
+    "connections": [
+        {"from": "entry", "to": "living", "type": "arterial_corridor", "width_in": 48, "traffic": "high"},
+        {"from": "living", "to": "kitchen", "type": "open_threshold", "width_in": 72, "traffic": "high"},
+        {"from": "living", "to": "terrace", "type": "exterior_slider", "width_in": 96, "traffic": "high", "step_down_in": 2.0},
+        {"from": "entry", "to": "bed_master", "type": "secondary_hall", "width_in": 42, "traffic": "medium"},
+        {"from": "kitchen", "to": "mech", "type": "fire_door", "width_in": 36, "traffic": "low"},
     ],
     "doors": [
         {"x": 8, "y": 16, "width_ft": 3.0, "orientation": "horizontal"},
