@@ -24,7 +24,7 @@ def check_shellcheck(script_path: Path) -> dict:
     if not shellcheck_bin:
         # Check standard local paths
         candidates = [
-            Path("/home/orbiter/.gemini/antigravity-cli/bin/shellcheck"),
+            Path.home() / ".gemini/antigravity-cli/bin/shellcheck",
             Path.home() / ".local/bin/shellcheck",
             Path("/usr/local/bin/shellcheck"),
             Path("/usr/bin/shellcheck"),

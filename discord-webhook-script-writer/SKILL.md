@@ -29,12 +29,12 @@ Interactively design, parameterize, and generate production-ready Bash scripts t
 - **Deep-Dive References**:
   - [Discord Webhook API & curl Reference](references/discord-api-reference.md): Payload schemas, embed field constraints, decimal colors, mentions, rate limits, and multipart upload specs.
   - [Bash Scripting Standard](references/bash-scripting-standard.md): Mandatory shell safety conventions (`set -euo pipefail`, `IFS=$'\n\t'`), dual-source webhook resolution, `jq` payload construction, and retry patterns.
-  - [Production Script Templates Catalog](references/script-templates.md): Index and selection guide for modular templates (CI/CD, cron monitoring, backups, file uploads).
-    - [CI/CD Deployment Notifier](references/templates/ci-cd-deploy-notify.md)
-    - [Cron Server Resource Monitor](references/templates/cron-server-monitor.md)
-    - [Automated Backup Notifier](references/templates/cron-backup-notify.md)
-    - [File Attachment & Log Uploader](references/templates/file-uploader-notify.md)
-    - [Generic Parameterized Alert](references/templates/generic-embed-alert.md)
+  - [Production Script Templates Catalog](references/script-templates.md): Index and selection guide for modular examples:
+    - [CI/CD Deployment Notifier](examples/ci-cd-deploy-notify.md)
+    - [Cron Server Resource Monitor](examples/cron-server-monitor.md)
+    - [Automated Backup Notifier](examples/cron-backup-notify.md)
+    - [File Attachment & Log Uploader](examples/file-uploader-notify.md)
+    - [Generic Parameterized Alert](examples/generic-embed-alert.md)
 
 ---
 
@@ -70,69 +70,30 @@ graph TD
 
 ### Step 1: Intake & Requirements Discovery
 
-When the user requests a Discord bash script, evaluate what information is provided and interactively confirm any missing specifications:
-
-- [ ] **Target Use Case**: Cron job (backup, uptime, resource alert), CI/CD runner (GitHub Actions, GitLab CI), deploy hook, or manual CLI tool?
-- [ ] **Notification Style**: Plain text message, rich embed, or multipart file attachment (e.g., build log)?
-- [ ] **Dynamic Parameters**: Which values must be passed as CLI arguments? (e.g., `--status`, `--message`, `--repo`, `--duration`, `--log-file`)
-- [ ] **Status / Visual Cues**: Does the embed require dynamic color states? (e.g., Green for Success, Red for Error, Yellow for In-Progress)
-- [ ] **Pings / Mentions**: Does the script need to mention specific Discord users or roles (`<@USER_ID>`, `<@&ROLE_ID>`) on failure?
-- [ ] **Silent Mode**: Should routine notifications be delivered silently (`flags: 4096`) to prevent notification fatigue?
-
-> [!NOTE]
-> If key parameters (e.g. embed fields, alert thresholds, or CLI arguments) are omitted, ask clarifying questions before generating the script.
+Confirm any missing parameters with the user before generating:
+- **Target Use Case**: Cron job, CI/CD runner (GitHub Actions, GitLab CI), deploy hook, or manual CLI?
+- **Payload & Attachments**: Plain text, rich embed, or `multipart/form-data` file upload?
+- **CLI Flags & Visuals**: Dynamic arguments (`--status`, `--message`, `--repo`, `--log-file`) and status colors (Green/Red/Yellow/Blurple).
+- **Mentions & Noise Control**: Role/user pings (`<@USER_ID>`, `<@&ROLE_ID>`) on failure, or silent flag (`flags: 4096`) on routine runs.
 
 ---
 
 ### Step 2: Parameter & Embed Architecture
 
-Map user requirements to standard Discord and Bash primitives:
-
-1. **CLI Flag Mapping**:
-   - Short and long flags (`-s` / `--status`, `-m` / `--message`, `-w` / `--webhook-url`).
-   - Standard flags required on every script: `-h` / `--help`, `-w` / `--webhook-url`, `--dry-run`.
-2. **Color Calculations**:
-   - Convert hex colors to decimal values using `$((16#RRGGBB))`:
-     - Success (Green): `5763719` (`#57F287`)
-     - Danger (Red): `15548997` (`#ED4245`)
-     - Warning (Yellow): `16705372` (`#FEE75C`)
-     - Info (Blurple): `5793266` (`#5865F2`)
-3. **Payload Structure**:
-   - Determine if payload contains `embeds`, `content`, `allowed_mentions`, or multipart files (`-F "payload_json=..." -F "file1=@..."`).
-   - Enforce Discord boundaries: $\le 2000$ chars content, $\le 256$ chars title, $\le 4096$ chars description, $\le 25$ fields, $\le 6000$ total characters across embeds.
+Map requirements onto [Discord API Constraints](references/discord-api-reference.md):
+- **Required Standard Flags**: `-h` / `--help`, `-w` / `--webhook-url`, and `--dry-run`.
+- **Decimal Colors**: Convert hex via `$((16#RRGGBB))` — Success `5763719` (`#57F287`), Danger `15548997` (`#ED4245`), Warning `16705372` (`#FEE75C`), Info `5793266` (`#5865F2`).
+- **Payload Limits**: $\le 2000$ chars content, $\le 256$ title, $\le 4096$ description, $\le 25$ fields, $\le 6000$ total embed chars.
 
 ---
 
 ### Step 3: Shell Script Authoring
 
-Generate the Bash script adhering to the mandatory template:
-
-1. **Header & Guards**:
-   ```bash
-   #!/usr/bin/env bash
-   # <script_name>.sh — <Brief description>
-   set -euo pipefail
-   IFS=$'\n\t'
-   ```
-2. **Temporary Directory & Cleanup**:
-   ```bash
-   TMP_DIR="$(mktemp -d -t discord_webhook.XXXXXX)"
-   cleanup() { rm -rf "$TMP_DIR"; }
-   trap cleanup EXIT
-   ```
-3. **Help Menu (`show_help`)**: Comprehensive document covering options, default values, env vars, and concrete invocation examples.
-4. **Option Parsing**: Parse with `while [[ $# -gt 0 ]]` supporting `-h|--help`, `-w|--webhook-url`, `--dry-run`, and script-specific flags.
-5. **Dual Webhook URL Check**:
-   ```bash
-   local webhook_url="${cli_url:-${DISCORD_WEBHOOK_URL:-}}"
-   if [[ -z "$webhook_url" && "$dry_run" != "true" ]]; then
-     >&2 echo "Error: Webhook URL required via -w/--webhook-url or DISCORD_WEBHOOK_URL"
-     exit 1
-   fi
-   ```
-6. **Payload Construction (`jq -n`)**: Build JSON strictly via `jq -n --arg ... --argjson ...`.
-7. **HTTP Execution & Retry Logic**: Call curl with `-sS -w "%{http_code}"`, handle 204/200 as success, retry on 429 and 5xx, and redirect errors to `>&2`.
-8. **Main Isolation**: Encapsulate logic in `main()` and invoke `main "$@"`.
+Select the closest starting pattern from [Production Script Templates Catalog](references/script-templates.md) and adhere strictly to [Bash Scripting Standard](references/bash-scripting-standard.md):
+1. `#!/usr/bin/env bash`, `set -euo pipefail`, `IFS=$'\n\t'`, and `mktemp -d` + `trap cleanup EXIT`.
+2. `show_help()` documenting flags, defaults, `DISCORD_WEBHOOK_URL`, and examples; `while [[ $# -gt 0 ]]` flag parser.
+3. Dual webhook resolution (`cli_url` -> `DISCORD_WEBHOOK_URL` -> fail to `>&2` unless `--dry-run`).
+4. Build JSON exclusively via `jq -n --arg ... --argjson ...` (never raw string interpolation), send with `curl -sS -w "%{http_code}"` handling `204`/`200`, `429` (`retry_after`), and `5xx` retries, and isolate execution inside `main "$@"`.
 
 ---
 

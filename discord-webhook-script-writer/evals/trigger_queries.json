@@ -1,0 +1,82 @@
+[
+  {
+    "query": "Write a reusable bash script to send GitHub Actions deploy alerts to a Discord webhook with --status, --repo, and --dry-run.",
+    "should_trigger": true,
+    "notes": "Core CI/CD Discord bash webhook trigger"
+  },
+  {
+    "query": "Create a cron monitoring bash script that checks disk and RAM every 10 minutes and posts an alert embed to Discord via curl.",
+    "should_trigger": true,
+    "notes": "Core cron monitoring Discord webhook trigger"
+  },
+  {
+    "query": "Generate a ShellCheck-clean bash script for nightly Postgres backup notifications to Discord attaching the last 10 lines on failure.",
+    "should_trigger": true,
+    "notes": "Core backup notifier bash webhook trigger"
+  },
+  {
+    "query": "Make a bash script that uploads build log files to a Discord channel via multipart webhook form-data.",
+    "should_trigger": true,
+    "notes": "File attachment webhook script trigger"
+  },
+  {
+    "query": "Parameterize a curl + jq Discord alert script that supports both --webhook-url and DISCORD_WEBHOOK_URL.",
+    "should_trigger": true,
+    "notes": "Core parameterized Discord webhook script"
+  },
+  {
+    "query": "Build a shell script to ping a Discord role ID silently or loudly based on job severity using webhook embeds.",
+    "should_trigger": true,
+    "notes": "Embed alert with mentions and flags in bash"
+  },
+  {
+    "query": "Automate a bash deployment notification trigger that sends green/red Discord rich embeds after rsync completes.",
+    "should_trigger": true,
+    "notes": "Deployment webhook script in bash"
+  },
+  {
+    "query": "Help me craft a bash script to send formatted Discord messages from a Makefile target with --dry-run preview.",
+    "should_trigger": true,
+    "notes": "CLI Discord webhook script"
+  },
+  {
+    "query": "Build an interactive Discord bot in Python using discord.py with slash commands and voice channels.",
+    "should_trigger": false,
+    "notes": "Near-miss: interactive Discord bot framework"
+  },
+  {
+    "query": "Write a TypeScript webhook notifier using @slack/webhook for Slack channels.",
+    "should_trigger": false,
+    "notes": "Near-miss: Slack + TypeScript SDK"
+  },
+  {
+    "query": "Create a Node.js discord.js bot listener that moderates spam messages in real time.",
+    "should_trigger": false,
+    "notes": "Near-miss: discord.js bot framework"
+  },
+  {
+    "query": "Send a Microsoft Teams adaptive card notification from a Python service.",
+    "should_trigger": false,
+    "notes": "Near-miss: Teams webhook + Python SDK"
+  },
+  {
+    "query": "Write a GitLab CI YAML pipeline for building and testing a Rust workspace.",
+    "should_trigger": false,
+    "notes": "Near-miss: CI pipeline config, not Discord bash script"
+  },
+  {
+    "query": "Debug why my systemd timer is not firing every 15 minutes.",
+    "should_trigger": false,
+    "notes": "Near-miss: systemd troubleshooting"
+  },
+  {
+    "query": "Log today's webhook troubleshooting session to /engineering-log.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to engineering-log"
+  },
+  {
+    "query": "Polish this Discord release announcement post so it sounds less robotic.",
+    "should_trigger": false,
+    "notes": "Near-miss: belongs to human-readable"
+  }
+]
