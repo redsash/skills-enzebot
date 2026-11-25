@@ -201,7 +201,13 @@ def calculate_buildable_envelope(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate architectural spans and site envelopes against CMU 8-inch/16-inch modular grids."
+        description="Validate architectural spans and site envelopes against CMU 8-inch/16-inch modular grids.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/validate_cmu_grid.py --check-spans \"24' 8\\\"\" \"16' 0\\\"\" --strict\n"
+            "  python3 scripts/validate_cmu_grid.py --site-envelope --lot-width \"60' 0\\\"\" --lot-depth \"100' 0\\\"\" --json"
+        ),
     )
     parser.add_argument(
         "--check-spans",
@@ -221,11 +227,13 @@ def main():
     parser.add_argument("--side-setback", help="Uniform side setback (applied to left and right)")
     parser.add_argument("--left-setback", default="10' 0\"", help="Left side setback (default: 10'-0\")")
     parser.add_argument("--right-setback", default="10' 0\"", help="Right side setback (default: 10'-0\")")
+    parser.add_argument("--strict", action="store_true", help="Exit with code 1 if any span is OFF_GRID or fails parsing, or if envelope calculation fails")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
 
     args = parser.parse_args()
 
     results = {}
+    has_strict_failure = False
 
     if args.check_spans:
         span_results = []
@@ -234,8 +242,11 @@ def main():
                 inches = parse_dimension(raw_s)
                 res = check_cmu_modularity(inches)
                 res["input"] = raw_s
+                if res["status"] == "OFF_GRID":
+                    has_strict_failure = True
                 span_results.append(res)
             except Exception as e:
+                has_strict_failure = True
                 span_results.append({"input": raw_s, "error": str(e)})
         results["spans"] = span_results
 
@@ -252,7 +263,10 @@ def main():
             ls = parse_dimension(args.side_setback or args.left_setback)
             rgs = parse_dimension(args.side_setback or args.right_setback)
 
-            results["envelope"] = calculate_buildable_envelope(lw, ld, fs, rs, ls, rgs)
+            env_res = calculate_buildable_envelope(lw, ld, fs, rs, ls, rgs)
+            if "error" in env_res:
+                has_strict_failure = True
+            results["envelope"] = env_res
         except Exception as e:
             sys.stderr.write(f"Error calculating envelope: {e}\n")
             sys.exit(1)
@@ -264,7 +278,7 @@ def main():
     if args.json:
         json.dump(results, sys.stdout, indent=2)
         print()
-        return
+        sys.exit(1 if (args.strict and has_strict_failure) else 0)
 
     # Formatted Markdown Table Output
     if "spans" in results:
@@ -296,6 +310,8 @@ def main():
             print(f"  - Ground Footprint: {env['snapped_envelope_16in']['footprint_sqft']} sq ft ({env['snapped_envelope_16in']['footprint_sqm']} m²)")
             print(f"  - Lot Coverage Ratio: {env['snapped_envelope_16in']['lot_coverage_pct']}%")
             print()
+
+    sys.exit(1 if (args.strict and has_strict_failure) else 0)
 
 
 if __name__ == "__main__":

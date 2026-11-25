@@ -44,7 +44,13 @@ def _invoke_stage(stage_name: str, cmd: list, stage_exit_codes: dict) -> tuple:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Master Quantitative Edge Auditor Runner."
+        description="Master Quantitative Edge Auditor Runner.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/run.py evals/files/sample_bets.csv --trials 25 --json\n"
+            "  python3 scripts/run.py evals/files/sample_bets.csv --trials 25 --odds -450 +350"
+        ),
     )
     parser.add_argument("file", help="Path to input predictions / bet history CSV or JSON")
     parser.add_argument("--trials", type=int, default=1, help="Number of discarded model iterations/trials")

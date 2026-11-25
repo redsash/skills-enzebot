@@ -166,7 +166,13 @@ def audit_file(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Forensic Point-in-Time & As-Of Join Integrity Auditor."
+        description="Forensic Point-in-Time & As-Of Join Integrity Auditor.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/asof_leakage_verifier.py evals/files/sample_bets.csv\n"
+            "  python3 scripts/asof_leakage_verifier.py predictions.csv --json"
+        ),
     )
     parser.add_argument("file", help="Path to CSV or JSON predictions dataset")
     parser.add_argument("--knowledge-col", default="knowledge_time", help="Column for knowledge/ingestion timestamp")

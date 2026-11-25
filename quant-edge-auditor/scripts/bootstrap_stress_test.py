@@ -89,23 +89,45 @@ def deflated_sharpe_ratio(
     return dsr
 
 
+def sample_moments(series: List[float]) -> Tuple[float, float]:
+    """Compute empirical sample skewness and kurtosis (fallback 0.0, 3.0 for small/flat samples)."""
+    n = len(series)
+    if n < 4:
+        return 0.0, 3.0
+    mean = sum(series) / n
+    diffs = [x - mean for x in series]
+    var = sum(d * d for d in diffs) / max(1, n - 1)
+    if var <= 1e-18:
+        return 0.0, 3.0
+    std = math.sqrt(var)
+    skew = sum((d / std) ** 3 for d in diffs) / n
+    kurt = sum((d / std) ** 4 for d in diffs) / n
+    return skew, kurt
+
+
 def block_bootstrap(
     records: List[dict],
     block_size: int = 10,
-    iterations: int = 1000
+    iterations: int = 1000,
+    rng: random.Random = None,
 ) -> Tuple[List[float], List[float]]:
-    """Resample contiguous blocks to preserve temporal covariance."""
+    """Politis & Romano (1994) stationary block bootstrap with geometric random block lengths."""
     n = len(records)
-    num_blocks = math.ceil(n / block_size)
+    sampler = rng or random
+    p_new_block = 1.0 / max(1, block_size)
     rois = []
     drawdowns = []
 
     for _ in range(iterations):
         resampled = []
-        for _ in range(num_blocks):
-            start_idx = random.randint(0, max(0, n - block_size))
-            resampled.extend(records[start_idx : start_idx + block_size])
-        resampled = resampled[:n]
+        idx = sampler.randint(0, n - 1)
+        for step in range(n):
+            if step > 0:
+                if sampler.random() < p_new_block:
+                    idx = sampler.randint(0, n - 1)
+                else:
+                    idx = (idx + 1) % n
+            resampled.append(records[idx])
 
         total_stake = sum(r["stake"] for r in resampled)
         pnls = [r["pnl"] for r in resampled]
@@ -119,8 +141,11 @@ def block_bootstrap(
     return rois, drawdowns
 
 
-def null_permutation_test(records: List[dict], iterations: int = 1000) -> float:
+def null_permutation_test(
+    records: List[dict], iterations: int = 1000, rng: random.Random = None
+) -> float:
     """Scramble outcomes to test probability that observed profit is purely random."""
+    sampler = rng or random
     observed_pnl = sum(r["pnl"] for r in records)
     outcomes = [r["outcome"] for r in records]
     placed_odds = [r["placed_odds"] for r in records]
@@ -130,7 +155,7 @@ def null_permutation_test(records: List[dict], iterations: int = 1000) -> float:
     beat_count = 0
     for _ in range(iterations):
         shuffled = outcomes[:]
-        random.shuffle(shuffled)
+        sampler.shuffle(shuffled)
         sim_pnl = sum(calculate_pnl(placed_odds[i], stakes[i], shuffled[i]) for i in range(n))
         if sim_pnl >= observed_pnl:
             beat_count += 1
@@ -140,14 +165,22 @@ def null_permutation_test(records: List[dict], iterations: int = 1000) -> float:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Resampling, CLV Significance, and Deflated Sharpe Stress Tester."
+        description="Resampling, CLV Significance, and Deflated Sharpe Stress Tester.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/bootstrap_stress_test.py evals/files/sample_bets.csv --trials 25 --sims 1000\n"
+            "  python3 scripts/bootstrap_stress_test.py evals/files/sample_bets.csv --seed 42 --json"
+        ),
     )
     parser.add_argument("file", help="Path to bet history CSV/JSON")
     parser.add_argument("--trials", type=int, default=1, help="Number of discarded model iterations/trials for Deflated Sharpe (default: 1)")
-    parser.add_argument("--block-size", type=int, default=10, help="Block size for stationary bootstrap (default: 10)")
+    parser.add_argument("--block-size", type=int, default=10, help="Mean geometric block length for stationary bootstrap (default: 10)")
     parser.add_argument("--sims", type=int, default=1000, help="Number of bootstrap simulations (default: 1000)")
+    parser.add_argument("--seed", type=int, default=None, help="Optional RNG seed for reproducible bootstrap and permutation runs")
     parser.add_argument("--json", action="store_true", help="Output raw JSON")
     args = parser.parse_args()
+    rng = random.Random(args.seed) if args.seed is not None else random.Random()
 
     records = []
     with open(args.file, "r", encoding="utf-8") as f:
@@ -199,22 +232,23 @@ def main():
     se_clv = std_clv / math.sqrt(n)
     t_stat_clv = (mean_clv / se_clv) if se_clv > 0 else 0.0
 
-    # Sharpe ratio (per-bet annualized approximation)
+    # Sharpe ratio & empirical non-normality moments
     mean_pnl = total_pnl / n
     var_pnl = sum((x - mean_pnl) ** 2 for x in pnls) / max(1, n - 1)
     std_pnl = math.sqrt(var_pnl)
     sharpe = (mean_pnl / std_pnl) if std_pnl > 0 else 0.0
-    dsr = deflated_sharpe_ratio(sharpe, args.trials, n)
+    emp_skew, emp_kurt = sample_moments(pnls)
+    dsr = deflated_sharpe_ratio(sharpe, args.trials, n, skew=emp_skew, kurtosis=emp_kurt)
 
     # Bootstrap & Null test
-    boot_rois, boot_dds = block_bootstrap(records, block_size=args.block_size, iterations=args.sims)
+    boot_rois, boot_dds = block_bootstrap(records, block_size=args.block_size, iterations=args.sims, rng=rng)
     boot_rois.sort()
     boot_dds.sort()
     roi_ci_low = boot_rois[int(0.025 * len(boot_rois))]
     roi_ci_high = boot_rois[int(0.975 * len(boot_rois))]
     dd_95th = boot_dds[int(0.95 * len(boot_dds))]
 
-    null_p_val = null_permutation_test(records, iterations=args.sims)
+    null_p_val = null_permutation_test(records, iterations=args.sims, rng=rng)
 
     results = {
         "sample_size": n,
@@ -230,6 +264,8 @@ def main():
         },
         "overfitting_and_significance": {
             "per_bet_sharpe": round(sharpe, 4),
+            "sample_skewness": round(emp_skew, 4),
+            "sample_kurtosis": round(emp_kurt, 4),
             "trials_tested": args.trials,
             "deflated_sharpe_ratio_dsr": round(dsr, 4),
             "null_permutation_p_value": round(null_p_val, 4),

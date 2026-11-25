@@ -2712,7 +2712,29 @@ def cmd_hook(args: argparse.Namespace) -> Dict[str, Any]:
                     if len(active) >= 3:
                         break
         pending = list_pending_stubs(store_dir)
-        if not active and not pending:
+        global_rules: List[Tuple[str, str]] = []
+        if getattr(args, "include_global_rules", False):
+            seen_rules = set()
+            for ent in state.get("ordered_entries", []):
+                if ent.get("_superseded_by"):
+                    continue
+                for rc in ent.get("rule_candidates") or []:
+                    if isinstance(rc, dict):
+                        scope = str(rc.get("scope") or "").strip().lower()
+                        rule_txt = str(rc.get("rule") or "").strip()
+                    else:
+                        continue
+                    if scope == "global" and rule_txt:
+                        key = rule_txt.lower()
+                        if key not in seen_rules:
+                            seen_rules.add(key)
+                            global_rules.append((ent["id"], rule_txt))
+                            if len(global_rules) >= 3:
+                                break
+                if len(global_rules) >= 3:
+                    break
+
+        if not active and not pending and not global_rules:
             return {}
 
         parts = []
@@ -2720,6 +2742,10 @@ def cmd_hook(args: argparse.Namespace) -> Dict[str, Any]:
             parts.append(f"[engineering-log] Prior learnings for `{proj_hint}`:")
             for c in active:
                 parts.append(f"- [{c['id']}] ({c['shelf_life']}) {c['title']}: {c['summary']}")
+        if global_rules:
+            parts.append("[engineering-log] Global guardrails:")
+            for eid, rtxt in global_rules:
+                parts.append(f"- [{eid}] {rtxt}")
         if pending:
             parts.append(
                 f"[engineering-log] {len(pending)} unlogged session bookmark(s) in pending/. "
@@ -2939,6 +2965,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Hook execution mode",
     )
     p_hk.add_argument("--min-steps", type=int, default=15, help="Minimum step count for agy-nudge")
+    p_hk.add_argument("--include-global-rules", action="store_true", help="Also inject up to 3 active scope=global rule_candidates in agy-start")
 
     return parser
 

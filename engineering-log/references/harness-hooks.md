@@ -8,7 +8,7 @@ Configure automatic recall, zero-token save nudges, unlogged session bookmarking
 
 Antigravity discovers hooks in `~/.gemini/config/hooks.json` (global) or `.agents/hooks.json` (workspace). Update the path to `eng_log.py` to match your installed skill location.
 
-- **`SessionStart` (`agy-start`)**: Injects up to 3 active `evergreen` or `version-bound` learnings matching the exact current repo/project name (never leaking unrelated repos based on generic languages like Python/Markdown), plus a notice if `pending/` holds unlogged session bookmarks.
+- **`SessionStart` (`agy-start`)**: Injects up to 3 active `evergreen` or `version-bound` learnings matching the exact current repo/project name (never leaking unrelated repos based on generic languages like Python/Markdown), plus a notice if `pending/` holds unlogged session bookmarks. Pass `--include-global-rules` to optionally append up to 3 active `scope: "global"` `rule_candidates` under a separate `[engineering-log] Global guardrails:` heading.
 - **`PostInvocation` (`agy-nudge`)**: Fires once a session reaches `--min-steps 15` (if not already logged). Uses `metadata.user_markdown` with an empty `systemMessage` (`""`) so the reminder renders inline for you at **zero LLM token cost**.
 
 ```json

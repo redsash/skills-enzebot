@@ -304,7 +304,15 @@ DEFAULT_LAYOUT_SPEC = {
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Render clean 2D CAD architectural SVG floor plans with circulation overlays.")
+    parser = argparse.ArgumentParser(
+        description="Render clean 2D CAD architectural SVG floor plans with circulation overlays.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/render_floorplan_svg.py --demo -o plan.svg\n"
+            "  python3 scripts/render_floorplan_svg.py --spec layout.json -o plan.svg"
+        ),
+    )
     parser.add_argument("--spec", help="Path to layout spec JSON file")
     parser.add_argument("--demo", action="store_true", help="Generate SVG using default resilient villa template")
     parser.add_argument("-o", "--output", help="Output file path (default: stdout)")

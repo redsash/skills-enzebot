@@ -654,7 +654,13 @@ def run_full_validation_suite(layout: Dict[str, Any]) -> Dict[str, Any]:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Comprehensive floor plan validation: Geometry, Building Codes (IRC/IBC), Furniture Envelopes & Spatial UX."
+        description="Comprehensive floor plan validation: Geometry, Building Codes (IRC/IBC), Furniture Envelopes & Spatial UX.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/audit_spatial_ux.py --demo --json\n"
+            "  python3 scripts/audit_spatial_ux.py --spec layout.json --mermaid"
+        ),
     )
     parser.add_argument("--spec", help="Path to floor plan specification JSON file")
     parser.add_argument("--demo", action="store_true", help="Run audit on built-in resilient villa reference specification")

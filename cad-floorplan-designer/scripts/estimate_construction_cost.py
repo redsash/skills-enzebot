@@ -260,7 +260,13 @@ def estimate_floorplan_cost(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Parametric construction cost estimation with AACE Class 4 confidence intervals (-15% to +25%)."
+        description="Parametric construction cost estimation with AACE Class 4 confidence intervals (-15% to +25%).",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/estimate_construction_cost.py --demo --location island --slope 15 --json\n"
+            "  python3 scripts/estimate_construction_cost.py --spec layout.json"
+        ),
     )
     parser.add_argument("--spec", help="Path to floor plan specification JSON file")
     parser.add_argument("--demo", action="store_true", help="Run estimate on built-in resilient villa reference specification")

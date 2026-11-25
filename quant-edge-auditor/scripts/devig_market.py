@@ -44,6 +44,26 @@ def devig_proportional(implied_probs: List[float]) -> List[float]:
     return [p / total for p in implied_probs]
 
 
+def devig_log_odds(implied_probs: List[float], max_iter: int = 1000, tol: float = 1e-8) -> List[float]:
+    """Additive log-odds (logit) method: find constant c such that sum(sigmoid(logit(p_i) - c)) = 1."""
+    clipped = [min(1.0 - 1e-9, max(1e-9, p)) for p in implied_probs]
+    logits = [math.log(p / (1.0 - p)) for p in clipped]
+    low, high = -20.0, 20.0
+    probs = clipped[:]
+    for _ in range(max_iter):
+        mid = (low + high) / 2.0
+        probs = [1.0 / (1.0 + math.exp(-max(-60.0, min(60.0, lg - mid)))) for lg in logits]
+        total = sum(probs)
+        if abs(total - 1.0) < tol:
+            break
+        if total > 1.0:
+            low = mid
+        else:
+            high = mid
+    total_final = sum(probs)
+    return [p / total_final for p in probs]
+
+
 def devig_power(implied_probs: List[float], max_iter: int = 1000, tol: float = 1e-8) -> List[float]:
     """Power method: find exponent k such that sum(p_i^k) = 1."""
     low, high = 1.0, 10.0
@@ -121,7 +141,13 @@ def devig_shin(decimal_odds: List[float], max_iter: int = 1000, tol: float = 1e-
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Quantitative Market De-vigging Engine: Shin, Power, and Proportional Methods."
+        description="Quantitative Market De-vigging Engine: Shin, Power, Log-Odds, and Proportional Methods.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/devig_market.py -110 -110 --method shin\n"
+            "  python3 scripts/devig_market.py -450 +350 --method all --json"
+        ),
     )
     parser.add_argument(
         "odds",
@@ -130,7 +156,7 @@ def main():
     )
     parser.add_argument(
         "--method",
-        choices=["shin", "power", "proportional", "all"],
+        choices=["shin", "power", "log_odds", "proportional", "all"],
         default="shin",
         help="De-vigging algorithm to apply (default: shin)"
     )
@@ -153,6 +179,7 @@ def main():
 
     shin_probs, shin_z = devig_shin(dec_odds)
     power_probs = devig_power(implied_probs)
+    log_odds_probs = devig_log_odds(implied_probs)
     prop_probs = devig_proportional(implied_probs)
 
     results = {
@@ -170,6 +197,10 @@ def main():
             "power": {
                 "true_probabilities": [round(p, 5) for p in power_probs],
                 "fair_decimal_odds": [round(1.0 / p, 3) for p in power_probs]
+            },
+            "log_odds": {
+                "true_probabilities": [round(p, 5) for p in log_odds_probs],
+                "fair_decimal_odds": [round(1.0 / p, 3) for p in log_odds_probs]
             },
             "proportional": {
                 "true_probabilities": [round(p, 5) for p in prop_probs],
@@ -192,14 +223,15 @@ def main():
             print(json.dumps(selected, indent=2))
     else:
         print(f"### Market Overround: {results['market_overround']} ({results['bookmaker_margin_pct']}% vig)\n")
-        print("| Outcome | Quoted Odds | Implied Prob | Shin Prob (Fair) | Power Prob | Proportional Prob |")
-        print("| :--- | :--- | :--- | :--- | :--- | :--- |")
+        print("| Outcome | Quoted Odds | Implied Prob | Shin Prob (Fair) | Power Prob | Log-Odds Prob | Proportional Prob |")
+        print("| :--- | :--- | :--- | :--- | :--- | :--- | :--- |")
         for i, raw in enumerate(args.odds):
             print(
                 f"| Choice {i+1} | {raw} ({dec_odds[i]:.2f}) | "
                 f"{implied_probs[i]*100:.2f}% | "
                 f"**{shin_probs[i]*100:.2f}%** ({1.0/shin_probs[i]:.2f}) | "
                 f"{power_probs[i]*100:.2f}% | "
+                f"{log_odds_probs[i]*100:.2f}% | "
                 f"{prop_probs[i]*100:.2f}% |"
             )
         print(f"\n*Shin Informed Capital Parameter ($z$): {shin_z:.5f}*")

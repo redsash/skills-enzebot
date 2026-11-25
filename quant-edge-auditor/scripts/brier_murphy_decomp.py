@@ -142,7 +142,13 @@ def load_data(filepath: str, pred_col: str, outcome_col: str) -> Tuple[List[floa
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Probability Calibration & Murphy Brier Decomposition Engine."
+        description="Probability Calibration & Murphy Brier Decomposition Engine.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/brier_murphy_decomp.py evals/files/sample_bets.csv --strategy quantile --bins 10\n"
+            "  python3 scripts/brier_murphy_decomp.py predictions.csv --json"
+        ),
     )
     parser.add_argument("file", help="Path to CSV or JSON file containing predictions and actual outcomes")
     parser.add_argument("--pred-col", default="prediction", help="Name of prediction probability column (default: prediction)")
