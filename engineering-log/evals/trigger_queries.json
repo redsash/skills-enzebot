@@ -38,8 +38,13 @@
     },
     {
       "query": "Can you capture what broke, what unstuck us, and any rule candidates from this frustrating CI pipeline session?",
+      "should_trigger": false,
+      "notes": "Near-miss under manual-only posture: does not explicitly invoke /engineering-log or mention engineering log (nudge hook handles ambient prompts)"
+    },
+    {
+      "query": "Run /engineering-log to traverse related entries with eng_log.py graph and graduate a promoted rule.",
       "should_trigger": true,
-      "notes": "Implicit capture request naming core epistemic concepts"
+      "notes": "Explicit slash invocation for graph traversal and rule graduation"
     },
     {
       "query": "Start a new repo-local research journal entry inside research-journal/entries/ for my morning paper notes and track prompt iterations in prompts.json.",

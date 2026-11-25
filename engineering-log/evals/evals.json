@@ -46,6 +46,18 @@
         "None of the synthetic secret strings appear anywhere in entries/, ledgers/, or INDEX.md",
         "eng_log.py validate --dir /tmp/eval-eng-log passes with 0 errors"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Using --dir /tmp/eval-eng-log, run graph traversal from the oldest entry at depth 2 to discover multi-hop linked entries, and append an addendum with promoted_rules to graduate a rule candidate out of INDEX.md.",
+      "expected_output": "graph --id <ID> --depth 2 discovers both outgoing and incoming 1-hop and 2-hop nodes, and append with promoted_rules marks the rule graduated in the entry Markdown while removing it from INDEX.md's Promotable Rule Candidates section.",
+      "files": [],
+      "assertions": [
+        "eng_log.py graph --id <ID> --depth 2 --format json returns multi-hop nodes and edges",
+        "INDEX.md includes a ## Graph Hubs & Concept Map section and summaries <= 140 chars",
+        "append with promoted_rules removes matching rule_candidates from compiled INDEX.md without mutating prior JSONL lines",
+        "eng_log.py validate --dir /tmp/eval-eng-log passes with 0 errors"
+      ]
     }
   ]
 }

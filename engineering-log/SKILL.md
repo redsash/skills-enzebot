@@ -27,8 +27,9 @@ An epistemic flight recorder and cross-project second-brain capture engine. Dist
 - **CLI Engine (`scripts/eng_log.py`)** *(treat as a black box: run `python3 scripts/eng_log.py --help` and `<subcommand> --help` first rather than reading source)*:
   - `python3 scripts/eng_log.py init [--dir DIR]`
   - `python3 scripts/eng_log.py context [--cwd PATH] [--query TEXT] [--tech CSV] [--concepts CSV]`
-  - `python3 scripts/eng_log.py write [--input FILE|-] [--dry-run]`
+  - `python3 scripts/eng_log.py write --cwd . [--input FILE|-] [--dry-run] [--verbose]`
   - `python3 scripts/eng_log.py append --id <ENTRY_ID> [--input FILE|-] [--dry-run]`
+  - `python3 scripts/eng_log.py graph --id <ENTRY_ID> [--depth 2] [--format markdown]`
   - `python3 scripts/eng_log.py rebuild-index [--dir DIR]`
   - `python3 scripts/eng_log.py query [--project X] [--tech X] [--text X] [--exclude-superseded] [--format markdown]`
   - `python3 scripts/eng_log.py stats [--project X] [--since YYYY-MM-DD] [--format markdown]`
@@ -83,9 +84,9 @@ Avoid flat tag hairballs. Connect to relevant `related_entries` using `links`:
 - Assign `confidence` (`verified` | `observed` | `hypothesis`) and `shelf_life` (`evergreen` | `version-bound` | `ephemeral`) accurately so future recall does not surface stale hacks as timeless truth.
 
 ### Step 3: Draft Payload & Dry-Run Validate
-Construct the JSON payload (see [Schema Reference](references/schema.md) for all enums and optional fields). Always test via `--dry-run` before committing:
+Construct the JSON payload (see [Schema Reference](references/schema.md) for all enums and optional fields). Pass `--cwd .` so `write` deterministically auto-harvests `git`, `code_semantics`, and `actor` defaults—focus the JSON strictly on epistemic deltas, telemetry, concepts, and typed graph links. Always validate via `--dry-run` before committing:
 ```bash
-python3 scripts/eng_log.py write --dry-run --input - <<'EOF'
+python3 scripts/eng_log.py write --cwd . --dry-run --input - <<'EOF'
 { ... }
 EOF
 ```
@@ -97,7 +98,11 @@ Re-run without `--dry-run` (or use `append --id <ENTRY_ID>` when adding mileston
 
 ## Secondary Modes
 
-- **Follow-up Addendum (`append`)**: When adding late verification or closing an open thread on a prior entry, run `python3 scripts/eng_log.py append --id <ENTRY_ID> --input -` rather than mutating the original `.md` by hand.
+- **Follow-up Addendum (`append`)**: When adding late verification, closing threads (`closed_threads`), or graduating rules via `/learn` / `.agents/rules/` (`promoted_rules`), run `python3 scripts/eng_log.py append --id <ENTRY_ID> --input -` rather than mutating the original `.md` by hand.
+- **Graph Traversal (`graph`)**: Expand 1–2 hops of incoming and outgoing edges around an entry before batch-reading linked Markdown files:
+  ```bash
+  python3 scripts/eng_log.py graph --id <ENTRY_ID> --depth 2 --format markdown
+  ```
 - **Pre-Flight Recall (`query`)**: Surface active learnings before starting work in a repo or stack:
   ```bash
   python3 scripts/eng_log.py query --project <slug> --exclude-superseded --format markdown
@@ -107,6 +112,13 @@ Re-run without `--dry-run` (or use `append --id <ENTRY_ID>` when adding mileston
   python3 scripts/eng_log.py stats --format markdown
   ```
 - **Pending Session Catch-Up**: Run `eng_log.py hook --mode pending-list` and distill worthwhile bookmarked sessions, or delete dismissed `.json` stubs in `pending/`.
+
+---
+
+## Execution & Quota Posture
+
+- **Manual Boundary Trigger**: Invoke via `/engineering-log` at session or milestone boundaries rather than ambient routing; pair with the zero-token `PostInvocation` nudge and `SessionEnd` bookmarking in [Harness Hooks](references/harness-hooks.md).
+- **Model & Effort Tier**: Default to `fast` / `medium` (`gemini-4-hydrogen-medium`)—deterministic `--cwd` harvesting and strict validation handle mechanical fields cleanly. Escalate to `standard` / `medium` (`gemini-4-neon-medium`) for multi-hour, high-friction (`>= 4`) marathons needing deep belief-revision synthesis.
 
 ---
 

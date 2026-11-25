@@ -53,7 +53,7 @@ Exact layout:
 
 ## 3. Canonical `write` Payload (`schema_version: 1`)
 
-Pass via `--input payload.json` or stdin (`--input -`):
+Pass via `--input payload.json` or stdin (`--input -`). When `--cwd PATH` is passed to `write` (recommended), `git`, `code_semantics`, and `actor` defaults are auto-harvested if omitted—only supply epistemic deltas, telemetry, context tags, and graph links:
 
 ```json
 {
@@ -152,6 +152,9 @@ Used with `eng_log.py append --id <entry_id> --input -` to attach follow-up find
   ],
   "closed_threads": [
     "Verify multi-pod behavior when two tabs hit different backend replicas"
+  ],
+  "promoted_rules": [
+    "Never call /oauth/token refresh directly outside refreshSingleFlight()"
   ],
   "links": [
     {

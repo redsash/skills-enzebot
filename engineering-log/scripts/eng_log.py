@@ -34,7 +34,7 @@ import shutil
 import socket
 import subprocess
 import sys
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -740,6 +740,21 @@ def load_ledger_state(store_dir: Path) -> Dict[str, Any]:
             ent["open_threads"] = _merge_unique_list(
                 ent.get("open_threads", []), add["open_threads"]
             )
+        promoted = [
+            p.strip().lower()
+            for p in (add.get("promoted_rules") or [])
+            if isinstance(p, str) and p.strip()
+        ]
+        if promoted and ent.get("rule_candidates"):
+            kept_rules = []
+            for rc in ent.get("rule_candidates", []):
+                rule_txt = (
+                    rc.get("rule", "") if isinstance(rc, dict) else str(rc)
+                ).strip().lower()
+                if any(p == rule_txt or p in rule_txt for p in promoted):
+                    continue
+                kept_rules.append(rc)
+            ent["rule_candidates"] = kept_rules
 
     # Build incoming graph edges and supersession map
     cited_by: Dict[str, List[Dict[str, str]]] = defaultdict(list)
@@ -949,7 +964,7 @@ def _validate_epistemic_lists(payload: Dict[str, Any], errors: List[str], includ
     """Validate nested schemas for belief_revisions, dead_ends, findings, rule_candidates, and threads."""
     list_keys = ("belief_revisions", "dead_ends", "findings", "rule_candidates", "open_threads")
     if include_closed:
-        list_keys = list_keys + ("closed_threads",)
+        list_keys = list_keys + ("closed_threads", "promoted_rules")
 
     for list_name in list_keys:
         val = payload.get(list_name)
@@ -1002,7 +1017,7 @@ def _validate_epistemic_lists(payload: Dict[str, Any], errors: List[str], includ
                 _validate_nonempty_str(item, req, ctx, errors)
             _validate_optional_str(item, "rationale", ctx, errors)
 
-    thread_keys = ("open_threads", "closed_threads") if include_closed else ("open_threads",)
+    thread_keys = ("open_threads", "closed_threads", "promoted_rules") if include_closed else ("open_threads",)
     for tkey in thread_keys:
         tlist = payload.get(tkey)
         if isinstance(tlist, list):
@@ -1414,9 +1429,74 @@ def _mean(nums: List[float]) -> Optional[float]:
     return round(sum(nums) / len(nums), 2) if nums else None
 
 
-def compile_index_markdown(state: Dict[str, Any]) -> str:
-    """Deterministically compile INDEX.md from folded ledger state."""
+def _truncate_text(text: str, max_len: int = 140) -> str:
+    """Truncate text cleanly to max_len characters."""
+    cleaned = re.sub(r"\s+", " ", (text or "").strip())
+    if len(cleaned) <= max_len:
+        return cleaned
+    return cleaned[: max_len - 1].rstrip() + "…"
+
+
+def compile_project_index_markdown(project: str, entries: List[Dict[str, Any]]) -> str:
+    """Deterministically compile a per-project overflow shard under indexes/by-project/."""
+    total = len(entries)
+    resolved_cnt = sum(1 for e in entries if e.get("outcome") == "resolved")
+    lines = [
+        f"# Engineering Log Project Index: `{project}`",
+        "",
+        f"> Auto-compiled from `ledgers/**/*.jsonl`. Entries: {total} | Resolved: {resolved_cnt}",
+        "",
+        "| Date | ID | Title | Summary | Outcome | Shape | F/V | Status |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+    ]
+    for ent in entries:
+        date_s = (ent.get("created_at") or "")[:10]
+        eid = ent["id"]
+        title = (ent.get("title") or eid).replace("|", "\\|")
+        summary = _truncate_text(ent.get("summary") or "", 140).replace("|", "\\|")
+        fpath = (ent.get("file_path") or "").replace("\\", "/")
+        link_md = f"[{title}](../../{fpath})" if fpath else title
+        m = ent.get("metrics") or {}
+        fv = f"{m.get('friction') or '-'}/{m.get('value') or '-'}"
+        sup = ent.get("_superseded_by")
+        status = f"superseded by `{sup}`" if sup else (ent.get("shelf_life") or "active")
+        lines.append(
+            f"| {date_s} | `{eid}` | {link_md} | {summary} | `{ent.get('outcome')}` | "
+            f"`{ent.get('session_shape')}` | {fv} | {status} |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def write_compiled_indexes(store_dir: Path, state: Dict[str, Any]) -> None:
+    """Write deterministic INDEX.md and overflow project shards when > 50 entries."""
+    write_text_atomic(store_dir / "INDEX.md", compile_index_markdown(state))
     entries = state.get("ordered_entries", [])
+    by_proj_dir = store_dir / "indexes" / "by-project"
+    if len(entries) > 50:
+        by_proj_dir.mkdir(parents=True, exist_ok=True)
+        grouped: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        for ent in entries:
+            grouped[ent.get("project", "general")].append(ent)
+        active_files = set()
+        for proj, p_ents in sorted(grouped.items()):
+            fname = f"{sanitize_slug(proj, max_len=64)}.md"
+            active_files.add(fname)
+            write_text_atomic(by_proj_dir / fname, compile_project_index_markdown(proj, p_ents))
+        for existing in by_proj_dir.glob("*.md"):
+            if existing.name not in active_files:
+                existing.unlink(missing_ok=True)
+    elif by_proj_dir.is_dir():
+        for existing in by_proj_dir.glob("*.md"):
+            existing.unlink(missing_ok=True)
+
+
+def compile_index_markdown(state: Dict[str, Any]) -> str:
+    """Deterministically compile bounded, graph-aware INDEX.md from folded ledger state."""
+    entries = state.get("ordered_entries", [])
+    entries_by_id = state.get("entries_by_id", {})
+    cited_by = state.get("cited_by", {})
+    superseded_by = state.get("superseded_by", {})
     total = len(entries)
     resolved_cnt = sum(1 for e in entries if e.get("outcome") == "resolved")
     frictions = [
@@ -1434,6 +1514,7 @@ def compile_index_markdown(state: Dict[str, Any]) -> str:
     evergreen_rules: List[Tuple[str, str, str, str, str]] = []
     failure_counts: Counter = Counter()
     catalyst_counts: Counter = Counter()
+    tag_index: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
 
     for ent in entries:
         for th in ent.get("open_threads", []) or []:
@@ -1462,6 +1543,13 @@ def compile_index_markdown(state: Dict[str, Any]) -> str:
                             ent.get("file_path", ""),
                         )
                     )
+            ctx = ent.get("context") or {}
+            seen_terms = set()
+            for raw_term in list(ctx.get("concepts") or []) + list(ctx.get("technologies") or []):
+                term = str(raw_term).strip().lower()
+                if term and term not in seen_terms:
+                    seen_terms.add(term)
+                    tag_index[term].append(ent)
         tel = ent.get("telemetry") or {}
         for fm in tel.get("agent_failure_modes", []) or []:
             failure_counts[fm] += 1
@@ -1491,16 +1579,22 @@ def compile_index_markdown(state: Dict[str, Any]) -> str:
     ]
 
     if entries:
+        recent_entries = entries[:50]
+        if total > 50:
+            lines.append(
+                f"_Showing latest 50 of {total} entries; see `indexes/by-project/` or run `eng_log.py query`._"
+            )
+            lines.append("")
         lines.append(
             "| Date | ID | Project | Highlight | Outcome | Shape | F/V | Status |"
         )
         lines.append("| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |")
-        for ent in entries:
+        for ent in recent_entries:
             date_s = (ent.get("created_at") or "")[:10]
             eid = ent["id"]
             proj = ent.get("project", "general")
             title = (ent.get("title") or eid).replace("|", "\\|")
-            summary = (ent.get("summary") or "").replace("|", "\\|")
+            summary = _truncate_text(ent.get("summary") or "", 140).replace("|", "\\|")
             fpath = (ent.get("file_path") or "").replace("\\", "/")
             link_md = f"[{title}]({fpath})" if fpath else title
             highlight = f"{link_md} — {summary}" if summary else link_md
@@ -1515,6 +1609,75 @@ def compile_index_markdown(state: Dict[str, Any]) -> str:
     else:
         lines.append("_No entries logged yet._")
     lines.append("")
+
+    lines.append("## Graph Hubs & Concept Map")
+    lines.append("")
+    hubs = []
+    for ent in entries:
+        inc = ent.get("_incoming_citations", 0)
+        out = len(ent.get("links") or [])
+        if inc + out > 0:
+            hubs.append((inc + out, inc, ent.get("created_at", ""), ent, out))
+    hubs.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
+
+    same_root_clusters: List[Tuple[str, List[str]]] = []
+    for anchor_id in sorted(cited_by):
+        srcs = [r["source_id"] for r in cited_by[anchor_id] if r.get("rel") == "same_root_cause"]
+        if srcs:
+            same_root_clusters.append((anchor_id, srcs))
+
+    sup_chains: List[Tuple[str, str]] = sorted(
+        ((new_id, old_id) for old_id, new_id in superseded_by.items()),
+        reverse=True,
+    )
+
+    if hubs or same_root_clusters or sup_chains or tag_index:
+        if hubs:
+            lines.append("### Connected Hubs")
+            for _, inc, _, ent, out in hubs[:10]:
+                fpath = (ent.get("file_path") or "").replace("\\", "/")
+                title = ent.get("title") or ent["id"]
+                link_md = f"[{title}]({fpath})" if fpath else title
+                sup_s = f" *(superseded by `{ent['_superseded_by']}`)*" if ent.get("_superseded_by") else ""
+                lines.append(
+                    f"- `{ent['id']}` {link_md} (`{ent.get('project', 'general')}`) — "
+                    f"in={inc} / out={out}{sup_s}"
+                )
+            lines.append("")
+
+        if same_root_clusters or sup_chains:
+            lines.append("### Typed Clusters & Chains")
+            for anchor_id, srcs in same_root_clusters[:10]:
+                cluster_ids = [anchor_id] + srcs
+                refs = []
+                for cid in cluster_ids:
+                    c_ent = entries_by_id.get(cid)
+                    if c_ent and c_ent.get("file_path"):
+                        refs.append(f"[`{cid}`]({c_ent['file_path'].replace(chr(92), '/')})")
+                    else:
+                        refs.append(f"`{cid}`")
+                lines.append(f"- `same_root_cause`: " + ", ".join(refs))
+            for new_id, old_id in sup_chains[:10]:
+                n_ent = entries_by_id.get(new_id)
+                o_ent = entries_by_id.get(old_id)
+                n_ref = f"[`{new_id}`]({n_ent['file_path'].replace(chr(92), '/')})" if n_ent and n_ent.get("file_path") else f"`{new_id}`"
+                o_ref = f"[`{old_id}`]({o_ent['file_path'].replace(chr(92), '/')})" if o_ent and o_ent.get("file_path") else f"`{old_id}`"
+                lines.append(f"- `supersedes`: {n_ref} → {o_ref}")
+            lines.append("")
+
+        if tag_index:
+            lines.append("### Concept & Tech Index")
+            top_terms = sorted(tag_index.items(), key=lambda kv: (-len(kv[1]), kv[0]))[:20]
+            for term, term_ents in top_terms:
+                refs = []
+                for te in term_ents[:5]:
+                    fpath = (te.get("file_path") or "").replace("\\", "/")
+                    refs.append(f"[`{te['id']}`]({fpath})" if fpath else f"`{te['id']}`")
+                lines.append(f"- **`{term}`** ({len(term_ents)}): " + ", ".join(refs))
+            lines.append("")
+    else:
+        lines.append("_No graph links or concept tags recorded yet._")
+        lines.append("")
 
     lines.append("## Active Open Threads")
     lines.append("")
@@ -1766,7 +1929,7 @@ def cmd_write(args: argparse.Namespace) -> Dict[str, Any]:
     append_jsonl_line(store_dir / ledger_rel, record)
     _clean_matching_pending_stub(store_dir, record["actor"].get("conversation_id"))
     new_state = load_ledger_state(store_dir)
-    write_text_atomic(store_dir / "INDEX.md", compile_index_markdown(new_state))
+    write_compiled_indexes(store_dir, new_state)
 
     return {
         "status": "ok",
@@ -1799,12 +1962,13 @@ def _validate_addendum_payload(payload: Any) -> Tuple[Dict[str, Any], List[str]]
             "rule_candidates",
             "open_threads",
             "closed_threads",
+            "promoted_rules",
             "links",
         )
     )
     if not has_content:
         errors.append(
-            "Addendum must contain at least one update (note, findings, dead_ends, belief_revisions, rule_candidates, open_threads, closed_threads, or links)."
+            "Addendum must contain at least one update (note, findings, dead_ends, belief_revisions, rule_candidates, open_threads, closed_threads, promoted_rules, or links)."
         )
 
     if payload.get("outcome") is not None:
@@ -1876,6 +2040,8 @@ def _render_addendum_markdown(
             lines.append(f"- **Rule Candidate:** {rc}")
     for ct in add_record.get("closed_threads") or []:
         lines.append(f"- [x] Closed thread: {ct}")
+    for pr in add_record.get("promoted_rules") or []:
+        lines.append(f"- [x] Promoted rule: {pr}")
     for ot in add_record.get("open_threads") or []:
         lines.append(f"- [ ] {ot}")
     for lnk in resolved_links:
@@ -1928,6 +2094,7 @@ def cmd_append(args: argparse.Namespace) -> Dict[str, Any]:
         "rule_candidates": scrubbed.get("rule_candidates") or [],
         "open_threads": scrubbed.get("open_threads") or [],
         "closed_threads": scrubbed.get("closed_threads") or [],
+        "promoted_rules": scrubbed.get("promoted_rules") or [],
         "links": scrubbed.get("links") or [],
     }
 
@@ -1960,7 +2127,7 @@ def cmd_append(args: argparse.Namespace) -> Dict[str, Any]:
     write_text_atomic(entry_abs, existing_md + addendum_md)
     append_jsonl_line(store_dir / ledger_rel, add_record)
     new_state = load_ledger_state(store_dir)
-    write_text_atomic(store_dir / "INDEX.md", compile_index_markdown(new_state))
+    write_compiled_indexes(store_dir, new_state)
 
     return {
         "status": "ok",
@@ -1978,13 +2145,128 @@ def cmd_rebuild_index(args: argparse.Namespace) -> Dict[str, Any]:
     store_dir = resolve_store_dir(args.dir)
     ensure_store_initialized(store_dir)
     state = load_ledger_state(store_dir)
-    write_text_atomic(store_dir / "INDEX.md", compile_index_markdown(state))
+    write_compiled_indexes(store_dir, state)
     return {
         "status": "ok",
         "action": "rebuild-index",
         "store_dir": str(store_dir),
         "entries_indexed": len(state["ordered_entries"]),
         "addenda_folded": len(state["addenda"]),
+    }
+
+
+def cmd_graph(args: argparse.Namespace) -> Any:
+    """Traverse bidirectional graph links (outgoing + incoming) from an entry up to N hops."""
+    store_dir = resolve_store_dir(args.dir)
+    state = load_ledger_state(store_dir) if store_dir.exists() else {"entries_by_id": {}, "cited_by": {}}
+    entries_by_id = state.get("entries_by_id", {})
+    cited_by = state.get("cited_by", {})
+
+    anchor_id = args.id
+    if anchor_id not in entries_by_id:
+        raise FileNotFoundError(f"Entry ID {anchor_id!r} not found in {store_dir / 'ledgers'}")
+
+    depth = max(1, min(4, int(args.depth)))
+    visited_hop: Dict[str, int] = {anchor_id: 0}
+    queue: deque = deque([(anchor_id, 0)])
+    edges_seen: set = set()
+    edges: List[Dict[str, Any]] = []
+
+    def _add_edge(src_id: str, rel: str, tgt_id: str, note: str = "") -> None:
+        key = (src_id, rel, tgt_id)
+        if key in edges_seen:
+            return
+        edges_seen.add(key)
+        edges.append({"source_id": src_id, "rel": rel, "target_id": tgt_id, "note": note})
+
+    while queue:
+        curr_id, hop = queue.popleft()
+        curr_ent = entries_by_id.get(curr_id)
+        if not curr_ent or hop >= depth:
+            continue
+
+        for lnk in curr_ent.get("links") or []:
+            if not isinstance(lnk, dict):
+                continue
+            tgt = lnk.get("target_id")
+            rel = lnk.get("rel") or ""
+            note = lnk.get("note") or ""
+            if not tgt:
+                continue
+            _add_edge(curr_id, rel, tgt, note)
+            if tgt in entries_by_id and tgt not in visited_hop:
+                visited_hop[tgt] = hop + 1
+                queue.append((tgt, hop + 1))
+
+        for ref in cited_by.get(curr_id, []):
+            src_id = ref.get("source_id")
+            rel = ref.get("rel") or ""
+            if not src_id:
+                continue
+            note = ""
+            src_ent = entries_by_id.get(src_id)
+            if src_ent:
+                for slnk in src_ent.get("links") or []:
+                    if isinstance(slnk, dict) and slnk.get("target_id") == curr_id and slnk.get("rel") == rel:
+                        note = slnk.get("note") or ""
+                        break
+            _add_edge(src_id, rel, curr_id, note)
+            if src_id in entries_by_id and src_id not in visited_hop:
+                visited_hop[src_id] = hop + 1
+                queue.append((src_id, hop + 1))
+
+    nodes: List[Dict[str, Any]] = []
+    for eid, hop in sorted(visited_hop.items(), key=lambda item: (item[1], item[0])):
+        ent = entries_by_id[eid]
+        nodes.append(
+            {
+                "id": eid,
+                "hop": hop,
+                "title": ent.get("title"),
+                "project": ent.get("project"),
+                "file_path": ent.get("file_path"),
+                "shelf_life": ent.get("shelf_life"),
+                "superseded_by": ent.get("_superseded_by"),
+                "summary": _truncate_text(ent.get("summary") or "", 180),
+            }
+        )
+
+    if args.format == "markdown":
+        anchor_ent = entries_by_id[anchor_id]
+        lines = [
+            f"### Graph Neighborhood for `{anchor_id}` ({anchor_ent.get('title')}) [depth={depth}]",
+            "",
+            f"- **Nodes:** {len(nodes)} | **Edges:** {len(edges)}",
+            "",
+            "#### Nodes",
+        ]
+        for n in nodes:
+            sup = f" *(superseded by `{n['superseded_by']}`)*" if n.get("superseded_by") else ""
+            fpath = n.get("file_path") or ""
+            link_md = f"[{n['title']}]({fpath})" if fpath else n["title"]
+            lines.append(
+                f"- [hop {n['hop']}] `{n['id']}` (`{n['project']}`, `{n['shelf_life']}`) "
+                f"{link_md}{sup}: {n['summary']}"
+            )
+        lines.append("")
+        lines.append("#### Edges")
+        if edges:
+            for ed in edges:
+                note_s = f" — {ed['note']}" if ed.get("note") else ""
+                lines.append(f"- `{ed['source_id']}` --[`{ed['rel']}`]--> `{ed['target_id']}`{note_s}")
+        else:
+            lines.append("- None.")
+        return "\n".join(lines) + "\n"
+
+    return {
+        "status": "ok",
+        "action": "graph",
+        "anchor_id": anchor_id,
+        "depth": depth,
+        "node_count": len(nodes),
+        "edge_count": len(edges),
+        "nodes": nodes,
+        "edges": edges,
     }
 
 
@@ -2603,6 +2885,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_idx = sub.add_parser("rebuild-index", help="Deterministically recompile INDEX.md from all ledger shards.")
     p_idx.add_argument("--dir", default=None, help="Override store root")
 
+    p_gr = sub.add_parser(
+        "graph",
+        help="Traverse bidirectional graph links around an entry up to N hops.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Example:\n  python3 scripts/eng_log.py graph --id 20261122-1807-a1a6 --depth 2 --format markdown",
+    )
+    p_gr.add_argument("--id", required=True, help="Anchor entry ID")
+    p_gr.add_argument("--depth", type=int, default=2, help="Traversal hop depth 1..4 (default: 2)")
+    p_gr.add_argument("--dir", default=None, help="Override store root")
+    p_gr.add_argument("--format", choices=("json", "markdown"), default="json", help="Output format")
+
     p_q = sub.add_parser(
         "query",
         help="Search and filter entries across sharded ledgers.",
@@ -2664,6 +2957,8 @@ def main() -> None:
             res = cmd_append(args)
         elif args.command == "rebuild-index":
             res = cmd_rebuild_index(args)
+        elif args.command == "graph":
+            res = cmd_graph(args)
         elif args.command == "query":
             res = cmd_query(args)
         elif args.command == "stats":
