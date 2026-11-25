@@ -8,7 +8,7 @@ Configure automatic recall, zero-token save nudges, unlogged session bookmarking
 
 Antigravity discovers hooks in `~/.gemini/config/hooks.json` (global) or `.agents/hooks.json` (workspace). Update the path to `eng_log.py` to match your installed skill location.
 
-- **`SessionStart` (`agy-start`)**: Injects up to 3 active `evergreen` or `version-bound` learnings matching the current repo/project, plus a notice if `pending/` holds unlogged session bookmarks.
+- **`SessionStart` (`agy-start`)**: Injects up to 3 active `evergreen` or `version-bound` learnings matching the exact current repo/project name (never leaking unrelated repos based on generic languages like Python/Markdown), plus a notice if `pending/` holds unlogged session bookmarks.
 - **`PostInvocation` (`agy-nudge`)**: Fires once a session reaches `--min-steps 15` (if not already logged). Uses `metadata.user_markdown` with an empty `systemMessage` (`""`) so the reminder renders inline for you at **zero LLM token cost**.
 
 ```json
@@ -17,7 +17,7 @@ Antigravity discovers hooks in `~/.gemini/config/hooks.json` (global) or `.agent
     "SessionStart": [
       {
         "type": "command",
-        "command": "python3 ~/.gemini/skills/engineering-log/scripts/eng_log.py hook --mode agy-start",
+        "command": "python3 ~/.gemini/config/skills/engineering-log/scripts/eng_log.py hook --mode agy-start",
         "timeout": 10
       }
     ]
@@ -26,7 +26,7 @@ Antigravity discovers hooks in `~/.gemini/config/hooks.json` (global) or `.agent
     "PostInvocation": [
       {
         "type": "command",
-        "command": "python3 ~/.gemini/skills/engineering-log/scripts/eng_log.py hook --mode agy-nudge --min-steps 15",
+        "command": "python3 ~/.gemini/config/skills/engineering-log/scripts/eng_log.py hook --mode agy-nudge --min-steps 15",
         "timeout": 5
       }
     ]
@@ -67,7 +67,7 @@ Harnesses that emit a `SessionEnd` event (such as **Gemini CLI** in `~/.gemini/s
           {
             "name": "engineering-log-bookmark",
             "type": "command",
-            "command": "python3 ~/.gemini/skills/engineering-log/scripts/eng_log.py hook --mode session-end",
+            "command": "python3 ~/.gemini/config/skills/engineering-log/scripts/eng_log.py hook --mode session-end",
             "timeout": 5000
           }
         ]

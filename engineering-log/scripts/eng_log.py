@@ -933,6 +933,84 @@ def _validate_rating(val: Any, field: str, errors: List[str]) -> Optional[int]:
     return val
 
 
+def _validate_nonempty_str(obj: Dict[str, Any], key: str, ctx: str, errors: List[str]) -> None:
+    val = obj.get(key)
+    if not isinstance(val, str) or not val.strip():
+        errors.append(f"{ctx} missing required non-empty string '{key}'.")
+
+
+def _validate_optional_str(obj: Dict[str, Any], key: str, ctx: str, errors: List[str]) -> None:
+    val = obj.get(key)
+    if val is not None and not isinstance(val, str):
+        errors.append(f"{ctx}.{key} must be a string or null.")
+
+
+def _validate_epistemic_lists(payload: Dict[str, Any], errors: List[str], include_closed: bool = False) -> None:
+    """Validate nested schemas for belief_revisions, dead_ends, findings, rule_candidates, and threads."""
+    list_keys = ("belief_revisions", "dead_ends", "findings", "rule_candidates", "open_threads")
+    if include_closed:
+        list_keys = list_keys + ("closed_threads",)
+
+    for list_name in list_keys:
+        val = payload.get(list_name)
+        if val is not None and not isinstance(val, list):
+            errors.append(f"'{list_name}' must be a list.")
+
+    brs = payload.get("belief_revisions")
+    if isinstance(brs, list):
+        for i, item in enumerate(brs):
+            ctx = f"belief_revisions[{i}]"
+            if not isinstance(item, dict):
+                errors.append(f"{ctx} must be an object.")
+                continue
+            for req in ("assumed", "contradicted_by", "revised_model"):
+                _validate_nonempty_str(item, req, ctx, errors)
+
+    des = payload.get("dead_ends")
+    if isinstance(des, list):
+        for i, item in enumerate(des):
+            ctx = f"dead_ends[{i}]"
+            if not isinstance(item, dict):
+                errors.append(f"{ctx} must be an object.")
+                continue
+            for req in ("hypothesis", "why_failed"):
+                _validate_nonempty_str(item, req, ctx, errors)
+            _validate_optional_str(item, "error_signature", ctx, errors)
+
+    fns = payload.get("findings")
+    if isinstance(fns, list):
+        for i, item in enumerate(fns):
+            ctx = f"findings[{i}]"
+            if not isinstance(item, dict):
+                errors.append(f"{ctx} must be an object.")
+                continue
+            _validate_nonempty_str(item, "claim", ctx, errors)
+            if item.get("confidence") is not None:
+                _validate_enum(item["confidence"], CONFIDENCE_LEVELS, f"{ctx}.confidence", errors)
+            if item.get("shelf_life") is not None:
+                _validate_enum(item["shelf_life"], SHELF_LIVES, f"{ctx}.shelf_life", errors)
+            _validate_optional_str(item, "evidence", ctx, errors)
+
+    rcs = payload.get("rule_candidates")
+    if isinstance(rcs, list):
+        for i, item in enumerate(rcs):
+            ctx = f"rule_candidates[{i}]"
+            if not isinstance(item, dict):
+                errors.append(f"{ctx} must be an object.")
+                continue
+            for req in ("scope", "rule"):
+                _validate_nonempty_str(item, req, ctx, errors)
+            _validate_optional_str(item, "rationale", ctx, errors)
+
+    thread_keys = ("open_threads", "closed_threads") if include_closed else ("open_threads",)
+    for tkey in thread_keys:
+        tlist = payload.get(tkey)
+        if isinstance(tlist, list):
+            for i, item in enumerate(tlist):
+                if not isinstance(item, str) or not item.strip():
+                    errors.append(f"{tkey}[{i}] must be a non-empty string.")
+
+
 def validate_write_payload(payload: Any) -> Tuple[Dict[str, Any], List[str]]:
     """Validate and normalize a write payload against schema_version 1."""
     errors: List[str] = []
@@ -1002,16 +1080,12 @@ def validate_write_payload(payload: Any) -> Tuple[Dict[str, Any], List[str]]:
             if not lnk.get("target_id") or not isinstance(lnk.get("target_id"), str):
                 errors.append(f"links[{i}].target_id must be a non-empty string.")
 
-    for list_name in (
-        "belief_revisions",
-        "dead_ends",
-        "findings",
-        "rule_candidates",
-        "open_threads",
-    ):
-        val = payload.get(list_name, [])
-        if val is not None and not isinstance(val, list):
-            errors.append(f"'{list_name}' must be a list.")
+    if payload.get("actor") is not None and not isinstance(payload.get("actor"), dict):
+        errors.append("'actor' must be an object.")
+    if payload.get("context") is not None and not isinstance(payload.get("context"), dict):
+        errors.append("'context' must be an object.")
+
+    _validate_epistemic_lists(payload, errors, include_closed=False)
 
     if errors:
         return payload, errors
@@ -1573,9 +1647,59 @@ def cmd_context(args: argparse.Namespace) -> Dict[str, Any]:
     }
 
 
+def _auto_harvest_write_context(
+    raw_payload: Any, cwd_arg: Optional[str], no_auto_harvest: bool
+) -> Tuple[bool, bool]:
+    """Deterministically attach git and code_semantics when omitted on write."""
+    if no_auto_harvest or not isinstance(raw_payload, dict):
+        return False, False
+
+    ctx_in = raw_payload.get("context")
+    if ctx_in is not None and not isinstance(ctx_in, dict):
+        return False, False
+
+    cwd_str = cwd_arg or (ctx_in.get("cwd") if isinstance(ctx_in, dict) else None)
+    if not cwd_str:
+        return False, False
+
+    cwd_path = Path(cwd_str).expanduser().resolve()
+    if ctx_in is None:
+        raw_payload["context"] = {"cwd": str(cwd_path)}
+    elif not ctx_in.get("cwd"):
+        ctx_in["cwd"] = str(cwd_path)
+
+    auto_git = False
+    auto_sem = False
+    git_info = raw_payload.get("git")
+    if "git" not in raw_payload or git_info is None:
+        harvested_git = harvest_git_info(cwd_path)
+        if harvested_git.get("is_git"):
+            raw_payload["git"] = harvested_git
+            git_info = harvested_git
+            auto_git = True
+        else:
+            raw_payload["git"] = None
+            git_info = None
+
+    if (
+        ("code_semantics" not in raw_payload or raw_payload.get("code_semantics") is None)
+        and isinstance(git_info, dict)
+        and git_info.get("is_git")
+    ):
+        sem_info = harvest_code_semantics(cwd_path, git_info, detect_tools())
+        if sem_info:
+            raw_payload["code_semantics"] = sem_info
+            auto_sem = True
+
+    return auto_git, auto_sem
+
+
 def cmd_write(args: argparse.Namespace) -> Dict[str, Any]:
     store_dir = resolve_store_dir(args.dir)
     raw_payload = _read_json_input(args.input)
+    auto_git, auto_sem = _auto_harvest_write_context(
+        raw_payload, getattr(args, "cwd", None), getattr(args, "no_auto_harvest", False)
+    )
     normalized, val_errors = validate_write_payload(raw_payload)
     if val_errors:
         raise ValueError("Payload validation failed:\n- " + "\n- ".join(val_errors))
@@ -1585,6 +1709,15 @@ def cmd_write(args: argparse.Namespace) -> Dict[str, Any]:
         sys.stderr.write(f"Secret scrubber redacted {redactions} sensitive token(s).\n")
 
     state = load_ledger_state(store_dir) if store_dir.exists() else {"entries_by_id": {}, "ordered_entries": []}
+    conv_id = scrubbed["actor"].get("conversation_id")
+    if conv_id and not getattr(args, "allow_duplicate", False):
+        for existing_id, existing_ent in state.get("entries_by_id", {}).items():
+            if (existing_ent.get("actor") or {}).get("conversation_id") == conv_id:
+                raise ValueError(
+                    f"Entry {existing_id!r} already exists for conversation_id {conv_id!r}. "
+                    f"Use 'eng_log.py append --id {existing_id}' for follow-ups or pass --allow-duplicate."
+                )
+
     existing_ids = set(state.get("entries_by_id", {}).keys())
     now = utc_now()
     entry_id = _generate_entry_id(existing_ids)
@@ -1606,9 +1739,11 @@ def cmd_write(args: argparse.Namespace) -> Dict[str, Any]:
     markdown_content = render_entry_markdown(record, resolved_links)
     stream_id = resolve_stream_id(args.stream)
     ledger_rel = f"ledgers/{stream_id}.jsonl"
+    links_resolved_count = sum(1 for lnk in resolved_links if lnk["resolved"])
+    unresolved_links = [lnk["target_id"] for lnk in resolved_links if not lnk["resolved"]]
 
     if args.dry_run:
-        return {
+        out: Dict[str, Any] = {
             "status": "ok",
             "action": "write",
             "dry_run": True,
@@ -1616,9 +1751,15 @@ def cmd_write(args: argparse.Namespace) -> Dict[str, Any]:
             "file_path": rel_file_path,
             "ledger_path": ledger_rel,
             "redactions_applied": redactions,
-            "markdown_preview": markdown_content,
-            "ledger_record": record,
+            "links_resolved": links_resolved_count,
+            "unresolved_links": unresolved_links,
+            "auto_harvested_git": auto_git,
+            "auto_harvested_semantics": auto_sem,
         }
+        if getattr(args, "verbose", False):
+            out["markdown_preview"] = markdown_content
+            out["ledger_record"] = record
+        return out
 
     ensure_store_initialized(store_dir)
     write_text_atomic(entry_abs, markdown_content)
@@ -1636,7 +1777,9 @@ def cmd_write(args: argparse.Namespace) -> Dict[str, Any]:
         "file_path": rel_file_path,
         "ledger_path": ledger_rel,
         "redactions_applied": redactions,
-        "links_resolved": sum(1 for lnk in resolved_links if lnk["resolved"]),
+        "links_resolved": links_resolved_count,
+        "auto_harvested_git": auto_git,
+        "auto_harvested_semantics": auto_sem,
     }
 
 
@@ -1684,6 +1827,8 @@ def _validate_addendum_payload(payload: Any) -> Tuple[Dict[str, Any], List[str]]
             _validate_enum(lnk.get("rel"), LINK_RELS, f"links[{i}].rel", errors)
             if not lnk.get("target_id") or not isinstance(lnk.get("target_id"), str):
                 errors.append(f"links[{i}].target_id must be a non-empty string.")
+
+    _validate_epistemic_lists(payload, errors, include_closed=True)
 
     if errors:
         return payload, errors
@@ -1792,18 +1937,24 @@ def cmd_append(args: argparse.Namespace) -> Dict[str, Any]:
     addendum_md = _render_addendum_markdown(add_record, resolved_links)
     stream_id = resolve_stream_id(args.stream)
     ledger_rel = f"ledgers/{stream_id}.jsonl"
+    links_resolved_count = sum(1 for lnk in resolved_links if lnk["resolved"])
+    unresolved_links = [lnk["target_id"] for lnk in resolved_links if not lnk["resolved"]]
 
     if args.dry_run:
-        return {
+        out: Dict[str, Any] = {
             "status": "ok",
             "action": "append",
             "dry_run": True,
             "addendum_id": add_id,
             "target_id": args.id,
             "redactions_applied": redactions,
-            "markdown_addition": addendum_md,
-            "ledger_record": add_record,
+            "links_resolved": links_resolved_count,
+            "unresolved_links": unresolved_links,
         }
+        if getattr(args, "verbose", False):
+            out["markdown_addition"] = addendum_md
+            out["ledger_record"] = add_record
+        return out
 
     existing_md = entry_abs.read_text(encoding="utf-8").rstrip() + "\n"
     write_text_atomic(entry_abs, existing_md + addendum_md)
@@ -2264,18 +2415,20 @@ def cmd_hook(args: argparse.Namespace) -> Dict[str, Any]:
         git_info = harvest_git_info(cwd)
         proj_hint = git_info.get("repo") or cwd.name
         state = load_ledger_state(store_dir)
-        candidates = find_related_entries(
-            state,
-            project_hint=proj_hint,
-            tech_list=git_info.get("languages_touched", []),
-            query_text=proj_hint,
-            top_n=6,
-        )
-        active = [
-            c
-            for c in candidates
-            if not c.get("superseded_by") and c.get("shelf_life") in ("evergreen", "version-bound")
-        ][:3]
+        proj_low = (proj_hint or "").strip().lower()
+        active: List[Dict[str, Any]] = []
+        if proj_low:
+            for ent in state.get("ordered_entries", []):
+                if ent.get("_superseded_by"):
+                    continue
+                if ent.get("shelf_life") not in ("evergreen", "version-bound"):
+                    continue
+                ent_proj = (ent.get("project") or "").strip().lower()
+                ent_repo = ((ent.get("git") or {}).get("repo") or "").strip().lower()
+                if proj_low == ent_proj or proj_low == ent_repo:
+                    active.append(ent)
+                    if len(active) >= 3:
+                        break
         pending = list_pending_stubs(store_dir)
         if not active and not pending:
             return {}
@@ -2387,14 +2540,27 @@ def cmd_hook(args: argparse.Namespace) -> Dict[str, Any]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Engineering Log CLI — epistemic flight recorder & second-brain ledger."
+        description="Engineering Log CLI — epistemic flight recorder & second-brain ledger.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/eng_log.py context --cwd . --query \"oauth race\" --tech typescript\n"
+            "  python3 scripts/eng_log.py write --cwd . --dry-run --input payload.json\n"
+            "  python3 scripts/eng_log.py query --project my-app --exclude-superseded --format markdown\n"
+            "  python3 scripts/eng_log.py stats --format markdown"
+        ),
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_init = sub.add_parser("init", help="Idempotently initialize engineering log store.")
     p_init.add_argument("--dir", default=None, help="Override store root (default: $ENGINEERING_LOG_DIR or ~/engineering-log)")
 
-    p_ctx = sub.add_parser("context", help="Harvest workspace git/semantic context and find related entries.")
+    p_ctx = sub.add_parser(
+        "context",
+        help="Harvest workspace git/semantic context and find related entries.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Example:\n  python3 scripts/eng_log.py context --cwd . --query \"timeout\" --tech python,redis",
+    )
     p_ctx.add_argument("--dir", default=None, help="Override store root")
     p_ctx.add_argument("--cwd", default=".", help="Workspace directory to inspect")
     p_ctx.add_argument("--query", default="", help="Free-text topic or error keywords")
@@ -2402,23 +2568,47 @@ def build_parser() -> argparse.ArgumentParser:
     p_ctx.add_argument("--concepts", default="", help="Comma-separated concepts")
     p_ctx.add_argument("--top", type=int, default=5, help="Max related entries to return")
 
-    p_wr = sub.add_parser("write", help="Validate, scrub secrets, write Markdown entry, and append JSONL ledger.")
+    p_wr = sub.add_parser(
+        "write",
+        help="Validate, scrub secrets, write Markdown entry, and append JSONL ledger.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python3 scripts/eng_log.py write --cwd . --dry-run --input -\n"
+            "  python3 scripts/eng_log.py write --cwd . --input payload.json"
+        ),
+    )
     p_wr.add_argument("--dir", default=None, help="Override store root")
     p_wr.add_argument("--input", default="-", help="JSON payload file path or '-' for stdin")
+    p_wr.add_argument("--cwd", default=None, help="Workspace path for auto-harvesting git/code_semantics when omitted from JSON")
+    p_wr.add_argument("--no-auto-harvest", action="store_true", help="Disable deterministic git/code_semantics harvesting in write")
     p_wr.add_argument("--stream", default=None, help="Override ledger shard ID")
+    p_wr.add_argument("--allow-duplicate", action="store_true", help="Allow multiple entries for the same actor.conversation_id")
     p_wr.add_argument("--dry-run", action="store_true", help="Validate and preview without modifying disk")
+    p_wr.add_argument("--verbose", action="store_true", help="Include markdown_preview and ledger_record in --dry-run output")
 
-    p_app = sub.add_parser("append", help="Append an immutable addendum to an existing entry.")
+    p_app = sub.add_parser(
+        "append",
+        help="Append an immutable addendum to an existing entry.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Example:\n  python3 scripts/eng_log.py append --id 20261122-1906-1a11 --dry-run --input addendum.json",
+    )
     p_app.add_argument("--id", required=True, help="Target entry ID")
     p_app.add_argument("--dir", default=None, help="Override store root")
     p_app.add_argument("--input", default="-", help="Addendum JSON payload path or '-' for stdin")
     p_app.add_argument("--stream", default=None, help="Override ledger shard ID")
     p_app.add_argument("--dry-run", action="store_true", help="Validate and preview without modifying disk")
+    p_app.add_argument("--verbose", action="store_true", help="Include markdown_addition and ledger_record in --dry-run output")
 
     p_idx = sub.add_parser("rebuild-index", help="Deterministically recompile INDEX.md from all ledger shards.")
     p_idx.add_argument("--dir", default=None, help="Override store root")
 
-    p_q = sub.add_parser("query", help="Search and filter entries across sharded ledgers.")
+    p_q = sub.add_parser(
+        "query",
+        help="Search and filter entries across sharded ledgers.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Example:\n  python3 scripts/eng_log.py query --tech pihole --exclude-superseded --format markdown",
+    )
     p_q.add_argument("--dir", default=None, help="Override store root")
     p_q.add_argument("--project", default=None, help="Filter by project slug")
     p_q.add_argument("--tech", default=None, help="Filter by technology")
@@ -2433,7 +2623,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_q.add_argument("--limit", type=int, default=10, help="Max results")
     p_q.add_argument("--format", choices=("json", "markdown"), default="json", help="Output format")
 
-    p_st = sub.add_parser("stats", help="Compute cross-project metrics, telemetry, and graph insights.")
+    p_st = sub.add_parser(
+        "stats",
+        help="Compute cross-project metrics, telemetry, and graph insights.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Example:\n  python3 scripts/eng_log.py stats --since 2026-11-01 --format markdown",
+    )
     p_st.add_argument("--dir", default=None, help="Override store root")
     p_st.add_argument("--project", default=None, help="Filter by project slug")
     p_st.add_argument("--since", default=None, help="Filter created_at >= YYYY-MM-DD")
